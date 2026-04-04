@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 4: Materials & Textures — Three.js + AI Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- Navigation -->
+  <nav class="nav" aria-label="Course navigation">
+    <div class="nav-inner">
+      <span class="nav-title">Day 4: Materials & Textures</span>
+      <div class="nav-dots"></div>
+    </div>
+    <div id="progress-bar"></div>
+  </nav>
+
+  <main id="main">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="module" data-module="objectives">
+      <div class="module-inner animate-in">
+        <div class="day-nav">
+          <a href="03-geometries.html">← Day 3: Geometries</a>
+          <a href="05-lighting.html">Day 5: Lighting →</a>
+        </div>
+        <h2>🎯 Learning Objectives</h2>
+        <p class="difficulty-badge">🟢 Beginner · ~1 hour</p>
+        <ul class="objective-list">
+          <li>Understand the different material types in Three.js and when to use each</li>
+          <li>Apply colors, transparency, and properties to materials</li>
+          <li>Load and apply image textures to geometries</li>
+          <li>Use the TextureLoader to manage texture loading</li>
+          <li>Configure texture properties (repeat, wrap, rotation)</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="module" data-module="concepts">
+      <div class="module-inner animate-in">
+        <h2>📚 Core Concepts</h2>
+
+        <h3>Material Types: From Simple to Realistic</h3>
+        <p>If geometry is the skeleton of a 3D object, materials are its skin. They determine how surfaces look — whether they're shiny or matte, transparent or opaque, and how they interact with light in the scene.</p>
+
+        <div class="callout-accent">
+          <span class="callout-icon">💡</span>
+          <div class="callout-content">
+            <strong>The golden rule:</strong> Use the simplest material that achieves your visual goal. MeshBasicMaterial is roughly 10x faster than MeshStandardMaterial because it skips all lighting calculations.
+          </div>
+        </div>
+
+        <p><strong>MeshBasicMaterial</strong> — Flat color, ignores lighting entirely. Like construction paper: flat, uniform, no depth. Perfect for debugging, wireframes, or flat-shaded aesthetics.</p>
+
+        <p><strong>MeshLambertMaterial</strong> — Responds to light with diffuse (matte) reflection. Looks like chalk, unpolished wood, or fabric. No shiny spots.</p>
+
+        <p><strong>MeshPhongMaterial</strong> — Adds specular highlights (shiny spots). Good for plastics, polished surfaces. The <code>shininess</code> property controls how focused the highlights are.</p>
+
+        <p><strong>MeshStandardMaterial</strong> — Physically-Based Rendering (PBR), the industry standard. Uses intuitive <code>roughness</code> (0=mirror, 1=matte) and <code>metalness</code> (0=plastic, 1=gold) properties.</p>
+
+        <p><strong>MeshPhysicalMaterial</strong> — Extends Standard with clearcoat (car paint), sheen (fabric), and transmission (glass). Most realistic but most expensive.</p>
+
+        <h3>Textures: Wrapping Images on Geometry</h3>
+        <p>A texture is an image mapped onto a 3D surface using <span class="term" data-definition="2D coordinates (values 0-1) that map texture pixels to geometry vertices — like unwrapping a box into a flat pattern">UV mapping</span>. Instead of a flat red cube, you can wrap a brick photograph onto it for a realistic look.</p>
+
+        <p>You can layer multiple texture types on one material:</p>
+        <ul>
+          <li><strong>map</strong> — Base color (albedo/diffuse)</li>
+          <li><strong>normalMap</strong> — Fakes surface bumps using RGB data</li>
+          <li><strong>roughnessMap</strong> — Varies roughness across the surface</li>
+          <li><strong>metalnessMap</strong> — Varies metallic properties</li>
+          <li><strong>aoMap</strong> — Ambient occlusion (darkens crevices)</li>
+        </ul>
+
+        <h3>Loading Textures</h3>
+        <p>Three.js loads textures asynchronously with <code>TextureLoader</code>. You can use the texture immediately — Three.js renders blank until the image loads, then updates automatically.</p>
+
+        <h3>Texture Properties</h3>
+        <p>Once loaded, textures have properties controlling how they're applied:</p>
+        <ul>
+          <li><strong>repeat</strong> — How many times to tile (e.g., 4×4 grid)</li>
+          <li><strong>wrapS / wrapT</strong> — Edge behavior: RepeatWrapping, MirroredRepeatWrapping, ClampToEdgeWrapping</li>
+          <li><strong>rotation</strong> — Rotate the texture (radians)</li>
+          <li><strong>offset</strong> — Shift position (animate for scrolling effects!)</li>
+        </ul>
+
+        <div class="callout-info">
+          <span class="callout-icon">🎯</span>
+          <div class="callout-content">
+            <strong>Key Insight:</strong> Materials + Textures = Visual realism. Geometry defines shape, materials define light interaction, textures add visual detail. Together, they transform simple shapes into convincing objects.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Key Terminology (Flashcards) -->
+    <section class="module" data-module="terminology">
+      <div class="module-inner animate-in">
+        <h2>🔑 Key Terminology</h2>
+        <p>Click each card to reveal the definition. Use arrow keys to navigate.</p>
+
+        <div class="flashcard-deck" id="terms-deck">
+          <div class="flashcard" id="fc-diffuse">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Diffuse</strong></div>
+              <div class="flashcard-back">Light scattered equally in all directions — creates a matte appearance. Examples: chalk, unpolished wood, fabric.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-specular">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Specular</strong></div>
+              <div class="flashcard-back">Light reflected in a mirror-like direction — creates shiny spots. Examples: plastic, polished metal, water surfaces.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-pbr">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>PBR (Physically-Based Rendering)</strong></div>
+              <div class="flashcard-back">Rendering approach that simulates realistic light behavior using roughness and metalness properties. Used in MeshStandardMaterial — the industry standard for 3D.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-uv">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>UV Mapping</strong></div>
+              <div class="flashcard-back">2D coordinates (0-1 range) that map texture pixels to geometry vertices. Like unwrapping a 3D box into a flat pattern for painting.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-albedo">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Albedo</strong></div>
+              <div class="flashcard-back">The base color of a surface without any lighting or shadows applied — the "true" color you'd see in perfectly neutral light.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-normal">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Normal Map</strong></div>
+              <div class="flashcard-back">An RGB image encoding surface normals to fake bumps and detail without adding geometry. Makes a flat wall look like rough bricks.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-metalness">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Metalness</strong></div>
+              <div class="flashcard-back">How metallic a surface appears. 0 = non-metal (rubber, plastic), 0.5 = brushed steel, 1.0 = fully metallic (gold, chrome).</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-roughness">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Roughness</strong></div>
+              <div class="flashcard-back">How rough or smooth a surface is. 0 = perfect mirror, 0.5 = satin finish, 1.0 = sandpaper. Controls how focused reflections are.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
+            <span class="flashcard-counter" style="font-size:var(--text-sm);color:var(--text-muted);"></span>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <button class="fc-incorrect" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);cursor:pointer;">✗ Still learning</button>
+            <button class="fc-correct" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);cursor:pointer;">✓ Got it</button>
+          </div>
+          <div class="flashcard-progress" style="text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Code Examples -->
+    <section class="module" data-module="code">
+      <div class="module-inner animate-in">
+        <h2>💻 Code Examples</h2>
+
+        <h3>Example 1: Material Comparison</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">material-comparison.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// Four identical spheres with different materials</span>
+<span class="code-keyword">const</span> geometry = <span class="code-keyword">new</span> <span class="code-function">THREE.SphereGeometry</span>(<span class="code-number">1</span>, <span class="code-number">32</span>, <span class="code-number">32</span>);
+
+<span class="code-keyword">const</span> materials = [
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshBasicMaterial</span>({ <span class="code-property">color</span>: <span class="code-number">0xff0000</span> }),
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshLambertMaterial</span>({ <span class="code-property">color</span>: <span class="code-number">0xff0000</span> }),
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshPhongMaterial</span>({ <span class="code-property">color</span>: <span class="code-number">0xff0000</span>, <span class="code-property">shininess</span>: <span class="code-number">100</span> }),
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshStandardMaterial</span>({
+        <span class="code-property">color</span>: <span class="code-number">0xff0000</span>,
+        <span class="code-property">roughness</span>: <span class="code-number">0.5</span>,
+        <span class="code-property">metalness</span>: <span class="code-number">0</span>
+    })
+];
+
+materials.<span class="code-function">forEach</span>((mat, i) => {
+    <span class="code-keyword">const</span> mesh = <span class="code-keyword">new</span> THREE.<span class="code-function">Mesh</span>(geometry, mat);
+    mesh.position.x = (i - <span class="code-number">1.5</span>) * <span class="code-number">2.5</span>;
+    scene.<span class="code-function">add</span>(mesh);
+});</code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> Four identical spheres, each with a different material, reveal how material choice affects appearance. BasicMaterial ignores light. Lambert shows soft gradients. Phong adds specular highlights. Standard uses PBR for the most realistic look.
+          </div>
+        </div>
+
+        <h3>Example 2: Loading & Applying Textures</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">textured-cube.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// Load and apply a UV test texture</span>
+<span class="code-keyword">const</span> textureLoader = <span class="code-keyword">new</span> THREE.<span class="code-function">TextureLoader</span>();
+<span class="code-keyword">const</span> texture = textureLoader.<span class="code-function">load</span>(
+    <span class="code-string">'https://threejs.org/examples/textures/uv_grid_opengl.jpg'</span>,
+    () => { console.<span class="code-function">log</span>(<span class="code-string">'Texture loaded!'</span>); },
+    <span class="code-keyword">undefined</span>,
+    (err) => { console.<span class="code-function">error</span>(<span class="code-string">'Error:'</span>, err); }
+);
+
+<span class="code-comment">// Apply texture as the base color map</span>
+<span class="code-keyword">const</span> geometry = <span class="code-keyword">new</span> THREE.<span class="code-function">BoxGeometry</span>(<span class="code-number">2</span>, <span class="code-number">2</span>, <span class="code-number">2</span>);
+<span class="code-keyword">const</span> material = <span class="code-keyword">new</span> THREE.<span class="code-function">MeshBasicMaterial</span>({ <span class="code-property">map</span>: texture });
+<span class="code-keyword">const</span> cube = <span class="code-keyword">new</span> THREE.<span class="code-function">Mesh</span>(geometry, material);</code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> TextureLoader fetches an image asynchronously and applies it as the <code>map</code> property. The UV grid texture shows exactly how the image wraps around each face of the cube.
+          </div>
+        </div>
+
+        <h3>Example 3: Texture Transformation</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">texture-transforms.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// Repeating texture — tiles 4×4 across the surface</span>
+<span class="code-keyword">const</span> tiledTexture = textureLoader.<span class="code-function">load</span>(<span class="code-string">'brick.jpg'</span>);
+tiledTexture.wrapS = THREE.RepeatWrapping;
+tiledTexture.wrapT = THREE.RepeatWrapping;
+tiledTexture.repeat.<span class="code-function">set</span>(<span class="code-number">4</span>, <span class="code-number">4</span>);
+
+<span class="code-comment">// Rotated texture — spin 45° around center</span>
+<span class="code-keyword">const</span> rotatedTexture = textureLoader.<span class="code-function">load</span>(<span class="code-string">'wood.jpg'</span>);
+rotatedTexture.rotation = Math.PI / <span class="code-number">4</span>;
+rotatedTexture.center.<span class="code-function">set</span>(<span class="code-number">0.5</span>, <span class="code-number">0.5</span>);
+
+<span class="code-comment">// Animate offset for scrolling water effect</span>
+<span class="code-comment">// In render loop: scrollTexture.offset.x += 0.001;</span></code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> Texture properties control mapping. <code>repeat</code> creates tiling (great for floors/walls). <code>rotation</code> spins the texture. Animating <code>offset</code> creates scrolling effects like flowing water.
+          </div>
+          <div class="try-it">
+            💡 <strong>Try it:</strong> Load a texture and animate its <code>offset</code> in the render loop for a scrolling water effect. Then try animating <code>rotation</code> for a spinning vortex!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Code ↔ English Translation -->
+    <section class="module" data-module="translation">
+      <div class="module-inner animate-in">
+        <h2>🔄 Code ↔ English</h2>
+        <p>Reading code like English — what each line actually means:</p>
+
+        <div class="translation-block">
+          <div class="translation-code">
+            <pre><code><span class="code-keyword">const</span> material = <span class="code-keyword">new</span> THREE.MeshStandardMaterial({
+  <span class="code-property">color</span>: <span class="code-number">0xff0000</span>,
+  <span class="code-property">roughness</span>: <span class="code-number">0.3</span>,
+  <span class="code-property">metalness</span>: <span class="code-number">0.8</span>,
+  <span class="code-property">map</span>: texture
+});
+
+texture.wrapS = THREE.RepeatWrapping;
+texture.repeat.<span class="code-function">set</span>(<span class="code-number">4</span>, <span class="code-number">4</span>);</code></pre>
+          </div>
+          <div class="translation-english">
+            <div class="translation-line">Create a realistic PBR material with:</div>
+            <div class="translation-line">• Base color: red</div>
+            <div class="translation-line">• Surface is mostly smooth (30% rough)</div>
+            <div class="translation-line">• Highly metallic (80% metal, like brushed steel)</div>
+            <div class="translation-line">• Use this image as the surface texture</div>
+            <div class="translation-line">&nbsp;</div>
+            <div class="translation-line">Allow the texture to tile horizontally</div>
+            <div class="translation-line">Repeat the texture image 4×4 across the surface</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Quiz -->
+    <section class="module" data-module="quiz">
+      <div class="module-inner animate-in">
+        <h2>🧪 Knowledge Check</h2>
+
+        <div class="quiz-card" id="quiz-1" data-correct="0"
+             data-explanation-0="Correct! MeshBasicMaterial ignores lighting entirely — it just shows the flat color. All other material types perform lighting calculations."
+             data-explanation-1="MeshLambertMaterial responds to light with diffuse (matte) shading."
+             data-explanation-2="MeshPhongMaterial adds specular highlights — it definitely reacts to lights."
+             data-explanation-3="MeshStandardMaterial uses PBR, which is entirely based on light interaction.">
+          <p class="quiz-question"><strong>Q1:</strong> Which material type does NOT react to lights in the scene?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">MeshBasicMaterial</button>
+            <button class="quiz-option">MeshLambertMaterial</button>
+            <button class="quiz-option">MeshPhongMaterial</button>
+            <button class="quiz-option">MeshStandardMaterial</button>
+          </div>
+        </div>
+
+        <div class="quiz-card" id="quiz-2" data-correct="2"
+             data-explanation-0="Shininess is a Phong-specific property, not PBR."
+             data-explanation-1="Reflectivity is used in some materials but isn't the core PBR pair."
+             data-explanation-2="Correct! PBR uses roughness (0=mirror to 1=matte) and metalness (0=plastic to 1=gold) — intuitive, physically-based properties."
+             data-explanation-3="Diffuse and specular are Phong-model concepts, not PBR properties.">
+          <p class="quiz-question"><strong>Q2:</strong> What two properties define PBR materials in MeshStandardMaterial?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">shininess and opacity</button>
+            <button class="quiz-option">reflectivity and emissive</button>
+            <button class="quiz-option">roughness and metalness</button>
+            <button class="quiz-option">diffuse and specular</button>
+          </div>
+        </div>
+
+        <div class="quiz-card" id="quiz-3" data-correct="1"
+             data-explanation-0="The 'map' property applies the base color texture, not bumps."
+             data-explanation-1="Correct! Normal maps use RGB data to encode surface normals, faking bumps and detail without adding extra geometry. Very efficient!"
+             data-explanation-2="Roughness maps control surface smoothness, not bump illusions."
+             data-explanation-3="AO maps darken crevices for depth, but don't create bump detail.">
+          <p class="quiz-question"><strong>Q3:</strong> Which texture type fakes surface bumps without adding geometry?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">map (color texture)</button>
+            <button class="quiz-option">normalMap</button>
+            <button class="quiz-option">roughnessMap</button>
+            <button class="quiz-option">aoMap</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Exercises -->
+    <section class="module" data-module="exercises">
+      <div class="module-inner animate-in">
+        <h2>✏️ Hands-On Exercises</h2>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 1: Material Showcase</h3>
+            <span class="time-estimate">⏱️ ~20 min</span>
+            <span class="difficulty">🟢 Beginner</span>
+          </div>
+          <p><strong>Goal:</strong> Compare all five material types visually</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Create 5 spheres</strong><p>One for each material: Basic, Lambert, Phong, Standard, Physical</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Add lighting</strong><p>Add a DirectionalLight — only Basic should look the same</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Move the light</strong><p>Observe which materials respond to the changed light position</p></div>
+            </div>
+          </div>
+          <div class="stretch-goal">🚀 <strong>Stretch:</strong> Add a slider to control metalness and roughness on StandardMaterial in real-time.</div>
+        </div>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 2: Textured Cube</h3>
+            <span class="time-estimate">⏱️ ~20 min</span>
+            <span class="difficulty">🟢 Beginner</span>
+          </div>
+          <p><strong>Goal:</strong> Load a texture, make it repeat, and animate a scrolling effect</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Load a texture</strong><p>Use <a href="https://polyhaven.com/textures" target="_blank">polyhaven.com</a> or the Three.js UV grid</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Set up repeating</strong><p>Set wrapS/wrapT to RepeatWrapping, then repeat.set(2, 2)</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Animate offset</strong><p>Add <code>texture.offset.x += 0.001</code> in the render loop</p></div>
+            </div>
+          </div>
+          <div class="exercise-hints">
+            <details>
+              <summary>💡 Hint: Texture not repeating?</summary>
+              <p>You must set wrapS and wrapT to THREE.RepeatWrapping <em>before</em> setting repeat values.</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 3: PBR Material Creation</h3>
+            <span class="time-estimate">⏱️ ~25 min</span>
+            <span class="difficulty">🟡 Intermediate</span>
+          </div>
+          <p><strong>Goal:</strong> Create three objects with distinctly different PBR surfaces</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Matte plastic</strong><p>roughness=0.9, metalness=0, bright color</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Shiny metal</strong><p>roughness=0.1, metalness=1.0, gold or silver color</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Rough stone</strong><p>roughness=0.8, metalness=0, gray with a texture map</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Resources -->
+    <section class="module" data-module="resources">
+      <div class="module-inner animate-in">
+        <h2>📖 Curated Resources</h2>
+        <div class="resource-cards">
+          <a class="resource-card" href="https://threejs.org/docs/#api/en/materials/Material" target="_blank">
+            <span class="resource-type">📄 DOCUMENTATION</span>
+            <span class="resource-title">Materials Overview — Three.js Docs</span>
+            <span class="resource-meta">Complete reference for all material types and their properties</span>
+          </a>
+          <a class="resource-card" href="https://threejs.org/manual/#en/textures" target="_blank">
+            <span class="resource-type">📄 TUTORIAL</span>
+            <span class="resource-title">Textures in Three.js — Three.js Manual</span>
+            <span class="resource-meta">Deep dive into texture loading, configuration, and optimization</span>
+          </a>
+          <a class="resource-card" href="https://polyhaven.com/textures" target="_blank">
+            <span class="resource-type">🎨 RESOURCE</span>
+            <span class="resource-title">Free PBR Textures — Poly Haven</span>
+            <span class="resource-meta">High-quality CC0 textures for realistic materials</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 9: Reflection -->
+    <section class="module" data-module="reflection">
+      <div class="module-inner animate-in">
+        <h2>🤔 Reflection</h2>
+
+        <div class="reflection-card" data-reflection="day4-q1">
+          <p class="reflection-prompt">Why does MeshBasicMaterial not react to lights? What does this tell you about the performance/quality tradeoff in material choice?</p>
+          <textarea placeholder="Write your thoughts here..."></textarea>
+          <button class="save-reflection">Save</button>
+        </div>
+
+        <div class="reflection-card" data-reflection="day4-q2">
+          <p class="reflection-prompt">What material type will you use most for your AI portfolio project, and why?</p>
+          <textarea placeholder="Write your thoughts here..."></textarea>
+          <button class="save-reflection">Save</button>
+        </div>
+
+        <h3>✅ Before Moving On</h3>
+        <div class="checklist">
+          <label><input type="checkbox"> I can explain the difference between Basic, Lambert, Phong, and Standard materials</label>
+          <label><input type="checkbox"> I can load and apply textures using TextureLoader</label>
+          <label><input type="checkbox"> I can configure texture repeat, wrap, and rotation</label>
+          <label><input type="checkbox"> I understand what roughness and metalness control in PBR</label>
+          <label><input type="checkbox"> I know when to use each material type</label>
+        </div>
+
+        <div class="day-nav bottom">
+          <a href="03-geometries.html">← Day 3: Geometries</a>
+          <a href="05-lighting.html">Day 5: Lighting →</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../main.js"></script>
+</body>
+</html>

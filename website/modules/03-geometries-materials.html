@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 3: Exploring Three.js Geometries & Materials</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <section id="main-content" class="day-content" data-module="03-geometries-materials" data-day="3">
+
+    <!-- Navigation -->
+    <nav class="day-nav" style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) 0;">
+      <a href="02-first-scene.html">← Previous</a>
+      <a href="../index.html">Course Home</a>
+      <a href="04-materials-textures.html">Next →</a>
+    </nav>
+
+    <div style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) var(--space-16);">
+
+      <h1 style="font-family:var(--font-heading);font-size:var(--text-3xl);margin-bottom:var(--space-2);">Day 3: Exploring Three.js Geometries & Materials</h1>
+      <div class="difficulty-badge" style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:var(--text-sm);background:var(--color-accent-light);margin-bottom:var(--space-8);">🟢 Beginner · ~1 hour</div>
+
+      <!-- 1. Learning Objectives -->
+      <div class="section objectives" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🎯 Learning Objectives</h2>
+        <ul style="line-height:1.8;">
+          <li>Create and customize at least 5 different built-in Three.js geometries</li>
+          <li>Understand geometry parameters and how they affect the shape</li>
+          <li>Combine multiple geometries into a complex scene</li>
+          <li>Position, scale, and rotate objects to create compositions</li>
+          <li>Use Groups to build hierarchical structures in the scene graph</li>
+        </ul>
+      </div>
+
+      <!-- 2. Core Concepts -->
+      <div class="section concepts" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📚 Core Concepts</h2>
+
+        <h3>What Is Geometry?</h3>
+        <p>Think of geometry like a <strong>wireframe skeleton</strong>. Imagine building a character for a video game — you start with a frame of bones (the geometry), then you wrap it in skin and clothes (the material). The geometry defines the shape: a sphere, a box, a pyramid, or anything custom.</p>
+        <p>In Three.js, geometry is made up of <strong>vertices</strong> (points in 3D space) and <strong>faces</strong> (triangles connecting those points). Every 3D shape, no matter how complex, is built from triangles. Why triangles? Because three points always define a flat plane, making them the most reliable primitive for graphics rendering.</p>
+
+        <h3>Built-in Geometries</h3>
+        <p>Three.js provides 13 primitive geometries. Here are the most commonly used:</p>
+        
+        <!-- Geometry showcase grid -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-3);margin:var(--space-4) 0;">
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">📦</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">BoxGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Cubes & boxes</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">⚽</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">SphereGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Perfect spheres</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">🥫</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">CylinderGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Cylinders & cones</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">🍩</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">TorusGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Donut shapes</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">🔺</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">ConeGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Pyramids & cones</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-3);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:24px;margin-bottom:var(--space-2);">💎</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">IcosahedronGeometry</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">20-sided shape</div>
+          </div>
+        </div>
+
+        <h3>Understanding Segments and Detail</h3>
+        <p>Segments determine how many subdivisions a shape has. More segments = smoother curves but more polygons = slower performance.</p>
+
+        <!-- Comparison boxes -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin:var(--space-4) 0;">
+          <div style="background:var(--bg-warm);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <div style="font-weight:700;margin-bottom:var(--space-2);color:var(--accent-green);">✓ Low Poly (few segments)</div>
+            <ul style="font-size:var(--text-sm);margin:0;padding-left:var(--space-4);line-height:1.6;">
+              <li>Faster to render</li>
+              <li>Lower memory usage</li>
+              <li>Stylized, geometric aesthetic</li>
+              <li>Visible facets/edges</li>
+            </ul>
+          </div>
+          <div style="background:var(--bg-warm);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <div style="font-weight:700;margin-bottom:var(--space-2);color:var(--accent-blue);">⚡ High Poly (many segments)</div>
+            <ul style="font-size:var(--text-sm);margin:0;padding-left:var(--space-4);line-height:1.6;">
+              <li>Slower to render</li>
+              <li>Higher memory usage</li>
+              <li>Smooth, realistic appearance</li>
+              <li>Curved surfaces look perfect</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Positioning, Scaling, and Rotating</h3>
+        <p>Every Object3D (including meshes) has three transform properties:</p>
+
+        <!-- Transform properties -->
+        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-4);margin:var(--space-4) 0;border:1px solid var(--border);">
+          <div style="display:grid;gap:var(--space-3);">
+            <div>
+              <div style="font-family:var(--font-code);font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">mesh.position</div>
+              <div style="font-size:var(--text-sm);color:var(--text-secondary);">Where the object is in 3D space</div>
+              <code style="display:block;margin-top:var(--space-1);font-size:var(--text-sm);background:var(--bg-warm);padding:var(--space-2);border-radius:4px;">mesh.position.set(2, 1, -5); // x, y, z</code>
+            </div>
+            <div>
+              <div style="font-family:var(--font-code);font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">mesh.rotation</div>
+              <div style="font-size:var(--text-sm);color:var(--text-secondary);">Orientation around each axis (in radians)</div>
+              <code style="display:block;margin-top:var(--space-1);font-size:var(--text-sm);background:var(--bg-warm);padding:var(--space-2);border-radius:4px;">mesh.rotation.y = Math.PI / 4; // 45°</code>
+            </div>
+            <div>
+              <div style="font-family:var(--font-code);font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">mesh.scale</div>
+              <div style="font-size:var(--text-sm);color:var(--text-secondary);">Size multiplier (1 = normal, 2 = double, 0.5 = half)</div>
+              <code style="display:block;margin-top:var(--space-1);font-size:var(--text-sm);background:var(--bg-warm);padding:var(--space-2);border-radius:4px;">mesh.scale.set(2, 1, 1); // 2x width</code>
+            </div>
+          </div>
+        </div>
+
+        <h3>Groups: Organizing Your Scene</h3>
+        <p>A <code>THREE.Group</code> is an empty container that holds multiple meshes. When you transform the group, all children transform with it. This is essential for building complex objects from simple primitives — a robot from boxes, a snowman from spheres, a house from rectangles.</p>
+
+        <!-- Callout -->
+        <div class="callout-box" style="background:var(--color-accent-light);border-left:4px solid var(--color-accent);border-radius:var(--radius-sm);padding:var(--space-4) var(--space-6);margin:var(--space-6) 0;">
+          <strong>💡 Key Insight:</strong> Geometry defines the shape, but transforms (position, rotation, scale) define where and how that shape exists in your 3D world. Groups let you treat multiple shapes as a single unit.
+        </div>
+      </div>
+
+      <!-- 3. Key Terminology -->
+      <div class="section terminology" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🔑 Key Terminology</h2>
+        <div class="term-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);">
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Vertex</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">A single point in 3D space (x, y, z). Example: corner of a cube.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Face</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Triangle formed by 3 vertices. Basic unit of all 3D surfaces.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Segments</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Number of subdivisions in a geometry. Higher = smoother curves.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">BufferGeometry</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Efficient geometry format using typed arrays. Modern standard in Three.js.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Polygon Count</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Total number of triangular faces. Lower = better performance.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Radians</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Unit for angles. <code>Math.PI</code> = 180°, <code>Math.PI * 2</code> = 360°.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Group</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Empty container for organizing multiple meshes. <code>new THREE.Group()</code></dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Code Examples -->
+      <div class="section code-examples" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">💻 Code Examples</h2>
+
+        <h3>Example 1: Geometry Showcase</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">geometry-showcase.js</span>
+            <span style="color:#96f2d7;">Working Example</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code>import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 10;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+<span style="color:#6c7086;">// Create different geometries</span>
+const geometries = [
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.SphereGeometry(0.7, 32, 32),
+    new THREE.CylinderGeometry(0.5, 0.5, 1, 32),
+    new THREE.TorusGeometry(0.5, 0.2, 16, 100),
+    new THREE.ConeGeometry(0.5, 1, 32),
+    new THREE.IcosahedronGeometry(0.7, 0)
+];
+
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+
+<span style="color:#6c7086;">// Position in a 2×3 grid</span>
+geometries.forEach((geo, i) => {
+    const mesh = new THREE.Mesh(geo, material);
+    const x = (i % 3) * 2.5 - 2.5;        <span style="color:#6c7086;">// -2.5, 0, 2.5</span>
+    const y = Math.floor(i / 3) * 2 - 1;   <span style="color:#6c7086;">// 1, -1</span>
+    mesh.position.set(x, y, 0);
+    scene.add(mesh);
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    scene.children.forEach(mesh => {
+        if (mesh instanceof THREE.Mesh) {
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.01;
+        }
+    });
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> Six geometries arranged in a 2×3 grid. Wireframe material shows the structure. The modulo operator (<code>%</code>) calculates column position, <code>Math.floor(i / 3)</code> calculates row.
+          </div>
+        </div>
+
+        <h3>Example 2: Customizing Geometry Parameters</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">sphere-detail-levels.js</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code><span style="color:#6c7086;">// Different sphere detail levels</span>
+const lowPoly = new THREE.SphereGeometry(1, 8, 6);     <span style="color:#6c7086;">// Blocky</span>
+const medPoly = new THREE.SphereGeometry(1, 16, 12);   <span style="color:#6c7086;">// Faceted</span>
+const highPoly = new THREE.SphereGeometry(1, 32, 32);  <span style="color:#6c7086;">// Smooth</span>
+
+<span style="color:#6c7086;">// Cone variations — changing sides changes the shape!</span>
+const cone = new THREE.ConeGeometry(1, 2, 32);    <span style="color:#6c7086;">// Standard</span>
+const pyramid = new THREE.ConeGeometry(1, 2, 4);  <span style="color:#6c7086;">// 4-sided = pyramid!</span>
+const triPrism = new THREE.ConeGeometry(1, 2, 3); <span style="color:#6c7086;">// 3-sided</span>
+
+<span style="color:#6c7086;">// Partial geometries — cut shapes with angle parameters</span>
+const halfSphere = new THREE.SphereGeometry(
+    1,            <span style="color:#6c7086;">// radius</span>
+    32, 32,       <span style="color:#6c7086;">// segments</span>
+    0,            <span style="color:#6c7086;">// phiStart (horizontal start)</span>
+    Math.PI,      <span style="color:#6c7086;">// phiLength — half circle</span>
+    0,            <span style="color:#6c7086;">// thetaStart (vertical start)</span>
+    Math.PI / 2   <span style="color:#6c7086;">// thetaLength — quarter arc</span>
+);</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> Parameters dramatically change appearance. Fewer segments = stylized look. You can create partial geometries (half-spheres, pie slices) with angle parameters. A 4-sided cone is actually a pyramid!
+          </div>
+        </div>
+
+        <h3>Example 3: Building with Groups</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">robot-head.js</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code><span style="color:#6c7086;">// Create a robot head from primitives</span>
+const headGroup = new THREE.Group();
+
+<span style="color:#6c7086;">// Main head (box)</span>
+const headGeo = new THREE.BoxGeometry(2, 2, 2);
+const headMat = new THREE.MeshBasicMaterial({ color: 0x888888 });
+const head = new THREE.Mesh(headGeo, headMat);
+headGroup.add(head);
+
+<span style="color:#6c7086;">// Eyes (spheres)</span>
+const eyeGeo = new THREE.SphereGeometry(0.2, 16, 16);
+const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+
+const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+leftEye.position.set(-0.5, 0.3, 1.01);  <span style="color:#6c7086;">// Left, slightly forward</span>
+headGroup.add(leftEye);
+
+const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+rightEye.position.set(0.5, 0.3, 1.01);   <span style="color:#6c7086;">// Right, slightly forward</span>
+headGroup.add(rightEye);
+
+<span style="color:#6c7086;">// Antenna (cylinder)</span>
+const antennaGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+const antennaMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const antenna = new THREE.Mesh(antennaGeo, antennaMat);
+antenna.position.set(0, 1.5, 0);  <span style="color:#6c7086;">// On top</span>
+headGroup.add(antenna);
+
+scene.add(headGroup);
+
+<span style="color:#6c7086;">// Rotating the group rotates ALL parts together!</span>
+function animate() {
+    requestAnimationFrame(animate);
+    headGroup.rotation.y += 0.01;
+    renderer.render(scene, camera);
+}</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> We use a <code>Group</code> to organize multiple meshes. When we rotate the group, all children (head, eyes, antenna) rotate together while maintaining their relative positions. This is the power of the scene graph!
+          </div>
+          <div style="padding:var(--space-3) var(--space-4);background:#fef9c3;font-size:var(--text-sm);">
+            💡 <strong>Try it:</strong> Create a simple scene using primitives — a house (boxes for walls, cone for roof) or a tree (cone + cylinder).
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Exercises -->
+      <div class="section exercises" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">✏️ Hands-On Exercises</h2>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 1: Geometry Parameter Explorer</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~15 min</span>
+          </div>
+          <p><strong>Goal:</strong> Understand how parameters affect geometry appearance</p>
+          <ol style="line-height:1.8;">
+            <li>Create spheres with different segment counts: 4, 8, 16, 32</li>
+            <li>Position them side-by-side using <code>position.set()</code></li>
+            <li>Use wireframe material to see the structure</li>
+            <li>Observe how smoothness changes with more segments</li>
+            <li>Which segment count looks "good enough" to you?</li>
+          </ol>
+          <div style="margin-top:var(--space-4);padding:var(--space-3);background:#f0fdf4;border-radius:var(--radius-sm);font-size:var(--text-sm);">
+            🚀 <strong>Stretch:</strong> Create partial geometries (half-sphere, quarter-torus) using angle parameters.
+          </div>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 2: Create a Solar System</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~25 min</span>
+          </div>
+          <p><strong>Goal:</strong> Use groups and transformations for orbiting objects</p>
+          <ol style="line-height:1.8;">
+            <li>Create a central "sun" (large yellow sphere, radius 1.5)</li>
+            <li>Create an "earth" (smaller blue sphere, radius 0.5)</li>
+            <li>Put earth in a <code>THREE.Group</code> called <code>earthOrbit</code></li>
+            <li>Position earth at x=5 within its group</li>
+            <li>Rotate the group (not the earth) to make it orbit</li>
+            <li>Add a "moon" (tiny grey sphere, radius 0.15) as child of earth</li>
+            <li>Position moon at x=1 relative to earth</li>
+            <li>Make moon orbit by rotating earth</li>
+          </ol>
+          <details style="margin-top:var(--space-3);">
+            <summary style="cursor:pointer;font-size:var(--text-sm);color:var(--color-accent);font-weight:500;">Need a hint?</summary>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:var(--space-2);">Use <code>THREE.Group()</code> for the orbit. Add earth to the group, then add the group to the scene. Rotating the group makes earth orbit the origin.</p>
+          </details>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 3: Low-Poly Scene</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~20 min</span>
+          </div>
+          <p><strong>Goal:</strong> Create a stylized scene using low-poly geometries</p>
+          <ol style="line-height:1.8;">
+            <li>Use low segment counts (4–8) for all geometries</li>
+            <li>Create at least 5 objects (trees, mountains, buildings, clouds)</li>
+            <li>Use different colors for each object</li>
+            <li>Arrange them into a coherent scene</li>
+            <li>Try both wireframe and solid — which looks better?</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 6. Resources -->
+      <div class="section resources" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📖 Curated Resources</h2>
+        <div class="resource-cards" style="display:grid;gap:var(--space-3);">
+          <a class="resource-card" href="https://threejs.org/manual/#en/primitives" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Article</span>
+            <span style="font-weight:600;">Primitives — Three.js Manual</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Comprehensive guide to all built-in geometries with live interactive examples</span>
+          </a>
+          <a class="resource-card" href="https://threejs.org/docs/#api/en/core/BufferGeometry" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Docs</span>
+            <span style="font-weight:600;">BufferGeometry — Three.js Docs</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Understanding the modern geometry format that powers all Three.js shapes</span>
+          </a>
+          <a class="resource-card" href="https://www.youtube.com/watch?v=Q7AOvWpIVHU" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">🎥 Video · ⚠️ Verified · 12 min</span>
+            <span style="font-weight:600;">3D Portfolio Website — Fireship</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">See how geometries and compositions come together in a real portfolio</span>
+          </a>
+          <a class="resource-card" href="https://threejs.org/docs/#api/en/core/BufferGeometry" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Deep Dive (optional)</span>
+            <span style="font-weight:600;">Custom BufferGeometry — Three.js Docs</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Learn to create completely custom shapes from scratch</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. Reflection -->
+      <div class="section reflection" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🤔 Reflection Questions</h2>
+        <div style="display:grid;gap:var(--space-4);">
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">What's the tradeoff between low-poly and high-poly geometries?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: Performance vs visual quality — when would you choose each?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">How would you create a snowman using only primitive geometries?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: Which shapes, what sizes, how to position them</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">Why are all 3D shapes made of triangles instead of squares?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: What's mathematically special about three points in space?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="section quiz" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🧠 Quick Quiz</h2>
+        <div class="quiz-card" data-quiz-id="d3-q1" style="background:var(--bg-card);padding:var(--space-6);border-radius:var(--radius-md);border:1px solid var(--border);margin:var(--space-4) 0;">
+          <p style="font-weight:600;margin-bottom:var(--space-4);">What are the basic building blocks of all 3D geometry in Three.js?</p>
+          <div style="display:grid;gap:var(--space-2);">
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">a) Pixels and colors</button>
+            <button onclick="checkQuiz(this,'correct')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">b) Vertices (points) and faces (triangles)</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">c) Lines and curves</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">d) Squares and rectangles</button>
+          </div>
+          <div class="quiz-feedback" style="display:none;margin-top:var(--space-4);padding:var(--space-3);border-radius:var(--radius-sm);font-size:var(--text-sm);"></div>
+        </div>
+      </div>
+
+      <!-- 8. Next Steps -->
+      <div class="section next-steps" style="margin-bottom:var(--space-8);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">➡️ Next Steps</h2>
+        <p><strong>Tomorrow:</strong> <a href="04-materials-textures.html">Day 4: Materials & Textures</a> — Learn how to make your geometries look realistic with materials, lighting, and textures.</p>
+        <p>Now that you can create any shape, tomorrow we'll make them beautiful. You'll learn about different material types, how lighting interacts with surfaces, and how to apply image textures.</p>
+        <div class="checklist" style="margin-top:var(--space-4);">
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can create at least 5 different geometries from memory</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can adjust geometry parameters to change appearance</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can position, rotate, and scale objects</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can use Groups to create hierarchical structures</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can explain what vertices and faces are</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="day-nav bottom" style="max-width:var(--content-width);margin:0 auto;padding:0 var(--space-4) var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-4);">
+      <a href="02-first-scene.html">← Previous</a>
+      <a href="../index.html">Course Home</a>
+      <a href="04-materials-textures.html">Next →</a>
+    </nav>
+
+  </section>
+
+  <script>
+    function checkQuiz(btn, result) {
+      const card = btn.closest('.quiz-card');
+      const feedback = card.querySelector('.quiz-feedback');
+      const buttons = card.querySelectorAll('button');
+      buttons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+      btn.style.opacity = '1';
+      if (result === 'correct') {
+        btn.style.background = '#d4edda';
+        btn.style.borderColor = '#28a745';
+        feedback.textContent = '✅ Correct! All 3D geometry is made of vertices (points in 3D space) connected by triangular faces. Triangles are the fundamental building block because three points always define a flat plane.';
+        feedback.style.background = '#d4edda';
+      } else {
+        btn.style.background = '#f8d7da';
+        btn.style.borderColor = '#dc3545';
+        feedback.textContent = '❌ Not quite. 3D geometry is built from vertices (points in 3D space, x/y/z coordinates) and faces (triangles connecting those points). Every shape, no matter how complex, breaks down into triangles.';
+        feedback.style.background = '#f8d7da';
+      }
+      feedback.style.display = 'block';
+    }
+  </script>
+  <script src="../main.js"></script>
+</body>
+</html>

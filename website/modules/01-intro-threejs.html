@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 1: Introduction to 3D on the Web & Three.js</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <section id="main-content" class="day-content" data-module="01-intro-threejs" data-day="1">
+
+    <!-- Navigation -->
+    <nav class="day-nav" style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) 0;">
+      <span></span>
+      <a href="../index.html">Course Home</a>
+      <a href="02-first-scene.html">Next →</a>
+    </nav>
+
+    <div style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) var(--space-16);">
+
+      <h1 style="font-family:var(--font-heading);font-size:var(--text-3xl);margin-bottom:var(--space-2);">Day 1: Introduction to 3D on the Web & Three.js</h1>
+      <div class="difficulty-badge" style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:var(--text-sm);background:var(--color-accent-light);margin-bottom:var(--space-8);">🟢 Beginner · ~1 hour</div>
+
+      <!-- 1. Learning Objectives -->
+      <div class="section objectives" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🎯 Learning Objectives</h2>
+        <ul style="line-height:1.8;">
+          <li>Explain what Three.js is and why it's used for 3D web graphics</li>
+          <li>Understand the basic components of a 3D scene (Scene, Camera, Renderer)</li>
+          <li>Describe the difference between WebGL and Three.js</li>
+          <li>Identify real-world applications of 3D on the web</li>
+          <li>Set up a basic development environment for Three.js</li>
+        </ul>
+      </div>
+
+      <!-- 2. Core Concepts -->
+      <div class="section concepts" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📚 Core Concepts</h2>
+
+        <h3>What is Three.js?</h3>
+        <p>Think of Three.js like <strong>LEGO blocks for 3D web graphics</strong>. Just as LEGO provides pre-made bricks that snap together to build complex structures, Three.js provides pre-built components that work together to create 3D scenes in your browser. Without it, you'd be writing thousands of lines of low-level WebGL code just to draw a simple cube.</p>
+        <p>Three.js is a JavaScript library that makes WebGL (Web Graphics Library) accessible and manageable. WebGL is a powerful but complex API that lets browsers render 3D graphics using the GPU. While WebGL gives you direct control over the graphics pipeline, Three.js wraps that complexity in an intuitive API. Instead of writing shader code and managing buffer arrays, you can create 3D objects, apply materials, add lighting, and animate scenes with just a few lines of JavaScript.</p>
+        <p>The library was created by Ricardo Cabello (Mr.doob) in 2010 and has become the industry standard for 3D web graphics. It's used by companies like Google, NASA, Apple, and thousands of creative studios worldwide.</p>
+
+        <h3>Why 3D on the Web Matters</h3>
+        <p><strong>Accessibility:</strong> No downloads, no installations. Users can access 3D experiences instantly through their browser. A VR museum tour, a product configurator, or an interactive data visualization is just a URL away.</p>
+        <p><strong>Reach:</strong> With WebGL support in all modern browsers, your 3D content can reach billions of devices — from desktop computers to smartphones and VR headsets.</p>
+        <p><strong>Integration:</strong> 3D can seamlessly integrate with HTML, CSS, and JavaScript. You can overlay UI elements on 3D scenes, respond to DOM events, and use the entire web platform ecosystem.</p>
+
+        <h3>The Three Essential Components</h3>
+        <p>Every Three.js application revolves around three core concepts (hence the name "Three.js"):</p>
+
+        <!-- Chat animation for Scene/Camera/Renderer -->
+        <div class="chat-animation" data-actors="Scene,Camera,Renderer" data-auto="false" style="background:var(--bg-warm);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-6) 0;">
+          <div style="margin-bottom:var(--space-4);">
+            <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">
+              <span style="background:var(--actor-1);color:white;padding:2px 10px;border-radius:12px;font-size:var(--text-sm);font-weight:600;">Scene</span>
+              <span style="color:var(--text-secondary);font-size:var(--text-sm);">I'm the 3D world — a container that holds all objects, lights, and cameras. Think of me like a movie set.</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-3);">
+              <span style="background:var(--actor-2);color:white;padding:2px 10px;border-radius:12px;font-size:var(--text-sm);font-weight:600;">Camera</span>
+              <span style="color:var(--text-secondary);font-size:var(--text-sm);">I define what the viewer sees. I can be a PerspectiveCamera (realistic depth) or OrthographicCamera (no distortion).</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-2);">
+              <span style="background:var(--actor-3);color:white;padding:2px 10px;border-radius:12px;font-size:var(--text-sm);font-weight:600;">Renderer</span>
+              <span style="color:var(--text-secondary);font-size:var(--text-sm);">I take the Scene and Camera and draw them onto an HTML canvas. I handle all the GPU communication.</span>
+            </div>
+          </div>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);margin:0;">These three work together in a continuous loop: the Renderer repeatedly draws the Scene as viewed through the Camera, creating smooth animation at 60 FPS.</p>
+        </div>
+
+        <!-- Callout Box -->
+        <div class="callout-box" style="background:var(--color-accent-light);border-left:4px solid var(--color-accent);border-radius:var(--radius-sm);padding:var(--space-4) var(--space-6);margin:var(--space-6) 0;">
+          <strong>💡 Key Insight:</strong> Three.js democratizes 3D web development by handling the complex WebGL code, letting you focus on creativity rather than low-level graphics programming.
+        </div>
+
+        <h3>WebGL vs Three.js</h3>
+        <p>To draw a single colored triangle in raw WebGL, you need roughly 100+ lines of code — vertex shaders, fragment shaders, buffer creation, attribute binding, and more. In Three.js, you can create a full 3D scene with lighting and animation in about 20 lines. Three.js doesn't replace WebGL; it sits on top of it, translating your high-level instructions into the low-level commands the GPU understands.</p>
+
+        <h3>Real-World Applications</h3>
+        <ul>
+          <li><strong>E-commerce:</strong> Product configurators (Nike shoe customizer, furniture visualizers)</li>
+          <li><strong>Education:</strong> Interactive 3D models (molecular structures, historical reconstructions)</li>
+          <li><strong>Data Visualization:</strong> Complex datasets rendered in 3D space</li>
+          <li><strong>Gaming:</strong> Browser-based games and interactive experiences</li>
+          <li><strong>Portfolios:</strong> Immersive developer portfolios that stand out from flat websites</li>
+        </ul>
+      </div>
+
+      <!-- 3. Key Terminology (Flashcards) -->
+      <div class="section terminology" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🔑 Key Terminology</h2>
+        <div class="term-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);">
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">WebGL</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Low-level JavaScript API for rendering 3D graphics using the GPU. The foundation that Three.js is built upon.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Scene</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Container that holds all 3D objects, lights, and cameras. <code>const scene = new THREE.Scene()</code></dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Camera</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Defines the viewpoint from which the scene is rendered. PerspectiveCamera for realistic depth.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Renderer</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Takes the scene and camera and renders them to a canvas element. <code>WebGLRenderer</code> converts your 3D world into pixels.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Mesh</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Combination of geometry (shape) and material (appearance). A cube with a red surface is a mesh.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Geometry</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">The shape/structure of a 3D object — vertices and faces. BoxGeometry, SphereGeometry, custom shapes.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Material</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Defines how a surface looks — color, texture, shininess. MeshBasicMaterial, MeshStandardMaterial.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Canvas</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">HTML element where 3D graphics are drawn. Three.js creates and manages this for you.</dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Code Examples -->
+      <div class="section code-examples" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">💻 Code Examples</h2>
+
+        <h3>Example 1: Basic Three.js HTML Template</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">index.html</span>
+            <span style="color:#96f2d7;">Working Example</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;My First Three.js Scene&lt;/title&gt;
+    &lt;style&gt;
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> This minimal HTML sets up a full-screen 3D canvas. CSS removes margins and scrollbars. The script loads as a module for ES6 imports.
+          </div>
+        </div>
+
+        <h3>Example 2: Installing Three.js with Vite</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">terminal</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code>mkdir threejs-ai-portfolio
+cd threejs-ai-portfolio
+npm create vite@latest . -- --template vanilla
+npm install three
+npm run dev</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> Vite provides instant server start and hot module replacement — the recommended setup for Three.js projects.
+          </div>
+        </div>
+
+        <h3>Example 3: The Render Loop Pattern</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">main.js</span>
+            <span style="color:#96f2d7;">Conceptual</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code><span style="color:#6c7086;">// Setup (runs once)</span>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
+const renderer = new THREE.WebGLRenderer();
+
+<span style="color:#6c7086;">// Animation loop (runs 60 times per second)</span>
+function animate() {
+    requestAnimationFrame(animate);  <span style="color:#6c7086;">// Schedule next frame</span>
+    <span style="color:#6c7086;">// Update objects here (rotate, move, etc.)</span>
+    renderer.render(scene, camera);  <span style="color:#6c7086;">// Draw the frame</span>
+}
+animate();</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> This is the heartbeat of Three.js. <code>requestAnimationFrame</code> calls your function before each screen repaint (~60 FPS). Update → render → repeat.
+          </div>
+          <div style="padding:var(--space-3) var(--space-4);background:#fef9c3;font-size:var(--text-sm);">
+            💡 <strong>Try it:</strong> Set up your environment with Vite. Install Node.js, create a project, and verify <code>npm run dev</code> works before Day 2.
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Exercises -->
+      <div class="section exercises" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">✏️ Hands-On Exercises</h2>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 1: Environment Setup</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~20 min</span>
+          </div>
+          <p><strong>Goal:</strong> Get your development environment ready for the course</p>
+          <ol style="line-height:1.8;">
+            <li>Install Node.js (LTS) from nodejs.org</li>
+            <li>Create folder: <code>threejs-ai-portfolio</code></li>
+            <li>Run <code>npm create vite@latest . -- --template vanilla</code></li>
+            <li>Run <code>npm install</code> then <code>npm install three</code></li>
+            <li>Run <code>npm run dev</code> — verify the Vite welcome page loads</li>
+          </ol>
+          <div style="margin-top:var(--space-4);padding:var(--space-3);background:#f0fdf4;border-radius:var(--radius-sm);font-size:var(--text-sm);">
+            🚀 <strong>Stretch:</strong> Explore the project structure. What files did Vite create? What's in <code>package.json</code>?
+          </div>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 2: Explore Three.js Docs</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~15 min</span>
+          </div>
+          <p><strong>Goal:</strong> Familiarize yourself with the Three.js documentation</p>
+          <ol style="line-height:1.8;">
+            <li>Go to <a href="https://threejs.org/docs/" target="_blank">threejs.org/docs</a></li>
+            <li>Find docs for Scene, PerspectiveCamera, and WebGLRenderer</li>
+            <li>Browse the <a href="https://threejs.org/examples/" target="_blank">examples page</a></li>
+            <li>Click on 3–5 examples that interest you</li>
+          </ol>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 3: Research Real-World Sites</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~15 min</span>
+          </div>
+          <p><strong>Goal:</strong> See professional Three.js applications in action</p>
+          <ol style="line-height:1.8;">
+            <li>Visit <a href="https://bruno-simon.com/" target="_blank">bruno-simon.com</a> (award-winning portfolio)</li>
+            <li>Browse <a href="https://www.awwwards.com/" target="_blank">awwwards.com</a> (search "Three.js")</li>
+            <li>For each: What 3D elements are used? How does 3D enhance the experience?</li>
+            <li>Write down 2–3 ideas for your own AI portfolio</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 6. Resources -->
+      <div class="section resources" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📖 Curated Resources</h2>
+        <div class="resource-cards" style="display:grid;gap:var(--space-3);">
+          <a class="resource-card" href="https://threejs.org/manual/#en/fundamentals" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Article · ~15 min</span>
+            <span style="font-weight:600;">Three.js Fundamentals — Official Docs</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Comprehensive introduction with live code examples</span>
+          </a>
+          <a class="resource-card" href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Article · ~10 min</span>
+            <span style="font-weight:600;">WebGL API — MDN Web Docs</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Understand what WebGL is and why we use Three.js instead</span>
+          </a>
+          <a class="resource-card" href="https://www.youtube.com/watch?v=Q7AOvWpIVHU" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">🎥 Video · 12 min · ⚠️ Verified</span>
+            <span style="font-weight:600;">Build a 3D Portfolio Website — Fireship</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Quick overview of what's possible with Three.js</span>
+          </a>
+          <a class="resource-card" href="https://www.youtube.com/watch?v=pUgWfqWZWmM" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">🎥 Video · 20 min · ⚠️ Verified</span>
+            <span style="font-weight:600;">Getting Started with Three.js — DesignCourse</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Beginner-friendly walkthrough of setup and basics</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. Reflection -->
+      <div class="section reflection" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🤔 Reflection Questions</h2>
+        <div style="display:grid;gap:var(--space-4);">
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">What are the three essential components of every Three.js application?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: How do they work together to create what you see on screen?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">How could 3D graphics enhance your portfolio compared to a traditional 2D website?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: What unique experiences can 3D provide that 2D can't?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">What are potential downsides of using 3D on the web?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: Performance, accessibility, mobile devices</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="section quiz" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🧠 Quick Quiz</h2>
+        <div class="quiz-card" data-quiz-id="d1-q1" style="background:var(--bg-card);padding:var(--space-6);border-radius:var(--radius-md);border:1px solid var(--border);margin:var(--space-4) 0;">
+          <p style="font-weight:600;margin-bottom:var(--space-4);">What does Three.js abstract away for developers?</p>
+          <div style="display:grid;gap:var(--space-2);">
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">a) HTML and CSS rendering</button>
+            <button onclick="checkQuiz(this,'correct')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">b) Low-level WebGL shader code and GPU communication</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">c) Server-side rendering and databases</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">d) Network requests and API calls</button>
+          </div>
+          <div class="quiz-feedback" style="display:none;margin-top:var(--space-4);padding:var(--space-3);border-radius:var(--radius-sm);font-size:var(--text-sm);"></div>
+        </div>
+      </div>
+
+      <!-- 8. Next Steps -->
+      <div class="section next-steps" style="margin-bottom:var(--space-8);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">➡️ Next Steps</h2>
+        <p><strong>Tomorrow:</strong> <a href="02-first-scene.html">Day 2: Your First Three.js Scene</a> — Create your first rotating cube and understand the scene graph.</p>
+        <div class="checklist" style="margin-top:var(--space-4);">
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can explain what Three.js is and why it's useful</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can identify the three core components (Scene, Camera, Renderer)</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can access the Three.js documentation</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I have a working dev environment with Vite + Three.js</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="day-nav bottom" style="max-width:var(--content-width);margin:0 auto;padding:0 var(--space-4) var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-4);">
+      <span></span>
+      <a href="../index.html">Course Home</a>
+      <a href="02-first-scene.html">Next →</a>
+    </nav>
+
+  </section>
+
+  <script>
+    function checkQuiz(btn, result) {
+      const card = btn.closest('.quiz-card');
+      const feedback = card.querySelector('.quiz-feedback');
+      const buttons = card.querySelectorAll('button');
+      buttons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+      btn.style.opacity = '1';
+      if (result === 'correct') {
+        btn.style.background = '#d4edda';
+        btn.style.borderColor = '#28a745';
+        feedback.textContent = '✅ Correct! Three.js handles all the complex WebGL shader code and GPU communication so you can focus on building 3D scenes.';
+        feedback.style.background = '#d4edda';
+      } else {
+        btn.style.background = '#f8d7da';
+        btn.style.borderColor = '#dc3545';
+        feedback.textContent = '❌ Not quite. Three.js specifically abstracts WebGL — the low-level 3D graphics API that communicates with the GPU.';
+        feedback.style.background = '#f8d7da';
+      }
+      feedback.style.display = 'block';
+    }
+  </script>
+  <script src="../main.js"></script>
+</body>
+</html>

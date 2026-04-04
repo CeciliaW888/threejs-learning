@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Three.js + AI Portfolio Course</title>
+  <meta name="description" content="21-Day Course — Build an AI-powered 3D portfolio generator">
+  <meta name="theme-color" content="#c4825a">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  
+  <style>
+    :root { --accent: #c4825a; --accent-hover: #b07149; --cream: #f5f0eb; --white: #fff; --border: #e8e0d8; --text-primary: #2c2420; --text-secondary: #6b5c52; --radius: 12px; --max-w: 860px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text-primary); line-height: 1.6; }
+    .hero { background: linear-gradient(135deg, var(--cream) 0%, #ede5db 100%); padding: 60px 20px 50px; text-align: center; border-bottom: 1px solid var(--border); }
+    .hero-emoji { font-size: 64px; margin-bottom: 16px; }
+    .hero h1 { font-family: 'Crimson Pro', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
+    .hero-subtitle { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 20px; }
+    .hero-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .hero-tag { background: rgba(196,130,90,0.12); color: var(--accent); border-radius: 20px; padding: 4px 14px; font-size: 0.85rem; font-weight: 500; }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+    .progress-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; margin: 24px 0; }
+    .progress-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .progress-track { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
+    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
+    .day-dot { aspect-ratio: 1; border-radius: 8px; background: var(--cream); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #9e8e84; cursor: pointer; transition: all 0.2s; }
+    .day-dot:hover { transform: scale(1.1); border-color: var(--accent); }
+    .day-dot.done { background: var(--accent); border-color: var(--accent); color: white; }
+    .week-section { margin-bottom: 32px; }
+    .week-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); color: var(--accent); }
+    .day-card { background: var(--white); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; padding: 16px 20px; transition: all 0.2s; }
+    .day-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .day-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .day-type { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+    .type-foundations { background: #d1fae5; color: #065f46; }
+    .type-concepts { background: #fef3c7; color: #92400e; }
+    .type-project { background: #ede9fe; color: #5b21b6; }
+    .day-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 0.875rem; font-weight: 600; text-decoration: none; margin-top: 8px; }
+    .day-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-emoji">🎨</div>
+  <h1>Three.js + AI Portfolio Course</h1>
+  <p class="hero-subtitle">21-Day Course · 1 hour/day</p>
+  <div class="hero-tags">
+    <span class="hero-tag">🟢 Beginner-Friendly</span>
+    <span class="hero-tag">🎯 Project-Based</span>
+    <span class="hero-tag">🤖 AI-Powered</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-card">
+    <div class="progress-header">
+      <h3>📊 Your Progress</h3>
+      <span id="progress-text">0 / 21 days</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-bar"></div>
+    </div>
+    <div class="day-grid" id="day-grid"></div>
+  </div>
+
+  <div class="week-section">
+    <h3>Week 1: Three.js Foundations</h3>
+    
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 1: Introduction to 3D on the Web
+        <span class="day-type type-foundations">Foundations</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Learn what Three.js is, how WebGL works, and set up your first 3D environment.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-01-intro-threejs.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 2: Setting Up Your First Scene
+        <span class="day-type type-foundations">Foundations</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Create your first rotating cube with Scene, Camera, Renderer.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-02-first-scene.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 3: Exploring Geometries & Materials
+        <span class="day-type type-foundations">Foundations</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Work with 5+ geometry types and use Groups to build complex objects.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-03-geometries-materials.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 4: Materials & Textures
+        <span class="day-type type-concepts">Concepts</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Master material types, texture loading, UV mapping, and PBR workflows.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-04-materials-textures.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 5: Lighting Fundamentals
+        <span class="day-type type-concepts">Concepts</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Learn 4 light types, shadow setup, and three-point lighting.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-05-lighting.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 6: Cameras & OrbitControls
+        <span class="day-type type-concepts">Concepts</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Master camera types, OrbitControls, and smooth animations.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-06-textures.md" target="_blank">Read Full Guide →</a>
+    </div>
+
+    <div class="day-card">
+      <div class="day-card-title">
+        Day 7: Week 1 Review & Mini-Project
+        <span class="day-type type-project">Project</span>
+      </div>
+      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Build an interactive 3D gallery combining all Week 1 skills.</p>
+      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-07-mini-project.md" target="_blank">Read Full Guide →</a>
+    </div>
+  </div>
+
+  <div class="week-section">
+    <h3>Week 2: Advanced Three.js + Prompt Engineering</h3>
+    <p style="color: #6b5c52;">Coming soon! Days 8-14 cover animation, models, shaders, and AI prompting.</p>
+  </div>
+
+  <div class="week-section">
+    <h3>Week 3: AI-Powered Portfolio Builder</h3>
+    <p style="color: #6b5c52;">Coming soon! Days 15-21 cover LLM APIs, text-to-3D, and deployment.</p>
+  </div>
+</div>
+
+<script>
+const KEY = 'threejs-course-progress';
+let progress = JSON.parse(localStorage.getItem(KEY) || '{"days": []}');
+
+function updateProgress() {
+  const done = progress.days.length;
+  document.getElementById('progress-text').textContent = `${done} / 21 days`;
+  document.getElementById('progress-bar').style.width = `${(done / 21) * 100}%`;
+}
+
+const grid = document.getElementById('day-grid');
+for (let i = 1; i <= 21; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'day-dot';
+  dot.innerHTML = `<span>${i}</span>`;
+  if (progress.days.includes(i)) dot.classList.add('done');
+  
+  dot.onclick = () => {
+    if (dot.classList.contains('done')) {
+      progress.days = progress.days.filter(d => d !== i);
+      dot.classList.remove('done');
+    } else {
+      progress.days.push(i);
+      dot.classList.add('done');
+    }
+    localStorage.setItem(KEY, JSON.stringify(progress));
+    updateProgress();
+  };
+  
+  grid.appendChild(dot);
+}
+
+updateProgress();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+
+</body>
+</html>

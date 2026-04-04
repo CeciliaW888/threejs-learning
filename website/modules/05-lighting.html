@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 5: Lighting — Three.js + AI Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- Navigation -->
+  <nav class="nav" aria-label="Course navigation">
+    <div class="nav-inner">
+      <span class="nav-title">Day 5: Lighting</span>
+      <div class="nav-dots"></div>
+    </div>
+    <div id="progress-bar"></div>
+  </nav>
+
+  <main id="main">
+
+    <!-- Section 1: Learning Objectives -->
+    <section class="module" data-module="objectives">
+      <div class="module-inner animate-in">
+        <div class="day-nav">
+          <a href="04-materials-textures.html">← Day 4: Materials & Textures</a>
+          <a href="06-cameras-controls.html">Day 6: Cameras & Controls →</a>
+        </div>
+        <h2>🎯 Learning Objectives</h2>
+        <p class="difficulty-badge">🟢 Beginner · ~1 hour</p>
+        <ul class="objective-list">
+          <li>Understand the four main light types in Three.js and their use cases</li>
+          <li>Configure light properties (color, intensity, position, target)</li>
+          <li>Create realistic lighting setups using multiple lights</li>
+          <li>Understand shadows and how to enable them</li>
+          <li>Combine lights and materials for specific moods and atmospheres</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: Core Concepts -->
+    <section class="module" data-module="concepts">
+      <div class="module-inner animate-in">
+        <h2>📚 Core Concepts</h2>
+
+        <h3>Why Lighting Matters</h3>
+        <p>Lighting is what makes 3D scenes feel real. Without lights, only MeshBasicMaterial is visible — everything else renders pitch black. The same model can look friendly or ominous based purely on how you light it.</p>
+
+        <p>Think of it like photography. A portrait photographer positions key lights, fill lights, and backlights to shape a subject. Three.js gives you the same tools.</p>
+
+        <h3>The Four Essential Light Types</h3>
+
+        <!-- Chat animation showing light types -->
+        <div class="chat-window">
+          <div class="chat-messages">
+            <div class="chat-message" data-msg="1" data-sender="1">
+              <strong>🌍 AmbientLight:</strong> I light everything equally from all directions. No shadows, no drama. I'm the baseline — keeping things from going pitch black.
+            </div>
+            <div class="chat-message" data-msg="2" data-sender="2">
+              <strong>☀️ DirectionalLight:</strong> I send parallel rays, like the sun. My position sets my direction, but distance doesn't matter. I'm perfect for outdoor scenes.
+            </div>
+            <div class="chat-message" data-msg="3" data-sender="3">
+              <strong>💡 PointLight:</strong> I radiate from a single point in all directions — like a bare light bulb. My brightness fades with distance. Use me for lamps and torches!
+            </div>
+            <div class="chat-message" data-msg="4" data-sender="4">
+              <strong>🔦 SpotLight:</strong> I'm the most dramatic — a focused cone of light. I have angle, penumbra (soft edges), and a target. Stage lighting? Car headlights? That's me.
+            </div>
+            <div class="chat-typing" style="display:none;">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="chat-controls">
+            <button class="chat-next-btn">Next 💬</button>
+            <button class="chat-all-btn">Show All</button>
+            <button class="chat-reset-btn">Reset</button>
+          </div>
+        </div>
+
+        <h3>Light Properties</h3>
+        <p>All lights share: <strong>color</strong> (hex value), <strong>intensity</strong> (brightness multiplier), <strong>position</strong> (3D coordinates), and <strong>castShadow</strong> (expensive, off by default).</p>
+
+        <p>Additional properties by type:</p>
+        <ul>
+          <li><strong>PointLight / SpotLight:</strong> <code>distance</code> (range), <code>decay</code> (falloff rate, 2 = realistic)</li>
+          <li><strong>SpotLight:</strong> <code>angle</code> (cone width), <code>penumbra</code> (soft edge, 0-1)</li>
+        </ul>
+
+        <h3>Shadows: Adding Depth</h3>
+        <p>Shadows ground objects in a scene — without them, everything looks like it's floating. But they're expensive because the GPU must render the scene again from the light's perspective.</p>
+
+        <div class="callout-warning">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-content">
+            <strong>Three steps to enable shadows:</strong><br>
+            1. <code>renderer.shadowMap.enabled = true</code><br>
+            2. <code>light.castShadow = true</code><br>
+            3. <code>mesh.castShadow = true</code> and <code>ground.receiveShadow = true</code><br>
+            Miss any one of these and shadows won't appear!
+          </div>
+        </div>
+
+        <h3>Professional Lighting Setups</h3>
+        <p><strong>Three-Point Lighting</strong> is the industry standard:</p>
+        <ul>
+          <li><strong>Key light</strong> — Main light, brightest, creates primary shadows</li>
+          <li><strong>Fill light</strong> — Softer, opposite side, reduces harsh shadows</li>
+          <li><strong>Back light</strong> — Behind subject, creates rim/edge highlights</li>
+        </ul>
+
+        <div class="callout-info">
+          <span class="callout-icon">🎯</span>
+          <div class="callout-content">
+            <strong>Key Insight:</strong> Lighting is as important as modeling. Great lighting can make simple geometry look amazing; poor lighting can ruin detailed models. Spend as much time on lights as you do on objects.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Key Terminology (Flashcards) -->
+    <section class="module" data-module="terminology">
+      <div class="module-inner animate-in">
+        <h2>🔑 Key Terminology</h2>
+        <p>Click each card to reveal the definition. Use arrow keys to navigate.</p>
+
+        <div class="flashcard-deck" id="light-terms-deck">
+          <div class="flashcard" id="fc-ambient">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>AmbientLight</strong></div>
+              <div class="flashcard-back">Uniform lighting from all directions — no shadows, no directionality. Acts as baseline illumination to prevent pitch-black areas.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-directional">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>DirectionalLight</strong></div>
+              <div class="flashcard-back">Parallel rays like sunlight. Position defines direction, but distance doesn't matter. Creates consistent shadows across the entire scene.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-point">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>PointLight</strong></div>
+              <div class="flashcard-back">Radiates from a single point in all directions, like a light bulb. Intensity decreases with distance. Great for lamps and torches.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-spot">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>SpotLight</strong></div>
+              <div class="flashcard-back">Focused cone of light like a flashlight. Has angle (cone width) and penumbra (soft edge). Most dramatic and cinematic light type.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-intensity">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Intensity</strong></div>
+              <div class="flashcard-back">Brightness multiplier for lights. 1 = normal, 2 = double bright, 0.5 = half. Controls how strong the light appears.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-shadowmap">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Shadow Map</strong></div>
+              <div class="flashcard-back">A depth texture rendered from the light's perspective. Higher resolution (e.g., 2048) creates sharper shadows but uses more GPU memory.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-penumbra">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Penumbra</strong></div>
+              <div class="flashcard-back">The soft edge on a spotlight cone. 0 = hard edge, 1 = very soft falloff. Creates realistic, natural-looking light boundaries.</div>
+            </div>
+          </div>
+          <div class="flashcard" id="fc-decay">
+            <div class="flashcard-inner">
+              <div class="flashcard-front"><strong>Light Decay</strong></div>
+              <div class="flashcard-back">How quickly light fades with distance. decay=2 is physically accurate (inverse-square law). Only applies to PointLight and SpotLight.</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;">
+            <span class="flashcard-counter" style="font-size:var(--text-sm);color:var(--text-muted);"></span>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <button class="fc-incorrect" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);cursor:pointer;">✗ Still learning</button>
+            <button class="fc-correct" style="padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);cursor:pointer;">✓ Got it</button>
+          </div>
+          <div class="flashcard-progress" style="text-align:center;font-size:var(--text-sm);color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Code Examples -->
+    <section class="module" data-module="code">
+      <div class="module-inner animate-in">
+        <h2>💻 Code Examples</h2>
+
+        <h3>Example 1: Basic Lighting Setup</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">basic-lighting.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// A sphere on a plane with ambient + directional light</span>
+<span class="code-keyword">const</span> sphere = <span class="code-keyword">new</span> THREE.<span class="code-function">Mesh</span>(
+    <span class="code-keyword">new</span> THREE.<span class="code-function">SphereGeometry</span>(<span class="code-number">1</span>, <span class="code-number">32</span>, <span class="code-number">32</span>),
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshStandardMaterial</span>({
+        <span class="code-property">color</span>: <span class="code-number">0xff0000</span>, <span class="code-property">roughness</span>: <span class="code-number">0.5</span>
+    })
+);
+sphere.position.y = <span class="code-number">1</span>;
+scene.<span class="code-function">add</span>(sphere);
+
+<span class="code-keyword">const</span> ground = <span class="code-keyword">new</span> THREE.<span class="code-function">Mesh</span>(
+    <span class="code-keyword">new</span> THREE.<span class="code-function">PlaneGeometry</span>(<span class="code-number">10</span>, <span class="code-number">10</span>),
+    <span class="code-keyword">new</span> THREE.<span class="code-function">MeshStandardMaterial</span>({ <span class="code-property">color</span>: <span class="code-number">0x808080</span> })
+);
+ground.rotation.x = -Math.PI / <span class="code-number">2</span>; <span class="code-comment">// Lay flat</span>
+scene.<span class="code-function">add</span>(ground);
+
+<span class="code-comment">// Ambient prevents pitch-black shadows</span>
+<span class="code-keyword">const</span> ambientLight = <span class="code-keyword">new</span> THREE.<span class="code-function">AmbientLight</span>(<span class="code-number">0x404040</span>, <span class="code-number">0.5</span>);
+scene.<span class="code-function">add</span>(ambientLight);
+
+<span class="code-comment">// Directional creates highlights and depth</span>
+<span class="code-keyword">const</span> dirLight = <span class="code-keyword">new</span> THREE.<span class="code-function">DirectionalLight</span>(<span class="code-number">0xffffff</span>, <span class="code-number">1</span>);
+dirLight.position.<span class="code-function">set</span>(<span class="code-number">5</span>, <span class="code-number">10</span>, <span class="code-number">5</span>);
+scene.<span class="code-function">add</span>(dirLight);</code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> The ambient light provides base illumination — without it, the sphere's shadow side would be completely black. The directional light creates the bright-to-dark gradient that our brains interpret as 3D depth.
+          </div>
+        </div>
+
+        <h3>Example 2: Enabling Shadows</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">shadows.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// Step 1: Enable on renderer</span>
+renderer.shadowMap.enabled = <span class="code-keyword">true</span>;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+<span class="code-comment">// Step 2: Tell light to cast shadows</span>
+dirLight.castShadow = <span class="code-keyword">true</span>;
+dirLight.shadow.camera.left = <span class="code-number">-10</span>;
+dirLight.shadow.camera.right = <span class="code-number">10</span>;
+dirLight.shadow.camera.top = <span class="code-number">10</span>;
+dirLight.shadow.camera.bottom = <span class="code-number">-10</span>;
+dirLight.shadow.mapSize.width = <span class="code-number">2048</span>;
+dirLight.shadow.mapSize.height = <span class="code-number">2048</span>;
+
+<span class="code-comment">// Step 3: Objects opt in</span>
+sphere.castShadow = <span class="code-keyword">true</span>;
+ground.receiveShadow = <span class="code-keyword">true</span>;
+
+<span class="code-comment">// Debug: visualize shadow camera</span>
+<span class="code-keyword">const</span> helper = <span class="code-keyword">new</span> THREE.<span class="code-function">CameraHelper</span>(dirLight.shadow.camera);
+scene.<span class="code-function">add</span>(helper);</code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> Shadows require the GPU to render from the light's perspective, creating a depth map. The shadow camera frustum defines the shadow area. Higher <code>mapSize</code> = sharper shadows. <code>PCFSoftShadowMap</code> creates soft, realistic edges.
+          </div>
+        </div>
+
+        <h3>Example 3: Three-Point Lighting</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="filename">three-point-lighting.js</span>
+            <span class="badge">Three.js</span>
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+          </div>
+          <pre><code><span class="code-comment">// Key light — main, bright, from front-right</span>
+<span class="code-keyword">const</span> keyLight = <span class="code-keyword">new</span> THREE.<span class="code-function">DirectionalLight</span>(<span class="code-number">0xffffff</span>, <span class="code-number">1</span>);
+keyLight.position.<span class="code-function">set</span>(<span class="code-number">5</span>, <span class="code-number">5</span>, <span class="code-number">5</span>);
+keyLight.castShadow = <span class="code-keyword">true</span>;
+scene.<span class="code-function">add</span>(keyLight);
+
+<span class="code-comment">// Fill light — softer, from left, slightly blue</span>
+<span class="code-keyword">const</span> fillLight = <span class="code-keyword">new</span> THREE.<span class="code-function">DirectionalLight</span>(<span class="code-number">0x8080ff</span>, <span class="code-number">0.4</span>);
+fillLight.position.<span class="code-function">set</span>(<span class="code-number">-5</span>, <span class="code-number">3</span>, <span class="code-number">0</span>);
+scene.<span class="code-function">add</span>(fillLight);
+
+<span class="code-comment">// Back light — warm rim behind subject</span>
+<span class="code-keyword">const</span> backLight = <span class="code-keyword">new</span> THREE.<span class="code-function">DirectionalLight</span>(<span class="code-number">0xffff80</span>, <span class="code-number">0.6</span>);
+backLight.position.<span class="code-function">set</span>(<span class="code-number">0</span>, <span class="code-number">3</span>, <span class="code-number">-5</span>);
+scene.<span class="code-function">add</span>(backLight);
+
+<span class="code-comment">// Subtle ambient fill</span>
+<span class="code-keyword">const</span> ambient = <span class="code-keyword">new</span> THREE.<span class="code-function">AmbientLight</span>(<span class="code-number">0x404040</span>, <span class="code-number">0.2</span>);
+scene.<span class="code-function">add</span>(ambient);</code></pre>
+          <div class="code-explanation">
+            <strong>What's happening:</strong> Professional three-point setup. Key light creates primary shadows. Blue-tinted fill brightens the shadow side. Warm back light creates a rim around the subject, separating it from the background. Together they give objects a 3D, cinematic quality.
+          </div>
+          <div class="try-it">
+            💡 <strong>Try it:</strong> Change the key light to red and the fill to blue for a dramatic neon look. Then move the key light directly above — how does the mood change?
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Code ↔ English Translation -->
+    <section class="module" data-module="translation">
+      <div class="module-inner animate-in">
+        <h2>🔄 Code ↔ English</h2>
+        <p>Reading lighting code like English:</p>
+
+        <div class="translation-block">
+          <div class="translation-code">
+            <pre><code>renderer.shadowMap.enabled = <span class="code-keyword">true</span>;
+
+<span class="code-keyword">const</span> light = <span class="code-keyword">new</span> THREE.DirectionalLight(
+  <span class="code-number">0xffffff</span>, <span class="code-number">1</span>
+);
+light.position.set(<span class="code-number">5</span>, <span class="code-number">10</span>, <span class="code-number">5</span>);
+light.castShadow = <span class="code-keyword">true</span>;
+light.shadow.mapSize.set(<span class="code-number">2048</span>, <span class="code-number">2048</span>);
+
+sphere.castShadow = <span class="code-keyword">true</span>;
+ground.receiveShadow = <span class="code-keyword">true</span>;</code></pre>
+          </div>
+          <div class="translation-english">
+            <div class="translation-line">Turn on the shadow system</div>
+            <div class="translation-line">&nbsp;</div>
+            <div class="translation-line">Create a sun-like light:</div>
+            <div class="translation-line">• White color, normal brightness</div>
+            <div class="translation-line">• Shining from upper-right-front</div>
+            <div class="translation-line">• This light creates shadows</div>
+            <div class="translation-line">• Use high-resolution shadow detail</div>
+            <div class="translation-line">&nbsp;</div>
+            <div class="translation-line">The sphere creates shadows on other objects</div>
+            <div class="translation-line">The ground displays shadows cast onto it</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Quiz -->
+    <section class="module" data-module="quiz">
+      <div class="module-inner animate-in">
+        <h2>🧪 Knowledge Check</h2>
+
+        <div class="quiz-card" id="quiz-l1" data-correct="1"
+             data-explanation-0="AmbientLight illuminates everything equally — it can't create directional shadows."
+             data-explanation-1="Correct! DirectionalLight sends parallel rays like the sun, making it ideal for outdoor scenes with consistent shadows."
+             data-explanation-2="PointLight radiates from a point — it's more like a lamp or torch."
+             data-explanation-3="SpotLight creates a focused cone — more like a flashlight than the sun.">
+          <p class="quiz-question"><strong>Q1:</strong> Which light type best simulates sunlight?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">AmbientLight</button>
+            <button class="quiz-option">DirectionalLight</button>
+            <button class="quiz-option">PointLight</button>
+            <button class="quiz-option">SpotLight</button>
+          </div>
+        </div>
+
+        <div class="quiz-card" id="quiz-l2" data-correct="2"
+             data-explanation-0="You need the renderer AND the light AND the objects — one isn't enough."
+             data-explanation-1="Two steps isn't enough — all three systems must opt in."
+             data-explanation-2="Correct! Shadows require: 1) renderer.shadowMap.enabled, 2) light.castShadow, 3) mesh.castShadow + ground.receiveShadow. Miss any one and shadows won't appear."
+             data-explanation-3="Shadow maps are a technique, not a separate library. Three.js handles them natively.">
+          <p class="quiz-question"><strong>Q2:</strong> How many steps are required to enable shadows in Three.js?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">1 — just enable shadows on the renderer</button>
+            <button class="quiz-option">2 — renderer + light</button>
+            <button class="quiz-option">3 — renderer + light + objects (cast & receive)</button>
+            <button class="quiz-option">4 — you need to import a separate shadow library</button>
+          </div>
+        </div>
+
+        <div class="quiz-card" id="quiz-l3" data-correct="3"
+             data-explanation-0="Key light is the main source from front — not from behind."
+             data-explanation-1="Fill light softens shadows from the opposite side of the key light."
+             data-explanation-2="Ambient light provides base illumination, not rim highlights."
+             data-explanation-3="Correct! The back light (rim light) is placed behind the subject to create a bright edge that visually separates it from the background.">
+          <p class="quiz-question"><strong>Q3:</strong> In three-point lighting, which light creates a bright rim around the subject?</p>
+          <div class="quiz-options">
+            <button class="quiz-option">Key light</button>
+            <button class="quiz-option">Fill light</button>
+            <button class="quiz-option">Ambient light</button>
+            <button class="quiz-option">Back light</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Exercises -->
+    <section class="module" data-module="exercises">
+      <div class="module-inner animate-in">
+        <h2>✏️ Hands-On Exercises</h2>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 1: Light Type Comparison</h3>
+            <span class="time-estimate">⏱️ ~20 min</span>
+            <span class="difficulty">🟢 Beginner</span>
+          </div>
+          <p><strong>Goal:</strong> See how each light type behaves differently</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Start with AmbientLight only</strong><p>Observe the flat, shadowless, uniform look</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Replace with DirectionalLight</strong><p>See gradient shading and defined highlights appear</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Try PointLight and SpotLight</strong><p>Notice falloff with PointLight, focused cone with SpotLight</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 2: Shadow Setup</h3>
+            <span class="time-estimate">⏱️ ~25 min</span>
+            <span class="difficulty">🟡 Intermediate</span>
+          </div>
+          <p><strong>Goal:</strong> Enable and configure realistic shadows</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>Create objects on a ground plane</strong><p>Sphere, cube, and cylinder above a PlaneGeometry</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>Enable all three shadow steps</strong><p>Renderer → Light → Objects (castShadow + receiveShadow)</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>Debug with CameraHelper</strong><p>Visualize the shadow camera frustum and adjust to cover all objects</p></div>
+            </div>
+          </div>
+          <div class="exercise-hints">
+            <details>
+              <summary>💡 Hint: Shadows not appearing?</summary>
+              <p>Check all four requirements: <code>renderer.shadowMap.enabled</code>, <code>light.castShadow</code>, <code>object.castShadow</code>, <code>ground.receiveShadow</code>. All four must be <code>true</code>!</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="exercise-card">
+          <div class="exercise-header">
+            <h3>Exercise 3: Mood Lighting</h3>
+            <span class="time-estimate">⏱️ ~25 min</span>
+            <span class="difficulty">🟡 Intermediate</span>
+          </div>
+          <p><strong>Goal:</strong> Create three distinct atmospheres using only lighting</p>
+          <div class="step-cards">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body"><strong>"Sunny Day"</strong><p>Bright white directional + warm ambient</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body"><strong>"Dramatic Night"</strong><p>Dark blue ambient + strong white directional from the side</p></div>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body"><strong>"Neon City"</strong><p>Very dark ambient + multiple colored PointLights</p></div>
+            </div>
+          </div>
+          <div class="stretch-goal">🚀 <strong>Stretch:</strong> Use keyboard keys (1, 2, 3) to switch between the three lighting setups in real-time.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Resources -->
+    <section class="module" data-module="resources">
+      <div class="module-inner animate-in">
+        <h2>📖 Curated Resources</h2>
+        <div class="resource-cards">
+          <a class="resource-card" href="https://threejs.org/docs/#api/en/lights/Light" target="_blank">
+            <span class="resource-type">📄 DOCUMENTATION</span>
+            <span class="resource-title">Lights in Three.js — Three.js Docs</span>
+            <span class="resource-meta">Complete reference for all light types, properties, and configuration</span>
+          </a>
+          <a class="resource-card" href="https://threejs.org/manual/#en/shadows" target="_blank">
+            <span class="resource-type">📄 TUTORIAL</span>
+            <span class="resource-title">Shadows — Three.js Manual</span>
+            <span class="resource-meta">Step-by-step shadow configuration, optimization, and common pitfalls</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 9: Reflection -->
+    <section class="module" data-module="reflection">
+      <div class="module-inner animate-in">
+        <h2>🤔 Reflection</h2>
+
+        <div class="reflection-card" data-reflection="day5-q1">
+          <p class="reflection-prompt">Why does AmbientLight not create shadows? What information does a shadow require that ambient light can't provide?</p>
+          <textarea placeholder="Write your thoughts here..."></textarea>
+          <button class="save-reflection">Save</button>
+        </div>
+
+        <div class="reflection-card" data-reflection="day5-q2">
+          <p class="reflection-prompt">What lighting setup will you use for your AI portfolio? Professional studio? Moody dramatic? Colorful neon? Why?</p>
+          <textarea placeholder="Write your thoughts here..."></textarea>
+          <button class="save-reflection">Save</button>
+        </div>
+
+        <h3>✅ Before Moving On</h3>
+        <div class="checklist">
+          <label><input type="checkbox"> I can add and configure all four main light types</label>
+          <label><input type="checkbox"> I can enable shadows on renderer, lights, and objects</label>
+          <label><input type="checkbox"> I can create a three-point lighting setup</label>
+          <label><input type="checkbox"> I can adjust light intensity and color for different moods</label>
+          <label><input type="checkbox"> I understand the performance cost of shadows</label>
+        </div>
+
+        <div class="day-nav bottom">
+          <a href="04-materials-textures.html">← Day 4: Materials & Textures</a>
+          <a href="06-cameras-controls.html">Day 6: Cameras & Controls →</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../main.js"></script>
+</body>
+</html>

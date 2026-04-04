@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 7: Week 1 Review & Mini-Project — Three.js + AI Portfolio</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="course-container">
+
+<section class="day-content" data-day="7">
+  <h2>Day 7: Week 1 Review & Mini-Project</h2>
+
+  <!-- Navigation -->
+  <nav class="day-nav">
+    <a href="06-textures.html">← Day 6: Cameras</a>
+    <a href="../index.html">Course Home</a>
+    <a href="08-animation.html">Day 8: Animation Basics →</a>
+  </nav>
+
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>🎯 Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Review and consolidate all Week 1 concepts</li>
+      <li data-objective="2">Build a complete interactive 3D scene from scratch</li>
+      <li data-objective="3">Combine multiple Three.js features into one cohesive project</li>
+      <li data-objective="4">Troubleshoot common issues independently</li>
+      <li data-objective="5">Identify knowledge gaps for deeper practice</li>
+    </ul>
+    <div class="difficulty-badge">🟢 Beginner</div>
+    <div class="time-estimate">⏱️ ~1 hour (10 min review + 50 min project)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>📚 Week 1 Recap</h3>
+
+    <h4>The Fundamentals</h4>
+    <p>This week you built a real foundation. Here's what you learned and how it all connects:</p>
+
+    <!-- Step Cards for Week Review -->
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">Day 1</div>
+        <div class="step-content">
+          <strong>Introduction</strong>
+          <p>What Three.js is, why it matters for web portfolios, setting up your dev environment with Vite.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">Day 2</div>
+        <div class="step-content">
+          <strong>First Scene</strong>
+          <p>The essential trio (Scene, Camera, Renderer), creating meshes, writing the animation loop.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-number">Day 3</div>
+        <div class="step-content">
+          <strong>Geometries</strong>
+          <p>Built-in shapes, controlling detail with segments, positioning in 3D space, groups for hierarchy.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="4">
+        <div class="step-number">Day 4</div>
+        <div class="step-content">
+          <strong>Materials</strong>
+          <p>Material types, PBR concepts (roughness, metalness), loading and applying textures.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="5">
+        <div class="step-number">Day 5</div>
+        <div class="step-content">
+          <strong>Lighting</strong>
+          <p>Light types, shadow configuration, three-point lighting for professional results.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="6">
+        <div class="step-number">Day 6</div>
+        <div class="step-content">
+          <strong>Cameras</strong>
+          <p>PerspectiveCamera parameters, OrbitControls for navigation, camera animation with easing.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>The Minimum Viable 3D Scene</h4>
+    <p>Every Three.js scene needs these 8 pieces working together: <strong>Scene</strong> (container), <strong>Camera</strong> (viewpoint), <strong>Renderer</strong> (draws to canvas), <strong>Geometry</strong> (shape), <strong>Material</strong> (appearance), <strong>Mesh</strong> (geometry + material), <strong>Light</strong> (illumination), and an <strong>Animation Loop</strong> (continuous rendering). If any piece is missing, you'll see a black screen.</p>
+
+    <h4>Common Gotchas</h4>
+
+    <div class="callout-box" data-type="warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-content">
+        <strong>Black Screen Debugging Checklist</strong>
+        <ul>
+          <li>Camera at (0,0,0) — you're inside objects. Move it back!</li>
+          <li>StandardMaterial with no lights — add ambient + directional</li>
+          <li>Camera looking wrong way — try <code>camera.lookAt(0, 0, 0)</code></li>
+          <li>Renderer not in DOM — check <code>document.body.appendChild(renderer.domElement)</code></li>
+          <li>Forgot <code>updateProjectionMatrix()</code> after camera changes</li>
+          <li>Forgot <code>controls.update()</code> in loop with damping</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <strong>Key Insight</strong>
+        <p>Most Three.js problems come from missing configuration, not code errors. When something doesn't look right, check your setup chain before debugging complex logic.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>🔑 Key Terminology Review</h3>
+
+    <div class="flashcard-set" data-set="day7-review">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Scene Graph</dt></div>
+        <div class="flashcard-back"><dd>Tree of parent-child 3D objects. Groups can contain meshes, lights, and other groups. (Day 2-3)</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>PBR</dt></div>
+        <div class="flashcard-back"><dd>Physically-Based Rendering — realistic material model using roughness and metalness to simulate real-world surfaces. (Day 4)</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Three-Point Lighting</dt></div>
+        <div class="flashcard-back"><dd>Professional lighting setup: Key light (main), Fill light (softens shadows), Back light (separates subject from background). (Day 5)</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Shadow Map</dt></div>
+        <div class="flashcard-back"><dd>A depth texture rendered from the light's perspective. Used to determine which areas are in shadow. (Day 5)</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>OrbitControls</dt></div>
+        <div class="flashcard-back"><dd>Mouse/touch camera navigation — left-click orbits, right-click pans, scroll zooms. Standard for 3D viewers. (Day 6)</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Mesh</dt></div>
+        <div class="flashcard-back"><dd>Geometry + Material = visible object. The fundamental building block of any Three.js scene. (Day 2)</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>FOV</dt></div>
+        <div class="flashcard-back"><dd>Field of View — the camera's vertical viewing angle in degrees. 75° is a good default. (Day 6)</dd></div>
+      </div>
+      <div class="flashcard" data-card="8">
+        <div class="flashcard-front"><dt>Texture Mapping</dt></div>
+        <div class="flashcard-back"><dd>Wrapping 2D images onto 3D surfaces. Loaded with TextureLoader and applied to material properties. (Day 4)</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">←</button>
+      <span class="flashcard-counter">1 / 8</span>
+      <button class="flashcard-next" aria-label="Next card">→</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples (Mini-Project) -->
+  <div class="section code-examples">
+    <h3>💻 Mini-Project: Interactive 3D Gallery</h3>
+
+    <p>Build a 3D art gallery with multiple objects on a floor, professional lighting, shadows, and orbit controls. This combines <strong>everything</strong> from Week 1.</p>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">gallery-starter.js</span>
+        <span class="badge">Starter Code</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+// ===== SCENE SETUP =====
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(
+    75, window.innerWidth / window.innerHeight, 0.1, 1000
+);
+camera.position.set(8, 5, 8);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+
+// ===== FLOOR =====
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: 0x404040, roughness: 0.8 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// ===== GALLERY OBJECTS =====
+// Object 1: Metallic red sphere
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 32),
+    new THREE.MeshStandardMaterial({
+        color: 0xff0000, roughness: 0.3, metalness: 0.7
+    })
+);
+sphere.position.set(-3, 1, 0);
+sphere.castShadow = true;
+scene.add(sphere);
+
+// TODO: Add 2-4 more objects with different geometries
+// TODO: Vary materials (roughness, metalness, colors)
+
+// ===== LIGHTS =====
+// TODO: Add three-point lighting setup
+// Hint: ambient (0.3) + directional (1.0) + fill light
+
+// ===== ANIMATION LOOP =====
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
+
+// ===== WINDOW RESIZE =====
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This starter code gives you the scene foundation — setup, floor, one object, controls, and resize handling. Your job: add more objects, lighting, and materials to create a complete gallery.
+      </div>
+      <div class="try-it">
+        💡 <strong>Your task:</strong> Extend this with 3+ more objects (different geometries), three-point lighting with shadows, and varied PBR materials. Make it look professional!
+      </div>
+    </div>
+
+    <!-- Requirements as a visual checklist -->
+    <div class="callout-box" data-type="task">
+      <div class="callout-icon">📋</div>
+      <div class="callout-content">
+        <strong>Project Requirements</strong>
+        <p><strong>Scene Setup (20 pts):</strong> Scene, camera, renderer, OrbitControls, resize handler, background color</p>
+        <p><strong>Geometry (20 pts):</strong> 3-5 different shapes, interesting layout, floor plane, at least one group</p>
+        <p><strong>Materials (20 pts):</strong> 3+ material configs, varied roughness/metalness, StandardMaterial for PBR</p>
+        <p><strong>Lighting (20 pts):</strong> Multi-light setup, shadows enabled, cast/receive configured, balanced intensity</p>
+        <p><strong>Polish (20 pts):</strong> Clean code, smooth controls, no errors, aesthetically pleasing</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>✏️ Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Quick Knowledge Check</h4>
+        <span class="time-estimate">⏱️ ~10 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Test your Week 1 retention</p>
+      <ol class="exercise-steps">
+        <li>Answer these 5 questions without looking at notes</li>
+        <li>Then check your answers against the course material</li>
+      </ol>
+    </div>
+
+    <!-- Knowledge Check Quiz -->
+    <div class="quiz" data-quiz="day7-review">
+      <div class="quiz-question" data-question="1">
+        <p><strong>Q1:</strong> What three objects does every Three.js scene require at minimum?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="r-q1" value="a"> Mesh, Light, Camera</label>
+          <label><input type="radio" name="r-q1" value="b" data-correct> Scene, Camera, Renderer</label>
+          <label><input type="radio" name="r-q1" value="c"> Scene, Mesh, Light</label>
+          <label><input type="radio" name="r-q1" value="d"> Camera, Renderer, Animation Loop</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! Scene (container), Camera (viewpoint), and Renderer (draws to canvas) are the essential trio.</p>
+          <p class="incorrect-feedback">❌ The essential trio is Scene, Camera, and Renderer. Without all three, nothing renders.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="2">
+        <p><strong>Q2:</strong> What's the key difference between MeshBasicMaterial and MeshStandardMaterial?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="r-q2" value="a"> BasicMaterial is faster to load</label>
+          <label><input type="radio" name="r-q2" value="b" data-correct> BasicMaterial ignores lights; StandardMaterial reacts to lights with PBR</label>
+          <label><input type="radio" name="r-q2" value="c"> StandardMaterial only works with textures</label>
+          <label><input type="radio" name="r-q2" value="d"> They're the same but with different defaults</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! MeshBasicMaterial is always fully lit (ignores lights). MeshStandardMaterial uses physically-based rendering and reacts realistically to lights.</p>
+          <p class="incorrect-feedback">❌ The key difference: BasicMaterial ignores all lights (always fully lit), while StandardMaterial uses PBR and reacts to lights realistically.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="3">
+        <p><strong>Q3:</strong> What are the 3 steps to enable shadows?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="r-q3" value="a"> Add light, add material, add camera</label>
+          <label><input type="radio" name="r-q3" value="b"> Enable on renderer, enable on scene, enable on mesh</label>
+          <label><input type="radio" name="r-q3" value="c" data-correct> Enable on renderer, set light.castShadow, set mesh.castShadow/receiveShadow</label>
+          <label><input type="radio" name="r-q3" value="d"> Just set renderer.shadowMap.enabled = true</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! Three steps: 1) <code>renderer.shadowMap.enabled = true</code>, 2) <code>light.castShadow = true</code>, 3) objects: <code>castShadow = true</code> and/or <code>receiveShadow = true</code>.</p>
+          <p class="incorrect-feedback">❌ Three steps needed: enable on the renderer, enable on the light source, and configure each mesh to cast and/or receive shadows.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="4">
+        <p><strong>Q4:</strong> What does FOV control in PerspectiveCamera?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="r-q4" value="a"> The camera's position in the scene</label>
+          <label><input type="radio" name="r-q4" value="b"> The render quality/resolution</label>
+          <label><input type="radio" name="r-q4" value="c" data-correct> The vertical viewing angle — how wide the camera can see</label>
+          <label><input type="radio" name="r-q4" value="d"> The depth of field blur effect</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! FOV is the vertical viewing angle in degrees. 75° is a good default; wider = more visible, narrower = zoomed in.</p>
+          <p class="incorrect-feedback">❌ FOV (Field of View) is the vertical viewing angle in degrees. Higher values show more of the scene (wide-angle), lower values show less (telephoto/zoom).</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="5">
+        <p><strong>Q5:</strong> Why must you call <code>updateProjectionMatrix()</code> after changing camera properties?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="r-q5" value="a"> To resize the renderer</label>
+          <label><input type="radio" name="r-q5" value="b"> To update the scene graph</label>
+          <label><input type="radio" name="r-q5" value="c" data-correct> Because the camera's internal projection matrix doesn't auto-update — the change is silently ignored without it</label>
+          <label><input type="radio" name="r-q5" value="d"> It's optional — changes apply automatically</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! The camera caches its projection matrix for performance. When you change FOV, aspect, near, or far, you must tell it to recalculate.</p>
+          <p class="incorrect-feedback">❌ The camera uses an internal projection matrix for rendering. When properties change, this matrix must be recalculated manually — Three.js doesn't do it automatically for performance reasons.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Build the Gallery</h4>
+        <span class="time-estimate">⏱️ ~40 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Complete the mini-project using the starter code above</p>
+      <ol class="exercise-steps">
+        <li>Start with the starter code template</li>
+        <li>Add 3-4 more objects with different geometries (torus, cylinder, cone, etc.)</li>
+        <li>Give each object a unique material (vary color, roughness, metalness)</li>
+        <li>Implement three-point lighting with shadows</li>
+        <li>Position objects in an interesting layout</li>
+        <li>Test controls, resize, and overall look</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Lighting hint</summary>
+        <p>Start with <code>AmbientLight(0xffffff, 0.3)</code> for base, then <code>DirectionalLight(0xffffff, 1.0)</code> at position (5, 10, 5) as key light with <code>castShadow = true</code>. Add a dimmer point light from the other side as fill.</p>
+      </details>
+      <details class="exercise-hints">
+        <summary>Layout hint</summary>
+        <p>Arrange objects in a semicircle or grid. Use different Y positions for visual interest. Try grouping a cylinder pedestal + object on top using <code>THREE.Group()</code>.</p>
+      </details>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Troubleshooting Practice</h4>
+        <span class="time-estimate">⏱️ ~10 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Build debugging intuition by breaking things on purpose</p>
+      <ol class="exercise-steps">
+        <li>Set camera position to (0, 0, 0) — what do you see?</li>
+        <li>Remove all lights — what happens to StandardMaterial objects?</li>
+        <li>Enable shadows but skip <code>castShadow</code> on objects — shadows appear?</li>
+        <li>Enable damping but remove <code>controls.update()</code> — how does it feel?</li>
+        <li>Document each symptom so you can recognize them instantly</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>📖 Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/fundamentals" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">Three.js Fundamentals</span>
+        <span class="resource-meta">Three.js Manual — Official refresher on core concepts</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/examples/" target="_blank" rel="noopener">
+        <span class="resource-type">🔗 Examples</span>
+        <span class="resource-title">Three.js Examples Gallery</span>
+        <span class="resource-meta">Official — Browse what's possible for inspiration</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/editor/" target="_blank" rel="noopener">
+        <span class="resource-type">🔧 Tool</span>
+        <span class="resource-title">Three.js Editor</span>
+        <span class="resource-meta">Official — Visual scene builder for experimentation</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>🤔 Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Which Week 1 concept did you find most challenging, and why?</p>
+      <textarea placeholder="Think about what needed the most re-reading or experimentation..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you optimize a scene with 100 objects for smooth performance?</p>
+      <textarea placeholder="Think about: geometry detail, shadow settings, material complexity, draw calls..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What kind of 3D scene are you most excited to build for your AI portfolio?</p>
+      <textarea placeholder="Dream big — what would make visitors go 'wow'?"></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>➡️ Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="08-animation.html">Day 8: Animation Basics</a> — Learn to animate objects with loops, tweening, and the Clock object.</p>
+    <p>You've mastered the foundations! Week 2 builds on everything with animation, 3D model loading (GLTF), shaders, and performance optimization.</p>
+
+    <div class="callout-box" data-type="preview">
+      <div class="callout-icon">🔮</div>
+      <div class="callout-content">
+        <strong>Week 2 Preview</strong>
+        <ul>
+          <li>Day 8-9: Animation techniques (Clock, tweening, keyframes)</li>
+          <li>Day 10-11: Loading 3D models (GLTF)</li>
+          <li>Day 12: Shaders and custom materials</li>
+          <li>Day 13: Performance optimization</li>
+          <li>Day 14: AI prompt patterns for 3D scenes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can build a complete 3D scene from scratch</label>
+      <label><input type="checkbox"> I can configure realistic lighting with shadows</label>
+      <label><input type="checkbox"> I can apply varied materials for visual interest</label>
+      <label><input type="checkbox"> I can set up interactive controls with damping and limits</label>
+      <label><input type="checkbox"> I can troubleshoot common issues (black screen, flat objects, missing shadows)</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  <nav class="day-nav bottom">
+    <a href="06-textures.html">← Day 6: Cameras</a>
+    <a href="../index.html">Course Home</a>
+    <a href="08-animation.html">Day 8: Animation Basics →</a>
+  </nav>
+</section>
+
+</div>
+<script src="../main.js"></script>
+</body>
+</html>

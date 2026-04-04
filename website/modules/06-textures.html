@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 6: Cameras and OrbitControls — Three.js + AI Portfolio</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="course-container">
+
+<section class="day-content" data-day="6">
+  <h2>Day 6: Cameras and OrbitControls</h2>
+
+  <!-- Navigation -->
+  <nav class="day-nav">
+    <a href="05-lighting.html">← Day 5: Lighting</a>
+    <a href="../index.html">Course Home</a>
+    <a href="07-mini-project.html">Day 7: Mini-Project →</a>
+  </nav>
+
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>🎯 Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Understand PerspectiveCamera parameters (FOV, aspect, near, far)</li>
+      <li data-objective="2">Compare PerspectiveCamera vs OrthographicCamera use cases</li>
+      <li data-objective="3">Implement OrbitControls for mouse-based camera navigation</li>
+      <li data-objective="4">Configure OrbitControls properties (damping, zoom limits, rotation limits)</li>
+      <li data-objective="5">Animate camera movement programmatically</li>
+    </ul>
+    <div class="difficulty-badge">🟢 Beginner</div>
+    <div class="time-estimate">⏱️ ~1 hour (20 min reading + 40 min hands-on)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>📚 Core Concepts</h3>
+
+    <h4>The Camera is Your Viewpoint</h4>
+    <p>In Three.js, the camera determines what the user sees. Unlike real cameras that capture light, Three.js cameras define a <strong>viewing frustum</strong> — a pyramid-shaped volume of space that gets rendered. Objects inside this frustum are visible; objects outside are "culled" (not rendered) for performance.</p>
+    <p>Think of it like looking through a window. The window frame determines what you can see, and you can only see things between the glass and the horizon — not things behind you or past the horizon. The camera's parameters control the shape and size of that window.</p>
+    <p>The most common camera is <code>PerspectiveCamera</code>, which mimics how human eyes see the world: objects farther away appear smaller. The alternative is <code>OrthographicCamera</code>, which has no perspective distortion — like architectural blueprints where parallel lines stay parallel.</p>
+
+    <h4>PerspectiveCamera Parameters</h4>
+
+    <!-- Callout Box -->
+    <div class="callout-box" data-type="concept">
+      <div class="callout-icon">📷</div>
+      <div class="callout-content">
+        <strong>The Four Camera Parameters</strong>
+        <p><code>new THREE.PerspectiveCamera(fov, aspect, near, far)</code></p>
+        <ul>
+          <li><strong>FOV</strong> — Vertical viewing angle in degrees (75° is a good default)</li>
+          <li><strong>Aspect</strong> — Width / Height of your viewport (match the window)</li>
+          <li><strong>Near</strong> — Minimum render distance (0.1 typical, never 0)</li>
+          <li><strong>Far</strong> — Maximum render distance (1000 typical)</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>FOV (Field of View)</strong> is the vertical viewing angle. Higher values give a wider fish-eye view, lower values give a narrow telephoto zoom. Human eyes see roughly 50-60°. Game cameras use 75-90° for immersion.</p>
+    <p><strong>Aspect Ratio</strong> should always match your viewport: <code>window.innerWidth / window.innerHeight</code>. Get this wrong and everything stretches.</p>
+    <p><strong>Near/Far Clipping Planes</strong> define the render range. Setting near to 0 causes Z-fighting (depth buffer precision issues). Setting far too high wastes GPU resources on invisible objects.</p>
+
+    <h4>OrbitControls: Interactive Navigation</h4>
+    <p>Portfolio sites need to feel alive. <code>OrbitControls</code> wires up all the standard 3D interactions: left-click to rotate, right-click to pan, scroll to zoom, and touch gestures for mobile.</p>
+    <p>The camera orbits around a <strong>target</strong> point (default: origin). The most important setting is <strong>damping</strong> — it adds inertia so the camera keeps gliding after you stop dragging. Without damping, movement feels abrupt. With it, your scene feels polished and premium.</p>
+    <p>Key configuration: <code>minDistance</code>/<code>maxDistance</code> for zoom limits, <code>maxPolarAngle</code> to prevent going underground, <code>autoRotate</code> for showcase hero sections, and <code>enablePan</code> to restrict to orbit-only.</p>
+
+    <h4>Camera Animation</h4>
+    <p>Cameras are just another <code>Object3D</code> — they have position, rotation, and can be animated like any object. Use <strong>linear interpolation</strong> (lerp) combined with <strong>easing functions</strong> for smooth, natural-feeling transitions between camera positions.</p>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <strong>Key Insight</strong>
+        <p>The camera is just another Object3D — it has position, rotation, and can be parented to groups. You can animate it like any other object in your scene.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>🔑 Key Terminology</h3>
+
+    <!-- Flashcard Set -->
+    <div class="flashcard-set" data-set="day6-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front">
+          <dt>FOV</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Field of View — the vertical viewing angle in degrees. 75° is normal, 120° is wide-angle, 30° is telephoto zoom.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front">
+          <dt>Frustum</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>The pyramid-shaped volume between near and far clipping planes. Only objects inside this volume get rendered.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front">
+          <dt>Clipping Plane</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Near/far boundaries that control render range. Objects outside these planes are invisible. Near should never be 0.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front">
+          <dt>OrbitControls</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Mouse/touch controls to rotate the camera around a target point. The standard interaction model for 3D viewers and portfolios.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front">
+          <dt>Damping</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Inertia effect that makes the camera glide smoothly after input stops. Requires <code>controls.update()</code> in the animation loop.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front">
+          <dt>Lerp</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Linear interpolation — smoothly blending between two values. Used to animate camera from position A to position B.</dd>
+        </div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">←</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">→</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>💻 Code Examples</h3>
+
+    <!-- Code Block 1: Camera Setup -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">camera-setup.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+
+// Create camera — these are the most common "good defaults"
+const camera = new THREE.PerspectiveCamera(
+    75,                                      // FOV: wider than human eye
+    window.innerWidth / window.innerHeight,  // Aspect: match browser window
+    0.1,                                     // Near: very close to camera
+    1000                                     // Far: render up to 1000 units
+);
+
+// Position camera — default (0,0,0) puts you INSIDE objects!
+camera.position.set(5, 5, 5);
+camera.lookAt(0, 0, 0);  // Point at scene origin
+
+// Dynamically change FOV (zoom effect)
+camera.fov = 50;  // Narrower = more zoomed in
+camera.updateProjectionMatrix();  // REQUIRED after changes!
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const cube = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
+);
+scene.add(cube);
+
+function animate() {
+    requestAnimationFrame(animate);
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We create a camera with typical settings and pull it back from the origin. The critical detail: whenever you change camera properties like <code>fov</code> at runtime, you <strong>must</strong> call <code>updateProjectionMatrix()</code> — otherwise the change is silently ignored.
+      </div>
+    </div>
+
+    <!-- Code/English Translation Block -->
+    <div class="code-translate" data-example="camera-params">
+      <h4>📖 Camera Parameters in Plain English</h4>
+      <div class="translate-grid">
+        <div class="translate-row">
+          <div class="translate-code"><code>PerspectiveCamera(75, ...)</code></div>
+          <div class="translate-english">"My vertical viewing angle is 75 degrees — wider than human eyes for an immersive feel"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>camera.position.set(5, 5, 5)</code></div>
+          <div class="translate-english">"Move me 5 units right, 5 units up, and 5 units toward the viewer"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>camera.lookAt(0, 0, 0)</code></div>
+          <div class="translate-english">"Rotate me so I'm facing the center of the scene"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>camera.updateProjectionMatrix()</code></div>
+          <div class="translate-english">"I changed a setting — please recalculate my internal math so it takes effect"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Block 2: OrbitControls -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">orbit-controls.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+// After creating camera and renderer...
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// Enable damping for smooth, premium feel
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;  // Lower = more glide
+
+// Prevent extreme zoom
+controls.minDistance = 2;
+controls.maxDistance = 20;
+
+// Stop camera from going below the floor
+controls.maxPolarAngle = Math.PI / 2;
+
+// Disable panning — orbit only (cleaner for portfolios)
+controls.enablePan = false;
+
+// Auto-rotate when idle
+controls.autoRotate = true;
+controls.autoRotateSpeed = 2;
+
+// CRITICAL: update every frame when damping is on
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();  // Calculates inertia each frame
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> OrbitControls listens for mouse/touch events on the renderer's canvas. Damping creates smooth gliding by gradually reducing velocity each frame — but only if you call <code>controls.update()</code> in the animation loop.
+      </div>
+    </div>
+
+    <!-- Code Block 3: Camera Animation -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">camera-animation.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Smooth camera movement with ease-in-out
+function moveCameraTo(targetPos, duration = 1000) {
+    const startPos = camera.position.clone();
+    const startTime = Date.now();
+
+    function animateCamera() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease-in-out: accelerate then decelerate
+        const eased = progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        // Blend between start and target
+        camera.position.lerpVectors(startPos, targetPos, eased);
+
+        if (progress < 1) {
+            requestAnimationFrame(animateCamera);
+        }
+    }
+    animateCamera();
+}
+
+// Move camera over 2 seconds
+moveCameraTo(new THREE.Vector3(10, 5, 10), 2000);</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We capture the starting position, then each frame calculate progress (0→1). The easing function transforms linear progress into smooth acceleration/deceleration. <code>lerpVectors</code> blends between start and end positions.
+      </div>
+      <div class="try-it">
+        💡 <strong>Try it:</strong> Set up OrbitControls with and without damping. Feel the difference — damping makes your scene feel professional instead of mechanical.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>✏️ Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Camera Parameter Exploration</h4>
+        <span class="time-estimate">⏱️ ~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Understand how FOV and clipping planes affect the view</p>
+      <ol class="exercise-steps">
+        <li>Create a scene with 5 cubes at different distances (z = -5, 0, 5, 10, 20)</li>
+        <li>Give each cube a different color so you can tell them apart</li>
+        <li>Start with FOV = 75, near = 0.1, far = 100</li>
+        <li>Change FOV to 30 — observe the "zoomed in" telephoto effect</li>
+        <li>Change FOV to 120 — observe the wide-angle distortion</li>
+        <li>Set far = 15 — watch distant cubes vanish</li>
+        <li>Set near = 10 — watch close cubes disappear</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: OrbitControls Configuration</h4>
+        <span class="time-estimate">⏱️ ~25 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Configure OrbitControls for a portfolio-like experience</p>
+      <ol class="exercise-steps">
+        <li>Create a scene with a sphere or torus at the center</li>
+        <li>Add OrbitControls with damping (dampingFactor = 0.05)</li>
+        <li>Set min/max distance to prevent extreme zoom</li>
+        <li>Set <code>maxPolarAngle = Math.PI / 2</code> to prevent underground view</li>
+        <li>Disable panning and enable auto-rotation</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Need a hint?</summary>
+        <p><code>controls.update()</code> must be in your animation loop — auto-rotation and damping both require it.</p>
+      </details>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Camera Showcase</h4>
+        <span class="time-estimate">⏱️ ~30 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create a multi-view scene with smooth camera switching</p>
+      <ol class="exercise-steps">
+        <li>Create a scene with several objects</li>
+        <li>Define 3 camera positions: front (0,2,10), side (10,2,0), top (0,10,0)</li>
+        <li>Add keyboard listeners for keys 1, 2, 3</li>
+        <li>Use the <code>moveCameraTo</code> function to animate transitions</li>
+        <li>Make transitions take 1.5 seconds with smooth easing</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>📖 Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/docs/#api/en/cameras/PerspectiveCamera" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">PerspectiveCamera</span>
+        <span class="resource-meta">Three.js — Complete parameter reference</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/docs/#examples/en/controls/OrbitControls" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">OrbitControls</span>
+        <span class="resource-meta">Three.js — All configuration options</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/examples/?q=camera" target="_blank" rel="noopener">
+        <span class="resource-type">🔗 Examples</span>
+        <span class="resource-title">Camera Examples</span>
+        <span class="resource-meta">Three.js — Interactive demos</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>🤔 Reflection Questions</h3>
+
+    <!-- Quiz -->
+    <div class="quiz" data-quiz="day6">
+      <div class="quiz-question" data-question="1">
+        <p><strong>Q1:</strong> What happens if you set the near clipping plane to 0?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q1" value="a"> Nothing — it renders the same</label>
+          <label><input type="radio" name="q1" value="b"> Objects very close to the camera become invisible</label>
+          <label><input type="radio" name="q1" value="c" data-correct> Depth buffer precision issues cause Z-fighting (flickering surfaces)</label>
+          <label><input type="radio" name="q1" value="d"> The renderer throws an error</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! Setting near to 0 causes the depth buffer to lose precision, resulting in Z-fighting where overlapping surfaces flicker.</p>
+          <p class="incorrect-feedback">❌ Setting near to 0 causes depth buffer precision issues. The near/far ratio determines depth precision — a near plane at 0 means infinite ratio, causing Z-fighting.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="2">
+        <p><strong>Q2:</strong> When would you use OrthographicCamera instead of PerspectiveCamera?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q2" value="a"> For better performance in all cases</label>
+          <label><input type="radio" name="q2" value="b" data-correct> For architectural visualization, 2D games, or CAD where parallel lines must stay parallel</label>
+          <label><input type="radio" name="q2" value="c"> When you want more realistic depth perception</label>
+          <label><input type="radio" name="q2" value="d"> Only for VR applications</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! OrthographicCamera preserves parallel lines — essential for architectural plans, isometric games, and technical visualization.</p>
+          <p class="incorrect-feedback">❌ OrthographicCamera is used when you need parallel lines to stay parallel — like architectural blueprints, isometric games, or CAD software.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="3">
+        <p><strong>Q3:</strong> Why must you call <code>controls.update()</code> every frame when damping is enabled?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q3" value="a"> To re-render the scene</label>
+          <label><input type="radio" name="q3" value="b"> To detect new mouse events</label>
+          <label><input type="radio" name="q3" value="c" data-correct> To calculate the inertia/deceleration effect each frame</label>
+          <label><input type="radio" name="q3" value="d"> It's optional — damping works without it</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! Damping works by reducing velocity each frame — <code>update()</code> is where that calculation happens. Without it, damping (and auto-rotate) won't work.</p>
+          <p class="incorrect-feedback">❌ Damping needs <code>update()</code> because that's where the inertia calculation happens each frame. The controls gradually reduce velocity — that math runs inside <code>update()</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What camera settings and controls will feel best for your AI portfolio site?</p>
+      <textarea placeholder="Think about: FOV, orbit limits, auto-rotation, mobile experience..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>➡️ Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="07-mini-project.html">Day 7: Week 1 Review & Mini-Project</a> — Build a complete interactive 3D gallery combining everything from this week.</p>
+    <div class="checklist">
+      <label><input type="checkbox"> I can create and configure a PerspectiveCamera</label>
+      <label><input type="checkbox"> I can set up OrbitControls with damping and limits</label>
+      <label><input type="checkbox"> I know to call updateProjectionMatrix() after camera changes</label>
+      <label><input type="checkbox"> I can animate camera position with easing</label>
+      <label><input type="checkbox"> I can configure auto-rotation and orbit constraints</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  <nav class="day-nav bottom">
+    <a href="05-lighting.html">← Day 5: Lighting</a>
+    <a href="../index.html">Course Home</a>
+    <a href="07-mini-project.html">Day 7: Mini-Project →</a>
+  </nav>
+</section>
+
+</div>
+<script src="../main.js"></script>
+</body>
+</html>

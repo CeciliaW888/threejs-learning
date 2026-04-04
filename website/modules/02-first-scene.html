@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 2: Your First Three.js Scene — The Rotating Cube</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <section id="main-content" class="day-content" data-module="02-first-scene" data-day="2">
+
+    <!-- Navigation -->
+    <nav class="day-nav" style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) 0;">
+      <a href="01-intro-threejs.html">← Previous</a>
+      <a href="../index.html">Course Home</a>
+      <a href="03-geometries-materials.html">Next →</a>
+    </nav>
+
+    <div style="max-width:var(--content-width);margin:0 auto;padding:var(--space-4) var(--space-4) var(--space-16);">
+
+      <h1 style="font-family:var(--font-heading);font-size:var(--text-3xl);margin-bottom:var(--space-2);">Day 2: Your First Three.js Scene — The Rotating Cube</h1>
+      <div class="difficulty-badge" style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:var(--text-sm);background:var(--color-accent-light);margin-bottom:var(--space-8);">🟢 Beginner · ~1 hour</div>
+
+      <!-- 1. Learning Objectives -->
+      <div class="section objectives" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🎯 Learning Objectives</h2>
+        <ul style="line-height:1.8;">
+          <li>Create a complete Three.js scene with all required components</li>
+          <li>Add a 3D mesh (geometry + material) to your scene</li>
+          <li>Implement a render loop for animation</li>
+          <li>Position and rotate objects in 3D space</li>
+          <li>Handle window resizing for responsive 3D graphics</li>
+        </ul>
+      </div>
+
+      <!-- 2. Core Concepts -->
+      <div class="section concepts" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📚 Core Concepts</h2>
+
+        <h3>The Scene Graph</h3>
+        <p>Think of a Three.js scene like a <strong>family tree</strong>. The <code>Scene</code> object is the root, and everything else — cameras, lights, meshes — are children. When you add an object with <code>scene.add(mesh)</code>, you're creating a parent-child relationship. This hierarchy matters because transformations (position, rotation, scale) apply to children relative to their parents.</p>
+        <p>This parent-child system is called the "scene graph." If you rotate a parent object, all its children rotate with it. Imagine a solar system where planets orbit the sun, and moons orbit planets. The scene graph handles all that nested motion automatically.</p>
+
+        <h3>Meshes: Geometry Meets Material</h3>
+        <p>A <code>Mesh</code> is the most fundamental 3D object in Three.js. It combines two concepts:</p>
+        <p><strong>Geometry</strong> — The shape. A collection of vertices (points in 3D space) and faces (triangles connecting those points). Three.js provides built-in geometries like <code>BoxGeometry</code>, <code>SphereGeometry</code>, and <code>PlaneGeometry</code>.</p>
+        <p><strong>Material</strong> — The appearance. How the surface reflects light, its color, texture, and visual properties. It's like 3D printing: the geometry is the model file, and the material is whether you print in red plastic, metal, or wood.</p>
+
+        <h3>The Coordinate System</h3>
+
+        <!-- Data flow animation for coordinate system -->
+        <div style="background:var(--bg-warm);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;">
+          <div style="font-family:var(--font-code);font-size:var(--text-sm);text-align:center;margin-bottom:var(--space-4);">
+            <div style="display:inline-grid;grid-template-columns:auto auto;gap:var(--space-1) var(--space-4);text-align:left;">
+              <span style="color:var(--accent-red);font-weight:700;">X-axis:</span> <span>Left (−) → Right (+)</span>
+              <span style="color:var(--accent-green);font-weight:700;">Y-axis:</span> <span>Down (−) → Up (+)</span>
+              <span style="color:var(--accent-blue);font-weight:700;">Z-axis:</span> <span>Back (−) → Front (+) toward camera</span>
+            </div>
+          </div>
+          <p style="font-size:var(--text-sm);color:var(--text-secondary);margin:0;text-align:center;">Origin (0, 0, 0) is the center. Position (2, 1, -5) = 2 right, 1 up, 5 away from camera.</p>
+        </div>
+
+        <h3>The Render Loop</h3>
+        <p>Animation in Three.js happens through continuous re-rendering. <code>requestAnimationFrame</code> tells the browser to call your function before the next screen refresh — typically 60 times per second.</p>
+
+        <!-- Step cards for render loop -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:var(--space-3);margin:var(--space-4) 0;">
+          <div style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:var(--text-2xl);margin-bottom:var(--space-2);">1️⃣</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">Update State</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Rotate, move, change</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:var(--text-2xl);margin-bottom:var(--space-2);">2️⃣</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">Render Scene</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Draw the frame</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:var(--text-2xl);margin-bottom:var(--space-2);">3️⃣</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">Request Next</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">Schedule callback</div>
+          </div>
+          <div style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);text-align:center;border:1px solid var(--border);">
+            <div style="font-size:var(--text-2xl);margin-bottom:var(--space-2);">🔄</div>
+            <div style="font-weight:600;font-size:var(--text-sm);">Repeat</div>
+            <div style="font-size:var(--text-xs);color:var(--text-secondary);">60 FPS forever</div>
+          </div>
+        </div>
+
+        <!-- Callout -->
+        <div class="callout-box" style="background:var(--color-accent-light);border-left:4px solid var(--color-accent);border-radius:var(--radius-sm);padding:var(--space-4) var(--space-6);margin:var(--space-6) 0;">
+          <strong>💡 Key Insight:</strong> Three.js is declarative — you describe <em>what</em> you want (a red cube at position X), not <em>how</em> to draw it. The renderer figures out the WebGL commands needed.
+        </div>
+      </div>
+
+      <!-- 3. Key Terminology -->
+      <div class="section terminology" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🔑 Key Terminology</h2>
+        <div class="term-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-4);">
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Mesh</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Combination of geometry (shape) and material (appearance). <code>new THREE.Mesh(geometry, material)</code></dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">BoxGeometry</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Built-in geometry for boxes/cubes. <code>new THREE.BoxGeometry(1, 1, 1)</code> = 1×1×1 cube.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">MeshBasicMaterial</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Simplest material — flat color, no lighting effects. Good for debugging.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">PerspectiveCamera</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Camera mimicking human eye perspective. Parameters: FOV, aspect ratio, near, far.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">requestAnimationFrame</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Browser API for scheduling smooth animations. Syncs with screen refresh (~60 FPS).</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Scene Graph</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Tree structure of parent-child relationships. Children inherit parent transforms.</dd>
+          </div>
+          <div class="term-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border-left:3px solid var(--color-accent);box-shadow:var(--shadow-sm);">
+            <dt style="font-weight:700;color:var(--color-accent);margin-bottom:var(--space-1);">Aspect Ratio</dt>
+            <dd style="margin:0;font-size:var(--text-sm);">Width ÷ height (e.g., 16:9 = 1.777). Prevents distortion in camera view.</dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Code Examples -->
+      <div class="section code-examples" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">💻 Code Examples</h2>
+
+        <h3>Example 1: Complete Rotating Cube</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">main.js</span>
+            <span style="color:#96f2d7;">Working Example</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code>import * as THREE from 'three';
+
+<span style="color:#6c7086;">// 1. Create the scene</span>
+const scene = new THREE.Scene();
+
+<span style="color:#6c7086;">// 2. Create the camera</span>
+const camera = new THREE.PerspectiveCamera(
+    75,                                      <span style="color:#6c7086;">// FOV in degrees</span>
+    window.innerWidth / window.innerHeight,  <span style="color:#6c7086;">// Aspect ratio</span>
+    0.1,                                     <span style="color:#6c7086;">// Near clip</span>
+    1000                                     <span style="color:#6c7086;">// Far clip</span>
+);
+camera.position.z = 5;  <span style="color:#6c7086;">// Move camera back</span>
+
+<span style="color:#6c7086;">// 3. Create the renderer</span>
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+<span style="color:#6c7086;">// 4. Create a cube</span>
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+<span style="color:#6c7086;">// 5. Animation loop</span>
+function animate() {
+    requestAnimationFrame(animate);
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> This is the "Hello World" of Three.js. We create the big three (scene, camera, renderer), add a green cube, and start an animation loop that rotates it slightly each frame.
+          </div>
+        </div>
+
+        <h3>Example 2: Handling Window Resize</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">resize-handler.js</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code>window.addEventListener('resize', onWindowResize);
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();  <span style="color:#6c7086;">// MUST call this!</span>
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> When the window resizes, update the camera aspect ratio and renderer size. <code>updateProjectionMatrix()</code> is crucial — it recalculates the camera's internal math.
+          </div>
+        </div>
+
+        <h3>Example 3: Material Variations</h3>
+        <div class="code-block" style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);margin:var(--space-4) 0;">
+          <div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-4);background:#2c2c2c;color:#ccc;font-size:var(--text-sm);">
+            <span style="flex:1;font-family:var(--font-code);">materials.js</span>
+          </div>
+          <pre style="margin:0;padding:var(--space-4);background:var(--bg-code);color:#cdd6f4;overflow-x:auto;font-family:var(--font-code);font-size:var(--text-sm);line-height:1.6;"><code><span style="color:#6c7086;">// Hex colors</span>
+const red = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const blue = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+
+<span style="color:#6c7086;">// CSS color names</span>
+const yellow = new THREE.MeshBasicMaterial({ color: 'yellow' });
+
+<span style="color:#6c7086;">// Transparent</span>
+const ghost = new THREE.MeshBasicMaterial({
+    color: 0x00ff00, transparent: true, opacity: 0.5
+});
+
+<span style="color:#6c7086;">// Wireframe (great for debugging)</span>
+const wire = new THREE.MeshBasicMaterial({
+    color: 0xffffff, wireframe: true
+});</code></pre>
+          <div style="padding:var(--space-3) var(--space-4);background:var(--bg-warm);font-size:var(--text-sm);border-top:1px solid var(--border);">
+            <strong>What's happening:</strong> Materials go beyond color — transparency, opacity, and wireframe mode reveal different aspects of your objects. Hex (<code>0xRRGGBB</code>) or CSS color names both work.
+          </div>
+          <div style="padding:var(--space-3) var(--space-4);background:#fef9c3;font-size:var(--text-sm);">
+            💡 <strong>Try it:</strong> Change the rotation speed. What happens with one fast axis and one slow? What about negative values?
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Exercises -->
+      <div class="section exercises" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">✏️ Hands-On Exercises</h2>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 1: Create Your First Scene</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~20 min</span>
+          </div>
+          <p><strong>Goal:</strong> Build a working Three.js scene from scratch</p>
+          <ol style="line-height:1.8;">
+            <li>Open your project from Day 1</li>
+            <li>Replace <code>main.js</code> with Example 1 above</li>
+            <li>Run <code>npm run dev</code> and open the browser</li>
+            <li>Verify you see a green rotating cube</li>
+            <li>Open the browser console — check for errors</li>
+          </ol>
+          <div style="margin-top:var(--space-4);padding:var(--space-3);background:#f0fdf4;border-radius:var(--radius-sm);font-size:var(--text-sm);">
+            🚀 <strong>Stretch:</strong> Add a second cube at a different position with a different rotation speed.
+          </div>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 2: Experiment with Colors & Rotation</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~15 min</span>
+          </div>
+          <p><strong>Goal:</strong> Understand how to modify mesh properties</p>
+          <ol style="line-height:1.8;">
+            <li>Change the cube's color to your favorite color</li>
+            <li>Try transparent (opacity 0.5)</li>
+            <li>Change rotation speeds (0.001, 0.05, negative values)</li>
+            <li>Rotate around only one axis</li>
+            <li>Try wireframe mode</li>
+          </ol>
+          <details style="margin-top:var(--space-3);">
+            <summary style="cursor:pointer;font-size:var(--text-sm);color:var(--color-accent);font-weight:500;">Need a hint?</summary>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:var(--space-2);">Colors: hex (0xFF5733) or names ('orange'). Rotation values are radians per frame — smaller = slower.</p>
+          </details>
+        </div>
+
+        <div class="exercise-card" style="background:var(--bg-card);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-4) 0;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4);">
+            <h3 style="margin:0;">Exercise 3: Multi-Cube Scene</h3>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">⏱️ ~25 min</span>
+          </div>
+          <p><strong>Goal:</strong> Create a scene with multiple objects at different positions</p>
+          <ol style="line-height:1.8;">
+            <li>Create 3 cubes with different colors</li>
+            <li>Position at (-2, 0, 0), (0, 0, 0), and (2, 0, 0)</li>
+            <li>Different rotation speeds for each</li>
+            <li>Add a wireframe cube at (0, 2, 0) — no rotation</li>
+            <li>Add window resize handling</li>
+          </ol>
+          <details style="margin-top:var(--space-3);">
+            <summary style="cursor:pointer;font-size:var(--text-sm);color:var(--color-accent);font-weight:500;">Need a hint?</summary>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-top:var(--space-2);">Use <code>mesh.position.set(x, y, z)</code> after creating each cube. Give each a variable name to reference in the animate function.</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- 6. Resources -->
+      <div class="section resources" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">📖 Curated Resources</h2>
+        <div class="resource-cards" style="display:grid;gap:var(--space-3);">
+          <a class="resource-card" href="https://threejs.org/manual/#en/fundamentals" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Article</span>
+            <span style="font-weight:600;">Creating a Scene — Three.js Manual</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Official guide with interactive examples</span>
+          </a>
+          <a class="resource-card" href="https://threejs.org/docs/#api/en/cameras/PerspectiveCamera" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Docs</span>
+            <span style="font-weight:600;">PerspectiveCamera — Three.js Docs</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Deep dive into camera parameters (FOV, near, far)</span>
+          </a>
+          <a class="resource-card" href="https://www.youtube.com/watch?v=YK1Sw_hnm58" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">🎥 Video · ⚠️ Verified · First 15 min</span>
+            <span style="font-weight:600;">Learn Three.js from Scratch — Chris Courses</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Step-by-step walkthrough of your first scene</span>
+          </a>
+          <a class="resource-card" href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:var(--space-3) var(--space-4);background:var(--bg-card);border-radius:var(--radius-sm);text-decoration:none;color:inherit;border:1px solid var(--border);">
+            <span style="font-size:var(--text-xs);color:var(--text-muted);">📄 Deep Dive (optional)</span>
+            <span style="font-weight:600;">requestAnimationFrame — MDN</span>
+            <span style="font-size:var(--text-sm);color:var(--text-secondary);">Understand the animation timing mechanism</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 7. Reflection -->
+      <div class="section reflection" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🤔 Reflection Questions</h2>
+        <div style="display:grid;gap:var(--space-4);">
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">Why do we call <code>requestAnimationFrame</code> continuously instead of just once?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: How does animation work at a fundamental level?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">What would happen if the camera's Z position was 0 instead of 5?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: Where is the cube? Where would the camera be?</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+          <div class="reflection-card" style="background:var(--bg-card);padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            <p style="font-weight:500;margin-bottom:var(--space-2);">How is the scene graph similar to the DOM in HTML?</p>
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);"><em>Think about: Parent-child relationships, how changes cascade down</em></p>
+            <textarea style="width:100%;min-height:80px;padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);resize:vertical;" placeholder="Your thoughts..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div class="section quiz" style="margin-bottom:var(--space-12);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">🧠 Quick Quiz</h2>
+        <div class="quiz-card" data-quiz-id="d2-q1" style="background:var(--bg-card);padding:var(--space-6);border-radius:var(--radius-md);border:1px solid var(--border);margin:var(--space-4) 0;">
+          <p style="font-weight:600;margin-bottom:var(--space-4);">What two things does a Mesh combine?</p>
+          <div style="display:grid;gap:var(--space-2);">
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">a) Scene and Camera</button>
+            <button onclick="checkQuiz(this,'correct')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">b) Geometry (shape) and Material (appearance)</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">c) Renderer and Canvas</button>
+            <button onclick="checkQuiz(this,'wrong')" style="text-align:left;padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);cursor:pointer;font-size:var(--text-sm);">d) Position and Rotation</button>
+          </div>
+          <div class="quiz-feedback" style="display:none;margin-top:var(--space-4);padding:var(--space-3);border-radius:var(--radius-sm);font-size:var(--text-sm);"></div>
+        </div>
+      </div>
+
+      <!-- 8. Next Steps -->
+      <div class="section next-steps" style="margin-bottom:var(--space-8);">
+        <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);">➡️ Next Steps</h2>
+        <p><strong>Tomorrow:</strong> <a href="03-geometries-materials.html">Day 3: Exploring Geometries & Materials</a> — Learn about all the built-in shapes Three.js provides and how to customize them.</p>
+        <div class="checklist" style="margin-top:var(--space-4);">
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can create a scene, camera, and renderer from memory</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can add a mesh and position it</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can implement an animation loop</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can handle window resizing</label>
+          <label style="display:block;padding:var(--space-2) 0;cursor:pointer;"><input type="checkbox" style="margin-right:var(--space-2);"> I can explain what a Mesh is</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom navigation -->
+    <nav class="day-nav bottom" style="max-width:var(--content-width);margin:0 auto;padding:0 var(--space-4) var(--space-8);border-top:1px solid var(--border);padding-top:var(--space-4);">
+      <a href="01-intro-threejs.html">← Previous</a>
+      <a href="../index.html">Course Home</a>
+      <a href="03-geometries-materials.html">Next →</a>
+    </nav>
+
+  </section>
+
+  <script>
+    function checkQuiz(btn, result) {
+      const card = btn.closest('.quiz-card');
+      const feedback = card.querySelector('.quiz-feedback');
+      const buttons = card.querySelectorAll('button');
+      buttons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+      btn.style.opacity = '1';
+      if (result === 'correct') {
+        btn.style.background = '#d4edda';
+        btn.style.borderColor = '#28a745';
+        feedback.textContent = '✅ Correct! A Mesh = Geometry (shape) + Material (appearance). It\'s the fundamental building block of 3D objects.';
+        feedback.style.background = '#d4edda';
+      } else {
+        btn.style.background = '#f8d7da';
+        btn.style.borderColor = '#dc3545';
+        feedback.textContent = '❌ Not quite. A Mesh combines Geometry (the shape/structure) with Material (how it looks — color, texture, shininess).';
+        feedback.style.background = '#f8d7da';
+      }
+      feedback.style.display = 'block';
+    }
+  </script>
+  <script src="../main.js"></script>
+</body>
+</html>

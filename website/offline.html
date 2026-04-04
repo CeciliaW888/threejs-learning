@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Three.js + AI Portfolio Course</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f0eb;
+      color: #2d2d2d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .offline-container {
+      max-width: 500px;
+    }
+    .emoji { font-size: 80px; margin-bottom: 1rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; color: #c4825a; }
+    p { line-height: 1.6; color: #6b6b6b; margin-bottom: 1.5rem; }
+    button {
+      background: #c4825a;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #b07149; }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="emoji">📴</div>
+    <h1>You're Offline</h1>
+    <p>No internet connection detected. Some course content may not be available, but you can still access cached lessons.</p>
+    <button onclick="window.location.reload()">Try Again</button>
+  </div>
+</body>
+</html>
