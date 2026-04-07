@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What underlying web technology does Three.js use to render 3D graphics in the browser?",
+    "options": [
+      "WebGL",
+      "SVG",
+      "Canvas 2D",
+      "WebGPU"
+    ],
+    "answer": 0,
+    "explanation": "Three.js is built on top of WebGL, which allows GPU-accelerated 3D rendering directly in the browser without plugins."
+  },
+  {
+    "question": "Which three core objects are required to display anything with Three.js?",
+    "options": [
+      "Mesh, Light, Camera",
+      "Scene, Camera, Renderer",
+      "Geometry, Material, Renderer",
+      "Scene, Mesh, Light"
+    ],
+    "answer": 1,
+    "explanation": "A Scene holds your objects, a Camera defines the viewpoint, and a Renderer draws everything to the screen. All three are required."
+  },
+  {
+    "question": "What does the Renderer do in a Three.js application?",
+    "options": [
+      "It defines which objects are visible",
+      "It calculates physics simulations",
+      "It draws the scene from the camera's perspective onto a canvas",
+      "It loads 3D models from files"
+    ],
+    "answer": 2,
+    "explanation": "The Renderer takes the Scene and Camera as inputs and draws (renders) the resulting image onto an HTML canvas element."
+  }
+]

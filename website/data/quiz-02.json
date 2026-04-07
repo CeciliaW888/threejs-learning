@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is the purpose of the animation loop (often called with requestAnimationFrame) in Three.js?",
+    "options": [
+      "To load textures asynchronously",
+      "To compile shaders for the GPU",
+      "To handle user input events",
+      "To continuously update and re-render the scene each frame"
+    ],
+    "answer": 3,
+    "explanation": "The animation loop runs every frame (typically 60fps), updating object properties and re-rendering the scene to create smooth animations."
+  },
+  {
+    "question": "In Three.js, what is a Mesh?",
+    "options": [
+      "A combination of a Geometry and a Material",
+      "A type of light source",
+      "A camera projection mode",
+      "A rendering technique"
+    ],
+    "answer": 0,
+    "explanation": "A Mesh is created by combining a Geometry (the shape) with a Material (the appearance), and it can be added to the scene."
+  },
+  {
+    "question": "In Three.js's default coordinate system, which axis points upward?",
+    "options": [
+      "X-axis",
+      "Y-axis",
+      "Z-axis",
+      "There is no default up direction"
+    ],
+    "answer": 1,
+    "explanation": "By default, Three.js uses a right-handed coordinate system where Y points up, X points right, and Z points toward the viewer."
+  }
+]

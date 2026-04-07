@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What must you enable on both the renderer and the light to get shadows in Three.js?",
+    "options": [
+      "renderer.antialias and light.visible",
+      "renderer.alpha and light.intensity",
+      "renderer.autoClear and light.shadow",
+      "renderer.shadowMap.enabled and light.castShadow"
+    ],
+    "answer": 3,
+    "explanation": "You must set renderer.shadowMap.enabled = true AND light.castShadow = true. Objects must also have castShadow and/or receiveShadow set."
+  },
+  {
+    "question": "What does PCFSoftShadowMap provide compared to the default shadow map type?",
+    "options": [
+      "Softer, smoother shadow edges",
+      "Faster shadow rendering",
+      "Colored shadows",
+      "Real-time shadow updates"
+    ],
+    "answer": 0,
+    "explanation": "PCFSoftShadowMap uses percentage-closer filtering to produce softer, more natural shadow edges compared to the default hard-edged shadows."
+  },
+  {
+    "question": "What is tone mapping used for in Three.js?",
+    "options": [
+      "Converting audio to visual effects",
+      "Mapping HDR (high dynamic range) colors to the displayable range",
+      "Generating texture maps from photos",
+      "Compressing model geometry"
+    ],
+    "answer": 1,
+    "explanation": "Tone mapping converts HDR color values into the limited range a monitor can display, preserving visual detail in both bright and dark areas."
+  }
+]

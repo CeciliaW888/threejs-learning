@@ -1,0 +1,472 @@
+<section class="day-content" data-day="17">
+  <h2>Day 17: Real-Time Scene Modifications</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Implement streaming API responses for real-time updates</li>
+      <li data-objective="2">Handle incremental scene modifications ("make it darker")</li>
+      <li data-objective="3">Manage scene state across multiple commands</li>
+      <li data-objective="4">Build undo/redo functionality for scene changes</li>
+    </ul>
+    <div class="difficulty-badge">Advanced</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>Streaming vs Single Response</h4>
+    <p>Yesterday's pipeline used <strong>single response</strong> mode: you send a prompt, wait for the complete JSON response, then render everything at once. This works, but the user stares at a loading spinner for 2-5 seconds with no feedback.</p>
+
+    <p><strong>Streaming</strong> changes the experience: tokens arrive as they're generated, like watching someone type in real-time. For scene modifications, this means you can start applying changes before the full response is ready.</p>
+
+    <p>When to use each approach:</p>
+    <ul>
+      <li><strong>Single response</strong> &mdash; Best for generating complete new scenes. You need the full JSON before you can parse and render it.</li>
+      <li><strong>Streaming</strong> &mdash; Best for modifications and feedback. You can show the AI's "thinking" as text while waiting for the final JSON, giving users confidence that something is happening.</li>
+    </ul>
+
+    <p>With streaming, the API sends chunks of text as they're generated. You accumulate these chunks in a buffer and attempt to parse the JSON once you detect it's complete (e.g., you've received a closing brace that balances all opening braces).</p>
+
+    <h4>Modification Command Types</h4>
+    <p>Scene modifications fall into three categories, each requiring a different approach:</p>
+
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">Add</div>
+        <div class="step-content">
+          <strong>Additive Commands</strong>
+          <p>"Add a table," "put a lamp in the corner," "add some trees." These commands create new objects without changing existing ones. The AI needs to know the current scene state so it can position new objects appropriately (not overlapping existing ones). Implementation: parse the new object JSON and call <code>scene.add()</code>.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">Transform</div>
+        <div class="step-content">
+          <strong>Transformative Commands</strong>
+          <p>"Make it darker," "rotate the chair," "change the floor to wood," "make everything blue." These modify properties of existing objects. The AI returns a list of changes referencing objects by name. Implementation: find the object in the scene by name and update its properties (position, rotation, material color, light intensity, etc.).</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-number">Remove</div>
+        <div class="step-content">
+          <strong>Subtractive Commands</strong>
+          <p>"Remove the lamp," "delete the table," "clear all the rocks." These remove objects from the scene. The AI identifies which objects to remove by name. Implementation: find the object and call <code>scene.remove()</code>. Don't forget to dispose of geometry and materials to free memory.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>The secret to modification commands is <strong>scene state</strong>. You must pass the current scene's object list to the AI so it knows what exists. Without context, the AI can't know which "chair" to rotate or whether there's already a lamp in the corner.</p>
+      </div>
+    </div>
+
+    <h4>Undo/Redo: Managing Scene History</h4>
+    <p>Users will make mistakes or want to experiment. Undo/redo is essential for a good creative tool. The simplest approach: store snapshots of the scene state as JSON before each modification.</p>
+
+    <p>How it works:</p>
+    <ul>
+      <li>Before every modification, push the current scene state (as JSON) onto an <code>undoStack</code></li>
+      <li>When the user clicks "Undo," pop the last state from <code>undoStack</code>, push the current state onto <code>redoStack</code>, then rebuild the scene from the popped state</li>
+      <li>When the user clicks "Redo," pop from <code>redoStack</code>, push current state onto <code>undoStack</code>, then rebuild</li>
+      <li>Any new modification clears the <code>redoStack</code> (you can't redo after making a new change)</li>
+    </ul>
+
+    <p>This is known as the <strong>Command Pattern</strong> &mdash; each action is recorded so it can be reversed. For large scenes, you might store diffs instead of full snapshots to save memory.</p>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day17-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Streaming Response</dt></div>
+        <div class="flashcard-back"><dd>Receiving API output token-by-token as it's generated, rather than waiting for the complete response. Enables real-time feedback and progressive rendering.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Additive Modification</dt></div>
+        <div class="flashcard-back"><dd>A scene change that creates new objects without altering existing ones. Example: "add a bookshelf" creates a new mesh and adds it to the scene.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Transformative Modification</dt></div>
+        <div class="flashcard-back"><dd>A scene change that alters properties of existing objects. Example: "make it darker" reduces light intensity, "rotate the chair" changes an object's rotation.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Subtractive Modification</dt></div>
+        <div class="flashcard-back"><dd>A scene change that removes existing objects. Example: "remove the lamp" finds and deletes the lamp mesh from the scene, including geometry and material disposal.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Scene State</dt></div>
+        <div class="flashcard-back"><dd>A JSON representation of all objects, lights, and camera settings in the current scene. Passed to the AI so it knows what exists and can make contextual modifications.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Command Pattern</dt></div>
+        <div class="flashcard-back"><dd>A design pattern where each action is recorded as an object, enabling undo/redo. Each command stores enough information to reverse itself.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Undo Stack</dt></div>
+        <div class="flashcard-back"><dd>An array of previous scene states. Each modification pushes the current state before changing it. Undo pops the last state and rebuilds the scene from it.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 7</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Streaming Modification Handler</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">streaming-modifier.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">async modifyScene(command) {
+  // Pass current scene state so the AI knows what exists
+  const stream = await this.client.messages.stream({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 512,
+    system: `You are modifying an existing 3D scene.
+Current scene state: ${JSON.stringify(this.sceneState)}
+
+Output ONLY a JSON object describing the changes:
+{
+  "action": "add" | "modify" | "remove",
+  "targets": [
+    {
+      "name": "object-name",
+      "changes": { "position": [x,y,z], "color": "#hex", ... }
+    }
+  ],
+  "newObjects": [
+    { "name": "new-obj", "type": "box", "position": [x,y,z], "color": "#hex", "scale": [x,y,z] }
+  ]
+}
+No explanations. Only JSON.`,
+    messages: [{ role: 'user', content: command }]
+  });
+
+  let buffer = '';
+  for await (const chunk of stream) {
+    if (chunk.type === 'content_block_delta') {
+      buffer += chunk.delta.text;
+      // Try to parse once we have enough data
+      this.tryParseAndApply(buffer);
+    }
+  }
+}
+
+tryParseAndApply(buffer) {
+  try {
+    const changes = JSON.parse(buffer);
+    this.applyChanges(changes);
+  } catch (e) {
+    // Not yet complete JSON, keep accumulating
+  }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> The streaming handler receives tokens incrementally. It accumulates them in a buffer and attempts to parse the JSON after each chunk. Once the JSON is complete (and parseable), it applies the changes to the scene. Failed parse attempts are silently caught &mdash; they just mean the response isn't complete yet.
+      </div>
+    </div>
+
+    <h4>Example 2: Applying Modifications by Type</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">apply-changes.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">applyChanges(changes) {
+  // Save current state for undo
+  this.undoStack.push(JSON.stringify(this.sceneState));
+  this.redoStack = []; // Clear redo on new change
+
+  switch (changes.action) {
+    case 'add':
+      // Create and add new objects
+      changes.newObjects.forEach(obj =&gt; {
+        const mesh = this.createMesh(obj);
+        mesh.name = obj.name;
+        this.scene.add(mesh);
+        this.sceneState.objects.push(obj);
+      });
+      break;
+
+    case 'modify':
+      // Update existing objects
+      changes.targets.forEach(target =&gt; {
+        const object = this.scene.getObjectByName(target.name);
+        if (!object) return;
+
+        if (target.changes.position) {
+          object.position.set(...target.changes.position);
+        }
+        if (target.changes.color) {
+          object.material.color.set(target.changes.color);
+        }
+        if (target.changes.rotation) {
+          object.rotation.set(...target.changes.rotation);
+        }
+        if (target.changes.scale) {
+          object.scale.set(...target.changes.scale);
+        }
+
+        // Update scene state to match
+        const stateObj = this.sceneState.objects.find(o =&gt; o.name === target.name);
+        if (stateObj) Object.assign(stateObj, target.changes);
+      });
+      break;
+
+    case 'remove':
+      // Remove objects from scene
+      changes.targets.forEach(target =&gt; {
+        const object = this.scene.getObjectByName(target.name);
+        if (!object) return;
+
+        // Dispose of geometry and material to free memory
+        if (object.geometry) object.geometry.dispose();
+        if (object.material) object.material.dispose();
+        this.scene.remove(object);
+
+        // Remove from state
+        this.sceneState.objects = this.sceneState.objects.filter(
+          o =&gt; o.name !== target.name
+        );
+      });
+      break;
+  }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This method handles all three modification types. For additions, it creates new meshes and adds them. For transforms, it finds objects by name and updates their properties. For removals, it properly disposes of Three.js resources before removing. Each change also updates the <code>sceneState</code> so the AI always has an accurate picture.
+      </div>
+    </div>
+
+    <h4>Example 3: Undo/Redo Implementation</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">undo-redo.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">class SceneHistory {
+  constructor(sceneBuilder) {
+    this.builder = sceneBuilder;
+    this.undoStack = [];
+    this.redoStack = [];
+    this.maxHistory = 20; // Limit memory usage
+  }
+
+  // Call this before every modification
+  saveState(currentState) {
+    this.undoStack.push(JSON.stringify(currentState));
+
+    // Trim if too many states stored
+    if (this.undoStack.length &gt; this.maxHistory) {
+      this.undoStack.shift();
+    }
+
+    // New action clears redo history
+    this.redoStack = [];
+  }
+
+  undo(currentState) {
+    if (this.undoStack.length === 0) return null;
+
+    // Save current state for redo
+    this.redoStack.push(JSON.stringify(currentState));
+
+    // Restore previous state
+    const previousState = JSON.parse(this.undoStack.pop());
+    this.builder.rebuildFromState(previousState);
+    return previousState;
+  }
+
+  redo(currentState) {
+    if (this.redoStack.length === 0) return null;
+
+    // Save current state for undo
+    this.undoStack.push(JSON.stringify(currentState));
+
+    // Restore next state
+    const nextState = JSON.parse(this.redoStack.pop());
+    this.builder.rebuildFromState(nextState);
+    return nextState;
+  }
+
+  canUndo() { return this.undoStack.length &gt; 0; }
+  canRedo() { return this.redoStack.length &gt; 0; }
+}
+
+// Wire up keyboard shortcuts
+document.addEventListener('keydown', (e) =&gt; {
+  if (e.ctrlKey &amp;&amp; e.key === 'z') {
+    e.preventDefault();
+    const state = history.undo(currentSceneState);
+    if (state) currentSceneState = state;
+  }
+  if (e.ctrlKey &amp;&amp; e.key === 'y') {
+    e.preventDefault();
+    const state = history.redo(currentSceneState);
+    if (state) currentSceneState = state;
+  }
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> The <code>SceneHistory</code> class manages two stacks. Before each modification, the current state is saved to <code>undoStack</code>. Ctrl+Z pops the last state and rebuilds the scene. Ctrl+Y restores forward. A max history of 20 states prevents memory bloat in long sessions.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Build a Modification UI</h4>
+        <span class="time-estimate">~25 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create an interface for sending modification commands to an existing scene</p>
+      <ol class="exercise-steps">
+        <li>Start with the pipeline from Day 16 &mdash; generate an initial scene</li>
+        <li>Add a second input field labeled "Modify scene..." below the generate button</li>
+        <li>When the user submits a modification command, call the streaming <code>modifyScene</code> method</li>
+        <li>Show the streaming text output in a small status area so users see progress</li>
+        <li>Test with commands: "add a red sphere on the left," "make the lighting warmer," "remove the floor"</li>
+      </ol>
+      <p><strong>Expected Output:</strong> An initial scene that you can modify with natural language commands without regenerating from scratch.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Implement Undo/Redo</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Add undo/redo support using the SceneHistory class</p>
+      <ol class="exercise-steps">
+        <li>Integrate the <code>SceneHistory</code> class from Example 3 into your project</li>
+        <li>Call <code>history.saveState()</code> before every modification in <code>applyChanges</code></li>
+        <li>Add "Undo" and "Redo" buttons to the UI (in addition to Ctrl+Z/Ctrl+Y keyboard shortcuts)</li>
+        <li>Disable the buttons when their respective stacks are empty (<code>canUndo()</code>, <code>canRedo()</code>)</li>
+        <li>Test: generate a scene, modify it 3 times, then undo all 3, then redo 2</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Smart Modification Detection</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Automatically classify user commands into add/modify/remove categories</p>
+      <ol class="exercise-steps">
+        <li>Create a <code>classifyCommand(text)</code> function that uses keyword detection to guess the command type</li>
+        <li>Keywords for additive: "add," "put," "place," "create," "insert"</li>
+        <li>Keywords for transformative: "change," "make," "rotate," "move," "resize," "color"</li>
+        <li>Keywords for subtractive: "remove," "delete," "clear," "get rid of"</li>
+        <li>Display the detected command type as a badge in the UI before sending to the API</li>
+        <li>Note: this is for UI feedback only &mdash; the AI still determines the actual action</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Classification hint</summary>
+        <pre><code class="language-javascript">function classifyCommand(text) {
+  const t = text.toLowerCase();
+  if (/\b(add|put|place|create|insert)\b/.test(t)) return 'additive';
+  if (/\b(remove|delete|clear|get rid)\b/.test(t)) return 'subtractive';
+  return 'transformative'; // default
+}</code></pre>
+      </details>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Anthropic Streaming API</span>
+        <span class="resource-meta">Anthropic &mdash; Official docs for streaming message responses with server-sent events</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/docs/#api/en/core/Object3D.getObjectByName" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Object3D.getObjectByName()</span>
+        <span class="resource-meta">Three.js &mdash; Finding objects in the scene graph by name, essential for targeted modifications</span>
+      </a>
+      <a class="resource-card" href="https://refactoring.guru/design-patterns/command" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">Command Pattern &mdash; Refactoring Guru</span>
+        <span class="resource-meta">Refactoring Guru &mdash; Deep dive into the undo/redo pattern used in our scene history</span>
+      </a>
+      <a class="resource-card" href="https://developer.mozilla.org/en-US/docs/Web/API/Streams_API" target="_blank" rel="noopener">
+        <span class="resource-type">Reference</span>
+        <span class="resource-title">Streams API &mdash; MDN</span>
+        <span class="resource-meta">MDN &mdash; Understanding web streams for processing chunked API responses</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">When would streaming responses be better than waiting for the full response? When would it be worse?</p>
+      <textarea placeholder="Think about user experience, JSON parsing complexity, and error handling..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why is it important to pass the current scene state to the AI when making modifications?</p>
+      <textarea placeholder="Think about context: how does the AI know what 'the chair' refers to without seeing the scene?"></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What are the memory implications of storing full scene snapshots for undo? How could you optimize this?</p>
+      <textarea placeholder="Think about diffs vs snapshots, compression, and history limits..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you handle conflicting modifications? (e.g., "make it darker" followed immediately by "make it brighter")</p>
+      <textarea placeholder="Think about queuing, debouncing, and cancellation..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What happens if the user sends a modification command while a previous one is still streaming? How should you handle this?</p>
+      <textarea placeholder="Think about request cancellation, AbortController, and queue management..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="18-memory-context.html">Day 18: Memory &amp; Context</a> &mdash; Learn how to maintain conversation context across multiple interactions, so the AI remembers previous commands and can build on them.</p>
+
+    <p>Today you learned how to modify scenes incrementally rather than rebuilding from scratch. You now have the three pillars of interactive 3D generation: <strong>create</strong> (Day 16), <strong>modify</strong> (today), and tomorrow you'll add <strong>remember</strong> (Day 18). Together, these make a creative tool that feels natural to use.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I understand the difference between streaming and single-response API calls</label>
+      <label><input type="checkbox"> I can classify modification commands as additive, transformative, or subtractive</label>
+      <label><input type="checkbox"> I can apply changes to existing scene objects by name</label>
+      <label><input type="checkbox"> I understand the undo/redo pattern using state snapshots</label>
+      <label><input type="checkbox"> I can properly dispose of Three.js resources when removing objects</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,0 +1,35 @@
+[
+  {
+    "question": "Which light type illuminates all objects equally from all directions, with no shadows?",
+    "options": [
+      "AmbientLight",
+      "DirectionalLight",
+      "PointLight",
+      "SpotLight"
+    ],
+    "answer": 0,
+    "explanation": "AmbientLight provides uniform illumination to all objects regardless of their position or orientation, simulating indirect environmental light."
+  },
+  {
+    "question": "How does a DirectionalLight differ from a PointLight?",
+    "options": [
+      "DirectionalLight emits in all directions, PointLight emits in one direction",
+      "DirectionalLight has parallel rays like sunlight, PointLight emits from a single point outward",
+      "DirectionalLight is weaker than PointLight",
+      "There is no difference"
+    ],
+    "answer": 1,
+    "explanation": "DirectionalLight emits parallel rays in a single direction (like the sun), while PointLight emits light outward in all directions from a single point (like a lightbulb)."
+  },
+  {
+    "question": "Which light type emits in a cone shape, similar to a flashlight or stage light?",
+    "options": [
+      "AmbientLight",
+      "DirectionalLight",
+      "SpotLight",
+      "PointLight"
+    ],
+    "answer": 2,
+    "explanation": "SpotLight emits light in a cone from a point in a specific direction, with configurable angle and penumbra (edge softness), like a flashlight."
+  }
+]

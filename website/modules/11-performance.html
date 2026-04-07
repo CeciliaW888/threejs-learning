@@ -1,0 +1,475 @@
+<section class="day-content" data-day="11">
+  <h2>Day 11: Performance Optimization Basics</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Measure rendering performance with the Stats panel and Chrome DevTools</li>
+      <li data-objective="2">Understand the main performance bottlenecks in Three.js (draw calls, geometry, textures)</li>
+      <li data-objective="3">Apply key optimization techniques: instancing, LOD, geometry merging</li>
+      <li data-objective="4">Optimize textures and materials for web delivery</li>
+      <li data-objective="5">Use disposal patterns to prevent memory leaks</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>Why Performance Matters</h4>
+    <p>Your AI portfolio needs to run smoothly on laptops, not just gaming PCs. A beautiful scene that stutters at 15fps on a MacBook Air is worse than a simple scene at solid 60fps. Users will close a slow 3D site within seconds.</p>
+
+    <p>The target: <strong>60fps consistently</strong> (or at minimum 30fps on mobile). That gives you ~16.6ms per frame to update logic, traverse the scene graph, and render everything.</p>
+
+    <h4>Measuring Performance</h4>
+    <p><strong>Stats.js Panel:</strong></p>
+    <pre><code class="language-javascript">import Stats from 'three/examples/jsm/libs/stats.module.js';
+
+const stats = new Stats();
+document.body.appendChild(stats.dom);
+
+function animate() {
+    stats.begin();
+    // ... your render code ...
+    stats.end();
+    requestAnimationFrame(animate);
+}</code></pre>
+
+    <p>This gives you FPS, frame time (ms), and memory usage in real-time.</p>
+
+    <p><strong>Renderer Info:</strong></p>
+    <pre><code class="language-javascript">console.log(renderer.info.render);
+// { calls: 42, triangles: 125000, points: 0, lines: 0 }
+
+console.log(renderer.info.memory);
+// { geometries: 15, textures: 8 }</code></pre>
+
+    <p><code>renderer.info.render.calls</code> is your <strong>draw call count</strong> &mdash; one of the most important numbers. Each draw call is a command to the GPU. More draw calls = more overhead.</p>
+
+    <h4>The Big Three Bottlenecks</h4>
+
+    <p><strong>1. Draw Calls</strong> (CPU-bound)</p>
+    <p>Each unique mesh with its own material is one draw call. 100 separate cubes = 100 draw calls. Even if each cube is trivial, the CPU overhead of issuing 100 commands adds up.</p>
+    <p><strong>Fix:</strong> Merge geometries, use InstancedMesh, reduce unique material count.</p>
+
+    <p><strong>2. Triangle Count</strong> (GPU-bound)</p>
+    <p>More triangles means more work for the GPU per frame. A single high-poly model (500K+ triangles) can tank performance.</p>
+    <p><strong>Fix:</strong> Use lower-poly models, Level of Detail (LOD), simplify geometry.</p>
+
+    <p><strong>3. Texture Memory</strong> (Memory-bound)</p>
+    <p>Large textures eat VRAM. A single 4096x4096 texture uses ~64MB of GPU memory. Multiple large textures can exceed device limits.</p>
+    <p><strong>Fix:</strong> Compress textures, use appropriate sizes, share textures between materials.</p>
+
+    <h4>InstancedMesh: The Draw Call Killer</h4>
+    <p>When you need many copies of the same geometry + material (trees, particles, buildings), <code>InstancedMesh</code> renders them all in a single draw call:</p>
+
+    <pre><code class="language-javascript">const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshStandardMaterial({ color: 0x44aa88 });
+
+// 1000 cubes in ONE draw call (instead of 1000)
+const instancedMesh = new THREE.InstancedMesh(geometry, material, 1000);
+
+const dummy = new THREE.Object3D();
+for (let i = 0; i &lt; 1000; i++) {
+    dummy.position.set(
+        (Math.random() - 0.5) * 50,
+        Math.random() * 10,
+        (Math.random() - 0.5) * 50
+    );
+    dummy.rotation.set(Math.random(), Math.random(), Math.random());
+    dummy.scale.setScalar(0.5 + Math.random());
+    dummy.updateMatrix();
+    instancedMesh.setMatrixAt(i, dummy.matrix);
+}
+
+scene.add(instancedMesh);</code></pre>
+
+    <h4>Level of Detail (LOD)</h4>
+    <p>Show simpler models when objects are far from camera:</p>
+
+    <pre><code class="language-javascript">const lod = new THREE.LOD();
+
+// High detail (close up)
+lod.addLevel(highPolyMesh, 0);     // Show when distance &lt; 10
+// Medium detail
+lod.addLevel(medPolyMesh, 10);     // Show when distance 10-30
+// Low detail (far away)
+lod.addLevel(lowPolyMesh, 30);     // Show when distance &gt; 30
+
+scene.add(lod);
+
+// Update in animation loop
+function animate() {
+    lod.update(camera);
+    // ...
+}</code></pre>
+
+    <h4>Geometry Merging</h4>
+    <p>Combine multiple static meshes into one to reduce draw calls:</p>
+
+    <pre><code class="language-javascript">import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+
+const geometries = [];
+for (let i = 0; i &lt; 100; i++) {
+    const geo = new THREE.BoxGeometry(1, 1, 1);
+    geo.translate(i * 2, 0, 0);  // Position each before merging
+    geometries.push(geo);
+}
+
+const mergedGeometry = mergeGeometries(geometries);
+const mesh = new THREE.Mesh(mergedGeometry, material);
+scene.add(mesh);  // 100 cubes, 1 draw call</code></pre>
+
+    <p><strong>Trade-off:</strong> You can't move or animate individual cubes after merging. Use for static scenery only.</p>
+
+    <h4>Texture Optimization</h4>
+
+    <pre><code class="language-javascript">// Use power-of-two sizes: 256, 512, 1024, 2048
+// Avoid odd sizes like 1000x750
+
+// Compress textures with KTX2 for GPU-native compression
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+
+// Dispose unused textures to free memory
+texture.dispose();
+material.dispose();
+geometry.dispose();</code></pre>
+
+    <h4>Memory Management</h4>
+    <p>Three.js doesn't automatically free GPU memory. You must manually dispose:</p>
+
+    <pre><code class="language-javascript">function removeObject(obj) {
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+        if (Array.isArray(obj.material)) {
+            obj.material.forEach(m =&gt; m.dispose());
+        } else {
+            obj.material.dispose();
+        }
+    }
+    obj.parent?.remove(obj);
+}</code></pre>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>The fastest optimization is the work you don't do. Fewer objects, simpler materials, smaller textures. Start simple and add complexity only where the user's eye focuses.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day11-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Draw Call</dt></div>
+        <div class="flashcard-back"><dd>Single GPU command to render a mesh. Each Mesh with its own material equals one or more draw calls.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>InstancedMesh</dt></div>
+        <div class="flashcard-back"><dd>Renders many copies of the same geometry and material in one draw call. Example: 1000 trees rendered as a single draw call.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>LOD (Level of Detail)</dt></div>
+        <div class="flashcard-back"><dd>Technique that shows simpler models when objects are far from the camera. Uses high, medium, and low poly versions at different distance thresholds.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Geometry Merging</dt></div>
+        <div class="flashcard-back"><dd>Combining multiple static meshes into one to reduce draw calls. Best for static scenery that doesn't need individual animation.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Dispose</dt></div>
+        <div class="flashcard-back"><dd>Freeing GPU memory for unused resources. Called via <code>geometry.dispose()</code>, <code>material.dispose()</code>, and <code>texture.dispose()</code>.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Frustum Culling</dt></div>
+        <div class="flashcard-back"><dd>Automatically skipping the rendering of objects that are off-screen (outside the camera's view frustum). Built into Three.js by default.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Stats.js</dt></div>
+        <div class="flashcard-back"><dd>An FPS and memory monitoring panel that overlays on your scene. Shows real-time frames per second, frame time in milliseconds, and memory usage.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 7</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Performance Monitoring Dashboard</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">perf-dashboard.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+
+const stats = new Stats();
+stats.showPanel(0); // 0=fps, 1=ms, 2=memory
+document.body.appendChild(stats.dom);
+
+// Custom renderer info display
+const infoDiv = document.createElement('div');
+infoDiv.style.cssText = 'position:fixed;bottom:0;left:0;background:rgba(0,0,0,0.7);color:white;padding:8px;font-family:monospace;font-size:12px;';
+document.body.appendChild(infoDiv);
+
+function animate() {
+    stats.begin();
+
+    renderer.render(scene, camera);
+
+    // Update info every 60 frames
+    if (renderer.info.render.frame % 60 === 0) {
+        const info = renderer.info;
+        infoDiv.textContent =
+            `Draw calls: ${info.render.calls} | ` +
+            `Triangles: ${info.render.triangles.toLocaleString()} | ` +
+            `Geometries: ${info.memory.geometries} | ` +
+            `Textures: ${info.memory.textures}`;
+    }
+
+    stats.end();
+    requestAnimationFrame(animate);
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We display real-time FPS and detailed renderer statistics. Watching draw calls and triangle counts while adding content tells you exactly when you're approaching performance limits.
+      </div>
+    </div>
+
+    <h4>Example 2: InstancedMesh with Per-Instance Colors</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">instanced-colors.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const count = 500;
+const geometry = new THREE.IcosahedronGeometry(0.5, 2);
+const material = new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.5 });
+
+const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+instancedMesh.castShadow = true;
+
+const dummy = new THREE.Object3D();
+const color = new THREE.Color();
+
+for (let i = 0; i &lt; count; i++) {
+    dummy.position.set(
+        (Math.random() - 0.5) * 40,
+        Math.random() * 15,
+        (Math.random() - 0.5) * 40
+    );
+    dummy.scale.setScalar(0.5 + Math.random() * 1.5);
+    dummy.updateMatrix();
+    instancedMesh.setMatrixAt(i, dummy.matrix);
+
+    // Per-instance color
+    color.setHSL(Math.random(), 0.7, 0.5);
+    instancedMesh.setColorAt(i, color);
+}
+
+instancedMesh.instanceMatrix.needsUpdate = true;
+instancedMesh.instanceColor.needsUpdate = true;
+scene.add(instancedMesh);
+
+// Result: 500 objects, 1 draw call!</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Each instance gets its own position, scale, rotation, and color &mdash; but it's all rendered in a single draw call. This is 500x more efficient than creating 500 separate meshes.
+      </div>
+    </div>
+
+    <h4>Example 3: Proper Cleanup on Scene Change</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">scene-cleanup.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">function disposeScene(scene) {
+    scene.traverse((object) =&gt; {
+        if (object.isMesh) {
+            object.geometry.dispose();
+
+            if (Array.isArray(object.material)) {
+                object.material.forEach(disposeMaterial);
+            } else {
+                disposeMaterial(object.material);
+            }
+        }
+    });
+
+    // Clear scene
+    while (scene.children.length &gt; 0) {
+        scene.remove(scene.children[0]);
+    }
+}
+
+function disposeMaterial(material) {
+    // Dispose all textures
+    for (const key in material) {
+        const value = material[key];
+        if (value &amp;&amp; typeof value.dispose === 'function') {
+            value.dispose();
+        }
+    }
+    material.dispose();
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> When switching scenes (which our AI portfolio will do), you must clean up GPU resources. Without disposal, memory usage grows until the browser tab crashes.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Performance Baseline</h4>
+        <span class="time-estimate">~10 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Measure your current scene's performance</p>
+      <ol class="exercise-steps">
+        <li>Add Stats.js to your portfolio scene from previous days</li>
+        <li>Log <code>renderer.info</code> to the console</li>
+        <li>Record: FPS, draw calls, triangles, geometries, textures</li>
+        <li>Try adding 100 spheres &mdash; watch how metrics change</li>
+        <li>Try adding 1000 spheres &mdash; at what point does FPS drop?</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Understanding of your baseline performance numbers.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Instancing Challenge</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Render 5000 objects at 60fps</p>
+      <ol class="exercise-steps">
+        <li>Create 5000 cubes using individual Meshes &mdash; measure FPS</li>
+        <li>Replace with InstancedMesh &mdash; measure FPS improvement</li>
+        <li>Add per-instance random colors</li>
+        <li>Animate instances by updating matrices in the loop</li>
+        <li>Compare draw calls before/after</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Dramatic FPS improvement (likely 5-20fps &rarr; 60fps).</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Optimize Your Portfolio Scene</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Apply optimizations to your portfolio project</p>
+      <ol class="exercise-steps">
+        <li>Audit your scene: log draw calls, triangles, texture count</li>
+        <li>Identify the biggest bottleneck (draws? triangles? textures?)</li>
+        <li>Apply at least 2 optimizations from today's lesson</li>
+        <li>Measure before/after FPS</li>
+        <li>Add proper <code>dispose()</code> calls for when scene elements change</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Measurable performance improvement with documented before/after numbers.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/cleanup" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">How to Dispose of Objects</span>
+        <span class="resource-meta">Three.js Manual &mdash; Essential for preventing memory leaks in dynamic scenes (~10 min read)</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/manual/#en/optimize-lots-of-objects" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Optimization Tips</span>
+        <span class="resource-meta">Three.js Manual &mdash; Official guidance on handling large numbers of objects</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=dc5iJVInpPY" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Three.js Optimization &mdash; Best Practices and Techniques</span>
+        <span class="resource-meta">Valentin's Coding Book &mdash; Comprehensive walkthrough of optimization techniques with live examples</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=IsRBxh4Jb18" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Better Performance With LOD in Three.js</span>
+        <span class="resource-meta">Wael Yasmina &mdash; Practical LOD implementation tutorial</span>
+      </a>
+      <a class="resource-card" href="https://developer.chrome.com/docs/devtools/performance" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">Chrome DevTools Performance Panel</span>
+        <span class="resource-meta">Google &mdash; Profile JavaScript execution, find frame budget bottlenecks</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's the difference between CPU-bound and GPU-bound performance issues? Which do draw calls affect?</p>
+      <textarea placeholder="Think about what the CPU does (issuing commands) vs what the GPU does (rendering triangles)..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Your scene has 200 identical trees. What's the best optimization approach?</p>
+      <textarea placeholder="Think about InstancedMesh and why it's ideal for many copies of the same geometry..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does the shadow map resolution from Day 10 affect performance?</p>
+      <textarea placeholder="Think about texture memory and GPU workload for rendering shadow maps each frame..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">When would geometry merging be a BAD idea?</p>
+      <textarea placeholder="Think about objects that need to move independently or be added/removed dynamically..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What performance target will you set for your portfolio? (FPS, load time, memory?)</p>
+      <textarea placeholder="Think about your target audience and devices they'll use to view your portfolio..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="12-prompt-engineering.html">Day 12: Intro to Prompt Engineering for 3D</a> &mdash; Start bridging the gap between AI and 3D graphics.</p>
+
+    <p>You now have the technical foundation for building performant 3D scenes. Starting tomorrow, we shift gears to the AI side of this course. You'll learn how to write prompts that describe 3D scenes, which will later power the AI-driven portfolio generator.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can measure FPS, draw calls, and triangle count</label>
+      <label><input type="checkbox"> I can use InstancedMesh for many identical objects</label>
+      <label><input type="checkbox"> I can properly dispose of geometries, materials, and textures</label>
+      <label><input type="checkbox"> I can identify my scene's primary performance bottleneck</label>
+      <label><input type="checkbox"> I can maintain 60fps in my portfolio scene</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

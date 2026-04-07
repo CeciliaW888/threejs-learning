@@ -1,0 +1,35 @@
+[
+  {
+    "question": "Why is conversation history important when building an AI-powered 3D tool?",
+    "options": [
+      "It makes the 3D rendering faster",
+      "It reduces API costs",
+      "It is required by all LLM APIs",
+      "It allows the AI to understand context from previous requests and make coherent modifications"
+    ],
+    "answer": 3,
+    "explanation": "Conversation history lets the AI understand what has already been created, so commands like 'make it bigger' or 'change its color' refer to the correct objects."
+  },
+  {
+    "question": "What is localStorage commonly used for in a web-based 3D application?",
+    "options": [
+      "Persisting user preferences or scene state between browser sessions",
+      "Storing 3D model files permanently",
+      "Running WebGL computations",
+      "Hosting the application server"
+    ],
+    "answer": 0,
+    "explanation": "localStorage persists key-value data in the browser across sessions, useful for saving user preferences, recent scenes, or conversation history."
+  },
+  {
+    "question": "Why do token limits matter when managing conversation context for LLMs?",
+    "options": [
+      "Tokens affect the color of the 3D scene",
+      "LLMs have a maximum context window, and exceeding it causes errors or lost information",
+      "Token limits only apply to image generation",
+      "Tokens determine the rendering resolution"
+    ],
+    "answer": 1,
+    "explanation": "Every LLM has a maximum context window (in tokens). Long conversation histories must be trimmed or summarized to stay within this limit."
+  }
+]

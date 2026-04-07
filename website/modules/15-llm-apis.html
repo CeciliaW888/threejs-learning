@@ -1,0 +1,584 @@
+<section class="day-content" data-day="15">
+  <h2>Day 15: Introduction to LLM APIs (Claude &amp; OpenAI)</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Understand how to interact with Claude and OpenAI APIs</li>
+      <li data-objective="2">Make your first API call to generate structured JSON output</li>
+      <li data-objective="3">Handle API responses, errors, and rate limits</li>
+      <li data-objective="4">Implement API key management and security best practices</li>
+      <li data-objective="5">Use structured outputs to ensure reliable JSON parsing</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour (30 min reading + 30 min hands-on)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>From Manual Prompting to Automated API Calls</h4>
+    <p>Think of LLM APIs like ordering from a restaurant. In Week 2, you manually typed prompts into ChatGPT or Claude (like calling the restaurant and placing an order). Now we're building a system that places orders automatically (API calls) and gets predictable responses (structured outputs).</p>
+
+    <p>The key difference: <strong>reliability</strong>. Manual copy-paste breaks at scale. API calls let you:</p>
+    <ul>
+      <li>Generate scenes in real-time as users type</li>
+      <li>Handle thousands of requests per day</li>
+      <li>Parse responses programmatically (no manual intervention)</li>
+      <li>Integrate with your Three.js application seamlessly</li>
+    </ul>
+
+    <h4>Two Main Players: Claude &amp; OpenAI</h4>
+
+    <p><strong>Anthropic Claude:</strong></p>
+    <ul>
+      <li>Models: claude-3-5-sonnet-20241022, claude-3-opus-20240229</li>
+      <li>Strengths: Excellent instruction-following, great at structured outputs</li>
+      <li>Pricing: $3/million input tokens, $15/million output tokens (Sonnet)</li>
+      <li>Best for: Complex scene descriptions, creative variations</li>
+    </ul>
+
+    <p><strong>OpenAI GPT:</strong></p>
+    <ul>
+      <li>Models: gpt-4o, gpt-4o-mini</li>
+      <li>Strengths: Fast, cheaper mini model, strong JSON mode</li>
+      <li>Pricing: $5/million input tokens, $15/million output tokens (GPT-4o)</li>
+      <li>Best for: High-volume requests, simpler transformations</li>
+    </ul>
+
+    <p>For this course, we'll focus on <strong>Claude API</strong> for its superior instruction-following and then show OpenAI as an alternative.</p>
+
+    <h4>Anatomy of an API Request</h4>
+    <p>Every API call has three parts:</p>
+
+    <p><strong>1. Headers</strong> &mdash; Authentication and metadata</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Request headers</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">headers: {
+  'Content-Type': 'application/json',
+  'x-api-key': 'YOUR_API_KEY', // For Claude
+  'anthropic-version': '2023-06-01'
+}</code></pre>
+    </div>
+
+    <p><strong>2. Body</strong> &mdash; Your instructions</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Request body</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">{
+  model: 'claude-3-5-sonnet-20241022',
+  max_tokens: 1024,
+  messages: [{
+    role: 'user',
+    content: 'Generate a 3D scene based on: "cyberpunk office"'
+  }]
+}</code></pre>
+    </div>
+
+    <p><strong>3. Response</strong> &mdash; The AI's output</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">API response</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">{
+  content: [{
+    type: 'text',
+    text: '{"scene": "office", "style": "cyberpunk", ...}'
+  }],
+  usage: { input_tokens: 50, output_tokens: 120 }
+}</code></pre>
+    </div>
+
+    <h4>Structured Outputs: The Secret to Reliable JSON</h4>
+    <p>The #1 problem with AI-generated content: <strong>unpredictable formatting</strong>. Sometimes you get JSON, sometimes you get markdown, sometimes you get explanation text wrapped around JSON.</p>
+
+    <p><strong>Solution:</strong> Force structured outputs using system prompts:</p>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">System prompt for structured output</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const systemPrompt = `You are a 3D scene generator.
+Output ONLY valid JSON matching this schema:
+{
+  "objects": [{ "type": string, "position": [x,y,z], "color": string }],
+  "lighting": { "type": string, "intensity": number },
+  "camera": { "position": [x,y,z], "lookAt": [x,y,z] }
+}
+
+No explanations. No markdown. Only JSON.`;</code></pre>
+    </div>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>System prompts set behavior rules. User prompts provide specific requests. Together, they ensure you get parseable JSON every time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day15-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>API Key</dt></div>
+        <div class="flashcard-back"><dd>Secret credential that authenticates your requests. Example: <code>sk-ant-api03-xxx</code> (Claude) or <code>sk-proj-xxx</code> (OpenAI)</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Token</dt></div>
+        <div class="flashcard-back"><dd>Unit of text processed by LLMs (~4 chars = 1 token). Example: "Hello world" is approximately 2 tokens</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>System Prompt</dt></div>
+        <div class="flashcard-back"><dd>Instructions that define the AI's role and output format. Example: "You are a JSON generator. Output only valid JSON."</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Structured Output</dt></div>
+        <div class="flashcard-back"><dd>Forcing the AI to return data in a specific format (like JSON schema). Example: Schema-enforced JSON responses</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Rate Limit</dt></div>
+        <div class="flashcard-back"><dd>Maximum number of requests per minute/hour. Example: Anthropic: 50 requests/min (free tier)</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Streaming</dt></div>
+        <div class="flashcard-back"><dd>Receiving API responses incrementally (like ChatGPT's typing effect). Example: Real-time token-by-token output</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Your First Claude API Call</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">first-api-call.js</span>
+        <span class="badge">Starter Code</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// first-api-call.js
+// Purpose: Make a simple Claude API call and get JSON back
+
+// 1. Install the SDK (run this in terminal first):
+// npm install @anthropic-ai/sdk
+
+import Anthropic from '@anthropic-ai/sdk';
+
+// 2. Initialize the client with your API key
+// Get your key from: https://console.anthropic.com/settings/keys
+const anthropic = new Anthropic({
+  apiKey: 'YOUR_API_KEY_HERE' // In production, use environment variables!
+});
+
+// 3. Define what you want
+const userPrompt = "A cozy reading nook with warm lighting";
+
+// 4. System prompt forces JSON output
+const systemPrompt = `You are a 3D scene generator. Output ONLY valid JSON with this structure:
+{
+  "objects": [{"type": "chair", "position": [0,0,0], "color": "#8B4513"}],
+  "lights": [{"type": "point", "position": [2,3,2], "intensity": 0.8, "color": "#FFE4B5"}],
+  "camera": {"position": [0,2,5], "lookAt": [0,0,0]}
+}
+No explanations. Just JSON.`;
+
+// 5. Make the API call
+async function generateScene() {
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{
+        role: 'user',
+        content: userPrompt
+      }]
+    });
+
+    // 6. Extract and parse the JSON
+    const jsonText = message.content[0].text;
+    const sceneData = JSON.parse(jsonText);
+
+    console.log('Generated scene:', sceneData);
+    console.log('Tokens used:', message.usage);
+
+    return sceneData;
+
+  } catch (error) {
+    console.error('API Error:', error.message);
+    throw error;
+  }
+}
+
+// 7. Run it
+generateScene();
+
+// Expected output:
+// Generated scene: { objects: [...], lights: [...], camera: {...} }
+// Tokens used: { input_tokens: 150, output_tokens: 95 }</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We send a user description + strict JSON schema, Claude responds with parseable JSON, we parse it and use it in Three.js.
+      </div>
+    </div>
+
+    <h4>Example 2: Error Handling &amp; Rate Limits</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">robust-api-client.js</span>
+        <span class="badge">Production-Ready</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// robust-api-client.js
+// Purpose: Handle real-world API issues (rate limits, timeouts, parsing errors)
+
+import Anthropic from '@anthropic-ai/sdk';
+
+class SceneGeneratorAPI {
+  constructor(apiKey) {
+    this.client = new Anthropic({ apiKey });
+    this.requestCount = 0;
+    this.lastRequestTime = Date.now();
+  }
+
+  // Rate limit: max 50 requests per minute (free tier)
+  async waitIfNeeded() {
+    this.requestCount++;
+
+    if (this.requestCount &gt;= 50) {
+      const elapsed = Date.now() - this.lastRequestTime;
+      if (elapsed &lt; 60000) { // Less than 1 minute
+        const waitTime = 60000 - elapsed;
+        console.log('Rate limit: waiting ' + waitTime + 'ms');
+        await new Promise(resolve =&gt; setTimeout(resolve, waitTime));
+      }
+      this.requestCount = 0;
+      this.lastRequestTime = Date.now();
+    }
+  }
+
+  async generateScene(userPrompt, options = {}) {
+    await this.waitIfNeeded();
+
+    try {
+      const message = await this.client.messages.create({
+        model: options.model || 'claude-3-5-sonnet-20241022',
+        max_tokens: options.maxTokens || 1024,
+        temperature: options.temperature || 0.7,
+        system: this.getSystemPrompt(),
+        messages: [{ role: 'user', content: userPrompt }]
+      });
+
+      const jsonText = message.content[0].text;
+
+      // Validate JSON before parsing
+      if (!jsonText.trim().startsWith('{')) {
+        throw new Error('Response is not JSON');
+      }
+
+      const sceneData = JSON.parse(jsonText);
+
+      // Validate schema
+      if (!sceneData.objects || !sceneData.lights || !sceneData.camera) {
+        throw new Error('Invalid scene schema');
+      }
+
+      return {
+        success: true,
+        data: sceneData,
+        usage: message.usage
+      };
+
+    } catch (error) {
+      // Handle different error types
+      if (error.status === 429) {
+        return { success: false, error: 'Rate limit exceeded. Try again in 1 minute.' };
+      } else if (error.status === 401) {
+        return { success: false, error: 'Invalid API key. Check your credentials.' };
+      } else if (error instanceof SyntaxError) {
+        return { success: false, error: 'AI returned invalid JSON. Try rephrasing your prompt.' };
+      } else {
+        return { success: false, error: 'API Error: ' + error.message };
+      }
+    }
+  }
+
+  getSystemPrompt() {
+    return `You are a 3D scene generator for Three.js. Output ONLY valid JSON.
+Schema:
+{
+  "objects": [{"type": string, "position": [x,y,z], "color": string, "scale": [x,y,z]}],
+  "lights": [{"type": "ambient"|"directional"|"point", "position": [x,y,z], "intensity": 0-1, "color": string}],
+  "camera": {"position": [x,y,z], "lookAt": [x,y,z]}
+}
+No markdown. No explanations. Only JSON.`;
+  }
+}
+
+// Usage
+const api = new SceneGeneratorAPI('YOUR_API_KEY');
+const result = await api.generateScene("A minimalist office with clean lines");
+
+if (result.success) {
+  console.log('Scene:', result.data);
+  console.log('Cost:', result.usage.input_tokens * 0.003 / 1000);
+} else {
+  console.error('Error:', result.error);
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We wrap the API with error handling, rate limiting, and JSON validation. This is production-ready code.
+      </div>
+      <div class="try-it">
+        <strong>Try it:</strong> Add a retry mechanism &mdash; if the first call fails, try again with a simplified prompt.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Get Your API Key</h4>
+        <span class="time-estimate">~10 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Set up your Claude API account and make your first authenticated call</p>
+      <ol class="exercise-steps">
+        <li>Go to <a href="https://console.anthropic.com/" target="_blank" rel="noopener">https://console.anthropic.com/</a></li>
+        <li>Sign up (free tier includes $5 credit)</li>
+        <li>Navigate to Settings &rarr; API Keys</li>
+        <li>Click "Create Key" &rarr; copy it</li>
+        <li>Store it safely: Create a <code>.env</code> file:
+          <pre><code class="language-javascript">ANTHROPIC_API_KEY=sk-ant-api03-xxxxx</code></pre>
+        </li>
+        <li>Install dependencies:
+          <pre><code class="language-javascript">npm install @anthropic-ai/sdk dotenv</code></pre>
+        </li>
+        <li>Modify Example 1 to load from <code>.env</code>:
+          <pre><code class="language-javascript">import 'dotenv/config';
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY
+});</code></pre>
+        </li>
+      </ol>
+      <p><strong>Expected Output:</strong></p>
+      <pre><code class="language-javascript">Generated scene: { objects: [...], lights: [...] }</code></pre>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Compare Claude vs OpenAI</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Make the same request to both APIs and compare outputs</p>
+      <ol class="exercise-steps">
+        <li>Get an OpenAI API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">https://platform.openai.com/api-keys</a></li>
+        <li>Install OpenAI SDK: <code>npm install openai</code></li>
+        <li>Create a comparison script:</li>
+      </ol>
+      <div class="code-block" data-lang="javascript">
+        <div class="code-header">
+          <span class="filename">compare-apis.js</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code class="language-javascript">import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
+
+const prompt = "A futuristic spaceship interior";
+
+// Claude version
+const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const claudeResponse = await claude.messages.create({
+  model: 'claude-3-5-sonnet-20241022',
+  max_tokens: 1024,
+  messages: [{ role: 'user', content: prompt }]
+});
+
+// OpenAI version
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openaiResponse = await openai.chat.completions.create({
+  model: 'gpt-4o',
+  messages: [{ role: 'user', content: prompt }],
+  response_format: { type: 'json_object' } // Forces JSON output
+});
+
+console.log('Claude:', JSON.parse(claudeResponse.content[0].text));
+console.log('OpenAI:', JSON.parse(openaiResponse.choices[0].message.content));</code></pre>
+      </div>
+      <p><strong>Compare:</strong> Which gives more creative results? Which is faster? Which is cheaper? (Claude Sonnet: $3/M input, OpenAI GPT-4o: $5/M input)</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Build a Simple Web Interface</h4>
+        <span class="time-estimate">~30 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create a web page that generates scenes via API</p>
+      <ol class="exercise-steps">
+        <li>Create an <code>index.html</code> with a textarea, generate button, and output area</li>
+        <li>Import the Anthropic SDK from CDN</li>
+        <li>Wire the button to make an API call and display the JSON result</li>
+        <li>Open in browser and test</li>
+        <li><strong>Stretch Goal:</strong> Add loading animation, error handling, and JSON pretty-printing</li>
+      </ol>
+
+      <div class="code-block" data-lang="html">
+        <div class="code-header">
+          <span class="filename">index.html</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code class="language-javascript">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;AI Scene Generator&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;AI 3D Scene Generator&lt;/h1&gt;
+  &lt;textarea id="prompt" placeholder="Describe a scene..."&gt;&lt;/textarea&gt;
+  &lt;button onclick="generate()"&gt;Generate Scene&lt;/button&gt;
+  &lt;pre id="output"&gt;&lt;/pre&gt;
+
+  &lt;script type="module"&gt;
+    import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.20.0/+esm';
+
+    window.generate = async function() {
+      const prompt = document.getElementById('prompt').value;
+      const output = document.getElementById('output');
+
+      output.textContent = 'Generating...';
+
+      // DON'T expose API keys in frontend! This is for learning only.
+      // In production, use a backend proxy (we'll cover this on Day 20)
+      const client = new Anthropic({
+        apiKey: 'YOUR_KEY_HERE',
+        dangerouslyAllowBrowser: true
+      });
+
+      const message = await client.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }]
+      });
+
+      output.textContent = message.content[0].text;
+    };
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+      </div>
+
+      <div class="callout-box" data-type="warning">
+        <div class="callout-icon">Warning</div>
+        <div class="callout-content">
+          <p>Never expose API keys in frontend JavaScript for production apps. Anyone viewing your page source can steal your key. This is for learning only &mdash; we'll cover backend proxies on Day 20.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://docs.anthropic.com/en/api/getting-started" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Anthropic API Documentation</span>
+        <span class="resource-meta">Anthropic (~10 min) &mdash; Official docs with request/response examples</span>
+      </a>
+      <a class="resource-card" href="https://platform.openai.com/docs/quickstart" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">OpenAI API Quickstart</span>
+        <span class="resource-meta">OpenAI (~15 min) &mdash; Understand the alternative API structure</span>
+      </a>
+      <a class="resource-card" href="https://json-schema.org/learn/getting-started-step-by-step" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">JSON Schema for Structured Outputs</span>
+        <span class="resource-meta">JSON Schema (~20 min) &mdash; Learn how to define strict schemas for reliable AI outputs</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=_rT3fM2DL7Y" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Anthropic API Tutorial</span>
+        <span class="resource-meta">Fireship (6:30) &mdash; Quick visual walkthrough of Claude API basics</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=aqdWSYWC_LI" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">OpenAI Function Calling Tutorial</span>
+        <span class="resource-meta">Dave Ebbelaar (14:25) &mdash; Shows structured outputs with OpenAI's function calling</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why do we use system prompts to force JSON output instead of relying on the AI to "figure it out"?</p>
+      <textarea placeholder="Think about: What happens when you need to parse 1000 responses per day..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">If you were building a production app, would you expose your API key in frontend JavaScript? Why or why not?</p>
+      <textarea placeholder="Think about: What happens if someone views your page source..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does structured output from APIs compare to the manual prompt testing we did in Week 2?</p>
+      <textarea placeholder="Think about: Reliability vs flexibility..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Claude costs $3/M input tokens, OpenAI costs $5/M. But OpenAI has GPT-4o-mini at $0.15/M. When would you choose each?</p>
+      <textarea placeholder="Think about: Quality vs cost tradeoffs..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's one scene description you're excited to generate programmatically?</p>
+      <textarea placeholder="Dream big..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="16-text-to-3d-pipeline.html">Day 16: Building a Text-to-3D Pipeline</a> &mdash; We'll connect today's API knowledge with Three.js rendering. You'll build a function that takes a text prompt, calls Claude, parses the JSON, and renders a 3D scene automatically.</p>
+
+    <p>Now that you can make API calls and get structured JSON, tomorrow we'll build the full pipeline: user types &rarr; API generates scene data &rarr; Three.js renders it. By the end of Day 16, you'll have a working text-to-3D system!</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can make authenticated API calls to Claude or OpenAI</label>
+      <label><input type="checkbox"> I can get structured JSON responses using system prompts</label>
+      <label><input type="checkbox"> I can handle errors and rate limits gracefully</label>
+      <label><input type="checkbox"> I can store API keys securely in environment variables</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,0 +1,35 @@
+[
+  {
+    "question": "Why are environment variables used for API keys in deployment?",
+    "options": [
+      "They make the application load faster",
+      "They keep secrets out of the source code and can be set differently per environment",
+      "They are required by JavaScript syntax",
+      "They compress the API key for faster transmission"
+    ],
+    "answer": 1,
+    "explanation": "Environment variables store sensitive configuration outside the codebase, preventing secrets from being committed to version control and allowing different values per environment."
+  },
+  {
+    "question": "What is a serverless function and why is it useful for AI-powered apps?",
+    "options": [
+      "A function that runs without any server hardware",
+      "A JavaScript function that doesn't return a value",
+      "A cloud function that runs on-demand without managing a server, ideal for proxying API calls securely",
+      "A function that only works offline"
+    ],
+    "answer": 2,
+    "explanation": "Serverless functions run on-demand in the cloud. They're perfect for securely calling LLM APIs from the server side, keeping API keys hidden from the client."
+  },
+  {
+    "question": "What is code splitting and why does it matter for deployment?",
+    "options": [
+      "Dividing code between frontend and backend",
+      "Splitting code across multiple Git repositories",
+      "Writing code in multiple programming languages",
+      "Breaking the application bundle into smaller chunks that load on demand, improving initial load time"
+    ],
+    "answer": 3,
+    "explanation": "Code splitting breaks a large JavaScript bundle into smaller pieces loaded only when needed, reducing initial page load time and improving user experience."
+  }
+]

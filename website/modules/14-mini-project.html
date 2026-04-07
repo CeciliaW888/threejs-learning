@@ -1,0 +1,567 @@
+<section class="day-content" data-day="14">
+  <h2>Day 14: Week 2 Mini-Project &mdash; Prompt-Driven Scene Generator</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Build a complete text-to-3D scene generator (the Week 2 capstone)</li>
+      <li data-objective="2">Create a UI with a text input that generates 3D scenes</li>
+      <li data-objective="3">Connect prompt templates with the SceneBuilder from Day 13</li>
+      <li data-objective="4">Handle the full flow: user input &rarr; prompt construction &rarr; JSON parse &rarr; 3D render</li>
+      <li data-objective="5">Add polish: loading states, error handling, scene transitions</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1.5 hours (15 min review + 75 min building)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>What We're Building</h4>
+    <p>A web app where you type a scene description (e.g., "a cozy reading nook with a bookshelf and warm lighting") and see a 3D scene appear in the browser. For now, we'll simulate the AI part with pre-built scene templates and manual Claude/ChatGPT usage. In Week 3, we'll connect real API calls.</p>
+
+    <h4>Architecture</h4>
+    <pre><code class="language-javascript">// Pipeline Overview:
+// Text Input (UI) -> Prompt Template -> JSON Scene Data -> Three.js Scene
+//
+// ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+// │  Text Input  │ ->  │  Prompt      │ ->  │  JSON Scene  │ ->  │  Three.js    │
+// │  (UI)        │    │  Template    │    │  Data        │    │  Scene       │
+// └─────────────┘    └──────────────┘    └──────────────┘    └──────────────┘</code></pre>
+
+    <h4>The UI Layer</h4>
+    <p>Keep it minimal &mdash; a text input, a generate button, and the 3D canvas:</p>
+
+    <div class="code-block" data-lang="html">
+      <div class="code-header">
+        <span class="filename">index.html (UI overlay)</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">&lt;div id="ui-overlay"&gt;
+    &lt;div id="input-container"&gt;
+        &lt;input type="text" id="scene-prompt"
+               placeholder="Describe a 3D scene..." /&gt;
+        &lt;button id="generate-btn"&gt;Generate Scene&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div id="loading" style="display: none;"&gt;
+        &lt;span&gt;Building scene...&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div id="error" style="display: none;"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;canvas id="three-canvas"&gt;&lt;/canvas&gt;</code></pre>
+    </div>
+
+    <h4>Pre-Built Scene Templates (Simulation Mode)</h4>
+    <p>Until we connect real APIs in Week 3, use keyword matching to select pre-built scenes:</p>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Template matching</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const sceneTemplates = {
+    workspace: { /* desk, laptop, lamp scene */ },
+    garden: { /* zen garden with stones */ },
+    gallery: { /* art gallery with pedestals */ },
+    space: { /* floating planets and stars */ },
+};
+
+function matchTemplate(userInput) {
+    const input = userInput.toLowerCase();
+    for (const [key, template] of Object.entries(sceneTemplates)) {
+        if (input.includes(key)) return template;
+    }
+    return sceneTemplates.workspace; // default
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This gives you a working demo now. Week 3 replaces <code>matchTemplate</code> with real LLM calls.
+      </div>
+    </div>
+
+    <h4>Scene Transitions</h4>
+    <p>Abruptly swapping scenes feels jarring. Add smooth transitions:</p>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Scene transition</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">async function transitionToScene(newSceneData) {
+    // Fade out current scene
+    await fadeOut(scene, 500);
+
+    // Build new scene
+    builder.build(newSceneData);
+
+    // Fade in new scene
+    await fadeIn(scene, 500);
+}</code></pre>
+    </div>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>This mini-project is a vertical slice of the final portfolio. It proves the concept works end-to-end. Don't aim for perfection &mdash; aim for "it works and demonstrates the idea."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day14-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Vertical Slice</dt></div>
+        <div class="flashcard-back"><dd>End-to-end demo of all layers. Example: Input &rarr; Processing &rarr; Output</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Template Matching</dt></div>
+        <div class="flashcard-back"><dd>Selecting pre-built responses by keyword. Example: "garden" &rarr; garden scene JSON</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Scene Transition</dt></div>
+        <div class="flashcard-back"><dd>Smooth visual change between scenes. Example: Fade out old &rarr; fade in new</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>UI Overlay</dt></div>
+        <div class="flashcard-back"><dd>HTML elements positioned on top of the 3D canvas. Example: Input field, buttons</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Loading State</dt></div>
+        <div class="flashcard-back"><dd>Visual feedback during processing. Example: Spinner, "Building scene..." text</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 5</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Complete Mini-Project Structure</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">main.js &mdash; Prompt-Driven Scene Generator</span>
+        <span class="badge">Complete Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { SceneBuilder } from './SceneBuilder.js';
+
+// ===== THREE.JS SETUP =====
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(5, 5, 10);
+
+const renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById('three-canvas'),
+    antialias: true
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// ===== SCENE BUILDER =====
+const builder = new SceneBuilder(scene, camera);
+
+// ===== SCENE TEMPLATES =====
+const templates = {
+    workspace: {
+        objects: [
+            { name: "floor", geometry: "plane", position: [0, 0, 0], rotation: [-1.5708, 0, 0], scale: [20, 20, 1], material: { color: "#2a2a3a", roughness: 0.8 } },
+            { name: "desk", geometry: "box", position: [0, 0.75, 0], rotation: [0, 0, 0], scale: [3, 0.08, 1.5], material: { color: "#5c3a1e", roughness: 0.6 } },
+            { name: "monitor", geometry: "box", position: [0, 1.4, -0.4], rotation: [0, 0, 0], scale: [1.6, 0.9, 0.05], material: { color: "#111111", roughness: 0.2, metalness: 0.8 } },
+            { name: "screen-glow", geometry: "box", position: [0, 1.4, -0.38], rotation: [0, 0, 0], scale: [1.4, 0.75, 0.01], material: { color: "#4488ff", roughness: 1, emissive: "#4488ff", emissiveIntensity: 0.3 } },
+            { name: "keyboard", geometry: "box", position: [0, 0.82, 0.2], rotation: [0.1, 0, 0], scale: [0.8, 0.03, 0.3], material: { color: "#333333", roughness: 0.5, metalness: 0.3 } },
+            { name: "mug", geometry: "cylinder", position: [1.1, 0.87, 0.3], rotation: [0, 0, 0], scale: [0.12, 0.16, 0.12], material: { color: "#cc4444", roughness: 0.7 } },
+            { name: "chair-seat", geometry: "box", position: [0, 0.45, 0.9], rotation: [0, 0, 0], scale: [0.6, 0.08, 0.6], material: { color: "#1a1a1a", roughness: 0.5 } },
+        ],
+        lights: [
+            { type: "ambient", color: "#303050", intensity: 0.3 },
+            { type: "directional", color: "#ffffff", intensity: 0.8, position: [5, 10, 5], castShadow: true },
+            { type: "point", color: "#4488ff", intensity: 0.5, position: [0, 2, -0.3] }
+        ],
+        camera: { position: [4, 3, 4], lookAt: [0, 1, 0], fov: 60 },
+        environment: { background: "#0a0a1a" }
+    },
+
+    garden: {
+        objects: [
+            { name: "ground", geometry: "plane", position: [0, 0, 0], rotation: [-1.5708, 0, 0], scale: [20, 20, 1], material: { color: "#3a5a3a", roughness: 0.9 } },
+            { name: "rock-1", geometry: "icosahedron", position: [-2, 0.4, 1], rotation: [0.3, 0.5, 0], scale: [0.8, 0.6, 0.8], material: { color: "#777777", roughness: 0.9 } },
+            { name: "rock-2", geometry: "icosahedron", position: [1.5, 0.3, -1], rotation: [0.1, 1.2, 0.2], scale: [0.6, 0.5, 0.7], material: { color: "#888888", roughness: 0.85 } },
+            { name: "bridge", geometry: "box", position: [0, 0.3, 0], rotation: [0, 0.4, 0.15], scale: [3, 0.1, 0.8], material: { color: "#8B4513", roughness: 0.7 } },
+            { name: "lantern-base", geometry: "box", position: [3, 0.4, 2], rotation: [0, 0.3, 0], scale: [0.3, 0.8, 0.3], material: { color: "#666666", roughness: 0.6 } },
+            { name: "lantern-top", geometry: "cone", position: [3, 1, 2], rotation: [0, 0, 0], scale: [0.5, 0.4, 0.5], material: { color: "#555555", roughness: 0.6 } },
+            { name: "water", geometry: "plane", position: [-1, 0.02, -2], rotation: [-1.5708, 0, 0], scale: [4, 4, 1], material: { color: "#224466", roughness: 0.1, metalness: 0.3, opacity: 0.7 } },
+        ],
+        lights: [
+            { type: "ambient", color: "#556655", intensity: 0.4 },
+            { type: "directional", color: "#ffe8cc", intensity: 1.2, position: [-5, 8, 3], castShadow: true },
+            { type: "point", color: "#ffaa44", intensity: 0.6, position: [3, 1.2, 2] }
+        ],
+        camera: { position: [6, 4, 6], lookAt: [0, 0, 0], fov: 55 },
+        environment: { background: "#1a2a1a" }
+    },
+
+    gallery: {
+        objects: [
+            { name: "floor", geometry: "plane", position: [0, 0, 0], rotation: [-1.5708, 0, 0], scale: [20, 20, 1], material: { color: "#f5f5f0", roughness: 0.6 } },
+            { name: "pedestal-1", geometry: "cylinder", position: [-3, 0.75, 0], rotation: [0, 0, 0], scale: [1, 1.5, 1], material: { color: "#ffffff", roughness: 0.3 } },
+            { name: "art-1", geometry: "torus", position: [-3, 2, 0], rotation: [1.5, 0, 0], scale: [0.8, 0.8, 0.8], material: { color: "#ff4444", roughness: 0.2, metalness: 0.8 } },
+            { name: "pedestal-2", geometry: "cylinder", position: [0, 0.75, 0], rotation: [0, 0, 0], scale: [1, 1.5, 1], material: { color: "#ffffff", roughness: 0.3 } },
+            { name: "art-2", geometry: "icosahedron", position: [0, 2, 0], rotation: [0, 0.5, 0], scale: [0.7, 0.7, 0.7], material: { color: "#44aaff", roughness: 0.1, metalness: 0.9 } },
+            { name: "pedestal-3", geometry: "cylinder", position: [3, 0.75, 0], rotation: [0, 0, 0], scale: [1, 1.5, 1], material: { color: "#ffffff", roughness: 0.3 } },
+            { name: "art-3", geometry: "sphere", position: [3, 2, 0], rotation: [0, 0, 0], scale: [0.6, 0.6, 0.6], material: { color: "#FFD700", roughness: 0.05, metalness: 1 } },
+        ],
+        lights: [
+            { type: "ambient", color: "#ffffff", intensity: 0.3 },
+            { type: "spot", color: "#ffffff", intensity: 2, position: [-3, 5, 2], castShadow: true },
+            { type: "spot", color: "#ffffff", intensity: 2, position: [0, 5, 2], castShadow: true },
+            { type: "spot", color: "#ffffff", intensity: 2, position: [3, 5, 2], castShadow: true }
+        ],
+        camera: { position: [0, 3, 8], lookAt: [0, 1.5, 0], fov: 50 },
+        environment: { background: "#f0f0f0" }
+    }
+};
+
+// ===== SCENE MATCHING =====
+function getSceneForPrompt(prompt) {
+    const p = prompt.toLowerCase();
+    if (p.includes('garden') || p.includes('zen') || p.includes('nature')) return templates.garden;
+    if (p.includes('gallery') || p.includes('art') || p.includes('museum')) return templates.gallery;
+    if (p.includes('work') || p.includes('desk') || p.includes('office') || p.includes('code')) return templates.workspace;
+
+    // Default: pick randomly
+    const keys = Object.keys(templates);
+    return templates[keys[Math.floor(Math.random() * keys.length)]];
+}
+
+// ===== UI HANDLERS =====
+const promptInput = document.getElementById('scene-prompt');
+const generateBtn = document.getElementById('generate-btn');
+const loadingEl = document.getElementById('loading');
+const errorEl = document.getElementById('error');
+
+async function generateScene() {
+    const prompt = promptInput.value.trim();
+    if (!prompt) return;
+
+    // Show loading
+    loadingEl.style.display = 'flex';
+    errorEl.style.display = 'none';
+    generateBtn.disabled = true;
+
+    try {
+        // Simulate API delay
+        await new Promise(resolve =&gt; setTimeout(resolve, 800));
+
+        // Get scene data
+        const sceneData = getSceneForPrompt(prompt);
+
+        // Build scene
+        builder.build(sceneData);
+
+        console.log('Scene generated for: "' + prompt + '"');
+    } catch (err) {
+        console.error('Scene generation failed:', err);
+        errorEl.textContent = 'Error: ' + err.message;
+        errorEl.style.display = 'block';
+    } finally {
+        loadingEl.style.display = 'none';
+        generateBtn.disabled = false;
+    }
+}
+
+generateBtn.addEventListener('click', generateScene);
+promptInput.addEventListener('keypress', (e) =&gt; {
+    if (e.key === 'Enter') generateScene();
+});
+
+// ===== ANIMATION LOOP =====
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();
+
+// ===== WINDOW RESIZE =====
+window.addEventListener('resize', () =&gt; {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Load default scene
+builder.build(templates.workspace);</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This is the complete mini-project. It has a UI for text input, template matching for scene selection, the SceneBuilder from Day 13, and proper loading/error states. The simulated delay makes it feel like an API call.
+      </div>
+    </div>
+
+    <h4>Example 2: CSS for the UI Overlay</h4>
+
+    <div class="code-block" data-lang="css">
+      <div class="code-header">
+        <span class="filename">style.css</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">/* style.css */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+#three-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-overlay {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+#input-container {
+    display: flex;
+    gap: 8px;
+    background: rgba(10, 10, 26, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#scene-prompt {
+    width: 400px;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#scene-prompt:focus {
+    border-color: #4488ff;
+}
+
+#scene-prompt::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+#generate-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4488ff, #6644ff);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+#generate-btn:hover { opacity: 0.9; }
+#generate-btn:active { transform: scale(0.97); }
+#generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10, 10, 26, 0.9);
+    padding: 20px 30px;
+    border-radius: 12px;
+    color: #4488ff;
+    font-size: 16px;
+}
+
+#error {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 50, 50, 0.9);
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Build the Mini-Project</h4>
+        <span class="time-estimate">~45 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create the complete prompt-driven scene generator</p>
+      <ol class="exercise-steps">
+        <li>Set up the HTML structure with canvas and UI overlay</li>
+        <li>Style the UI (use the CSS from Example 2 or design your own)</li>
+        <li>Implement the SceneBuilder (from Day 13)</li>
+        <li>Create at least 3 scene templates (workspace, garden, gallery)</li>
+        <li>Wire up the UI: input &rarr; template match &rarr; build scene</li>
+        <li>Test with various prompts</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A working web app where typing "zen garden" shows a garden scene, "office" shows a workspace, etc.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Add Scene Transitions</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Smooth transitions between generated scenes</p>
+      <ol class="exercise-steps">
+        <li>When generating a new scene, fade the current scene's objects to transparent</li>
+        <li>After fade completes, clear and build the new scene</li>
+        <li>Fade new objects from transparent to opaque</li>
+        <li>Use <code>requestAnimationFrame</code> for smooth animation</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Hint</summary>
+        <p>Set all materials to <code>transparent: true</code>, then animate opacity from 1&rarr;0 and 0&rarr;1.</p>
+      </details>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Extend with More Templates</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Add creativity and depth to your scene library</p>
+      <ol class="exercise-steps">
+        <li>Add 2 more scene templates: "space" (planets, stars) and "city" (buildings, roads)</li>
+        <li>Improve keyword matching to handle more synonyms</li>
+        <li>Add a "random" option that generates from a random template</li>
+        <li>Add a "history" feature that remembers the last 5 prompts</li>
+        <li>Show template name in a small label after generation</li>
+      </ol>
+      <p><strong>Expected Output:</strong> 5+ unique scene templates with smart keyword matching.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/custom-buffergeometry" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Three.js Manual &mdash; Custom Geometries</span>
+        <span class="resource-meta">Three.js &mdash; Understand how to extend the builder with custom shapes</span>
+      </a>
+      <a class="resource-card" href="https://easings.net/" target="_blank" rel="noopener">
+        <span class="resource-type">Reference</span>
+        <span class="resource-title">Easings Cheat Sheet</span>
+        <span class="resource-meta">easings.net &mdash; Visual reference for scene transition easing functions</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=Q7AOvWpIVHU" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Build a Mindblowing 3D Portfolio Website</span>
+        <span class="resource-meta">Fireship (12 min) &mdash; Inspiration for the final portfolio look and feel</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why do we use template matching now instead of real AI? What changes in Week 3?</p>
+      <textarea placeholder="Think about the difference between simulation and real API calls..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you make the scene transitions feel more "magical" &mdash; what visual effects could you add?</p>
+      <textarea placeholder="Think about particle effects, camera movement, color shifts..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Which concepts from Week 1 (scenes, materials, lighting) were most critical for making templates look good?</p>
+      <textarea placeholder="Consider what makes a scene look polished vs. flat..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What are the limitations of template matching vs. real AI generation?</p>
+      <textarea placeholder="Think about flexibility, creativity, and user expectations..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Show your mini-project to someone &mdash; what's their reaction? What would they want to try?</p>
+      <textarea placeholder="Get feedback from a friend or colleague..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Next week:</strong> <a href="15-llm-apis.html">Day 15: Intro to LLM APIs</a> &mdash; Replace template matching with real AI calls.</p>
+
+    <div class="callout-box" data-type="preview">
+      <div class="callout-icon">Week 2 Complete</div>
+      <div class="callout-content">
+        <p>Congratulations! You've completed Week 2. You now have:</p>
+        <ul>
+          <li>3D model loading</li>
+          <li>Professional lighting and shadows</li>
+          <li>Performance optimization knowledge</li>
+          <li>Prompt engineering fundamentals</li>
+          <li>A JSON-to-Three.js scene builder</li>
+          <li>A working text-to-3D demo</li>
+        </ul>
+        <p>Week 3 connects real AI APIs, adds memory and context, and builds the final AI Portfolio Generator.</p>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can type a scene description and see a 3D scene appear</label>
+      <label><input type="checkbox"> I can handle loading states and errors gracefully</label>
+      <label><input type="checkbox"> I can create at least 3 distinct scene templates</label>
+      <label><input type="checkbox"> I can clear and rebuild scenes without issues</label>
+      <label><input type="checkbox"> I can explain the full pipeline from text to 3D</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

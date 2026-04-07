@@ -1,0 +1,524 @@
+<section class="day-content" data-day="18">
+  <h2>Day 18: Adding Memory &amp; Context to AI Agent</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Implement conversation memory (multi-turn context)</li>
+      <li data-objective="2">Store user preferences and style guidelines</li>
+      <li data-objective="3">Use localStorage for persistent memory across sessions</li>
+      <li data-objective="4">Build a "portfolio profile" that the AI learns from</li>
+      <li data-objective="5">Optimize memory management (what to keep vs. discard)</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>Why Memory Matters</h4>
+    <p>Without memory, every AI request is independent. The AI doesn't know:</p>
+    <ul>
+      <li>What you built earlier in the session</li>
+      <li>Your preferred color schemes or styles</li>
+      <li>That you're building a developer portfolio (not a game or art project)</li>
+      <li>Past feedback ("I like minimal designs")</li>
+    </ul>
+    <p>With memory, the AI becomes a collaborative partner that learns your preferences.</p>
+
+    <h4>Types of Memory</h4>
+
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <strong>Short-Term Memory (Session)</strong>
+          <p>Current conversation history &mdash; lasts until page reload.</p>
+          <pre><code class="language-javascript">const messages = [
+    { role: 'user', content: 'Create a workspace' },
+    { role: 'assistant', content: '{"objects": [...]}' },
+    { role: 'user', content: 'Add a lamp' },
+    // AI sees full history
+];</code></pre>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <strong>Long-Term Memory (Persistent)</strong>
+          <p>User preferences stored in localStorage &mdash; survives page reloads.</p>
+          <pre><code class="language-javascript">const userProfile = {
+    preferredStyle: 'minimal',
+    colorScheme: 'dark',
+    industryKeywords: ['software', 'AI', 'web development'],
+    pastProjects: [...],
+};</code></pre>
+        </div>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <strong>Working Memory (Scene State)</strong>
+          <p>Current scene + recent modifications &mdash; what's on screen now.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>Conversation History Format</h4>
+    <p>Claude and OpenAI APIs use a messages array:</p>
+
+    <pre><code class="language-javascript">const messages = [
+    { role: 'user', content: 'Create a tech workspace' },
+    { role: 'assistant', content: '{"objects":[...]}' },
+    { role: 'user', content: 'Make it more colorful' },
+    { role: 'assistant', content: '{"objects":[...]}' },
+];
+
+// Send to API
+const response = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    system: systemPrompt,
+    messages: messages  // Full conversation history
+});</code></pre>
+
+    <p>The AI uses the full history to understand context for the latest request.</p>
+
+    <h4>Memory Management Strategy</h4>
+    <p>You can't send infinite history (API has token limits). Strategy:</p>
+    <ol>
+      <li><strong>System prompt</strong> &mdash; 500 tokens (always included)</li>
+      <li><strong>User profile</strong> &mdash; 200 tokens (always included)</li>
+      <li><strong>Recent messages</strong> &mdash; Last 5-10 turns (~2000 tokens)</li>
+      <li><strong>Current scene state</strong> &mdash; 500 tokens</li>
+    </ol>
+    <p>Total: ~3200 tokens input, leaving room for 4096 token output.</p>
+
+    <h4>Building a Portfolio Profile</h4>
+    <p>Instead of generic prompts, inject context about the user:</p>
+
+    <pre><code class="language-javascript">const portfolioProfile = {
+    role: 'Web Developer',
+    specialties: ['Three.js', 'React', 'AI Integration'],
+    style: 'Clean, modern, slightly futuristic',
+    colorPreferences: 'Blues and purples with dark backgrounds',
+    projects: [
+        { name: 'AI Chat App', tech: 'Claude API, React' },
+        { name: '3D Product Configurator', tech: 'Three.js' }
+    ]
+};
+
+const enhancedSystemPrompt = `${baseSystemPrompt}
+
+USER PORTFOLIO PROFILE:
+${JSON.stringify(portfolioProfile, null, 2)}
+
+When generating scenes, reflect this user's style and focus on showcasing their specialties.`;</code></pre>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>AI with memory feels intelligent. It remembers your corrections, learns your taste, and produces consistently better results over time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day18-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Conversation History</dt></div>
+        <div class="flashcard-back"><dd>Array of user/assistant message pairs that provides context for each new API request. Example: <code>[{role, content}, ...]</code></dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>System Prompt</dt></div>
+        <div class="flashcard-back"><dd>Persistent AI instructions that are always included first in every request. Defines the AI's role, output format, and constraints.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>User Profile</dt></div>
+        <div class="flashcard-back"><dd>Stored preferences and context about the user, such as portfolio style, color preferences, and specialties. Enhances every AI request.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Token Window</dt></div>
+        <div class="flashcard-back"><dd>Maximum context size for an API request. Claude supports up to 200K tokens. You must manage conversation history to stay within this limit.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>localStorage</dt></div>
+        <div class="flashcard-back"><dd>Browser persistent storage API that survives page reloads. Used to store user profiles and preferences across sessions.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Session State</dt></div>
+        <div class="flashcard-back"><dd>Temporary in-memory data that only lasts for the current browser session. Cleared when the page is reloaded.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Conversation Manager</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">conversationManager.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">export class ConversationManager {
+    constructor(maxMessages = 10) {
+        this.messages = [];
+        this.maxMessages = maxMessages;
+        this.systemPrompt = '';
+        this.userProfile = null;
+    }
+
+    setSystemPrompt(prompt) {
+        this.systemPrompt = prompt;
+    }
+
+    setUserProfile(profile) {
+        this.userProfile = profile;
+    }
+
+    addMessage(role, content) {
+        this.messages.push({ role, content });
+
+        // Keep only recent messages to stay within token limits
+        if (this.messages.length &gt; this.maxMessages) {
+            this.messages = this.messages.slice(-this.maxMessages);
+        }
+    }
+
+    getMessages() {
+        return [...this.messages];
+    }
+
+    clear() {
+        this.messages = [];
+    }
+
+    // Build enhanced system prompt with user profile
+    getEnhancedSystemPrompt() {
+        let enhanced = this.systemPrompt;
+
+        if (this.userProfile) {
+            enhanced += `\n\nUSER PORTFOLIO PROFILE:\n${JSON.stringify(this.userProfile, null, 2)}`;
+            enhanced += '\nGenerate scenes that reflect this user\'s style and showcase their skills.';
+        }
+
+        return enhanced;
+    }
+
+    // Prepare API call payload
+    getAPIPayload() {
+        return {
+            system: this.getEnhancedSystemPrompt(),
+            messages: this.getMessages()
+        };
+    }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This class manages conversation state. It maintains a rolling window of recent messages, injects the user profile into the system prompt, and prepares payloads for API calls.
+      </div>
+    </div>
+
+    <h4>Example 2: Persistent User Profile</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">userProfile.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const PROFILE_KEY = 'portfolio_ai_profile';
+
+export function saveProfile(profile) {
+    try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        console.log('Profile saved');
+    } catch (e) {
+        console.error('Failed to save profile:', e);
+    }
+}
+
+export function loadProfile() {
+    try {
+        const stored = localStorage.getItem(PROFILE_KEY);
+        return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+        console.error('Failed to load profile:', e);
+        return null;
+    }
+}
+
+export function createDefaultProfile() {
+    return {
+        role: '',
+        specialties: [],
+        style: 'modern and clean',
+        colorScheme: 'dark with accents',
+        projects: [],
+        preferences: {
+            lighting: 'realistic with shadows',
+            complexity: 'moderate',
+            theme: 'professional'
+        }
+    };
+}
+
+// UI for editing profile
+export function showProfileEditor() {
+    const profile = loadProfile() || createDefaultProfile();
+
+    const form = document.createElement('div');
+    form.innerHTML = `
+        &lt;div class="profile-editor"&gt;
+            &lt;h3&gt;Your Portfolio Profile&lt;/h3&gt;
+            &lt;label&gt;
+                Role:
+                &lt;input type="text" id="profile-role" value="${profile.role}"
+                       placeholder="e.g., Frontend Developer, 3D Artist"&gt;
+            &lt;/label&gt;
+            &lt;label&gt;
+                Specialties (comma-separated):
+                &lt;input type="text" id="profile-specialties"
+                       value="${profile.specialties.join(', ')}"
+                       placeholder="e.g., React, Three.js, AI"&gt;
+            &lt;/label&gt;
+            &lt;label&gt;
+                Style Preference:
+                &lt;input type="text" id="profile-style" value="${profile.style}"
+                       placeholder="e.g., minimal, futuristic, colorful"&gt;
+            &lt;/label&gt;
+            &lt;label&gt;
+                Color Scheme:
+                &lt;input type="text" id="profile-colors" value="${profile.colorScheme}"
+                       placeholder="e.g., dark blues and purples"&gt;
+            &lt;/label&gt;
+            &lt;button id="save-profile"&gt;Save Profile&lt;/button&gt;
+            &lt;button id="close-editor"&gt;Cancel&lt;/button&gt;
+        &lt;/div&gt;
+    `;
+
+    document.body.appendChild(form);
+
+    document.getElementById('save-profile').addEventListener('click', () =&gt; {
+        const updated = {
+            role: document.getElementById('profile-role').value,
+            specialties: document.getElementById('profile-specialties').value
+                .split(',').map(s =&gt; s.trim()).filter(Boolean),
+            style: document.getElementById('profile-style').value,
+            colorScheme: document.getElementById('profile-colors').value,
+            projects: profile.projects, // Preserve existing projects
+            preferences: profile.preferences
+        };
+
+        saveProfile(updated);
+        form.remove();
+        location.reload(); // Reload to apply new profile
+    });
+
+    document.getElementById('close-editor').addEventListener('click', () =&gt; {
+        form.remove();
+    });
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> User profile is stored in localStorage. A simple editor lets users define their role, specialties, and style preferences. The profile persists across sessions and enhances every AI request.
+      </div>
+    </div>
+
+    <h4>Example 3: Full Integration</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">main.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import { ConversationManager } from './conversationManager.js';
+import { loadProfile, showProfileEditor } from './userProfile.js';
+
+const conversation = new ConversationManager(10);
+const userProfile = loadProfile();
+
+// Set up conversation with profile
+conversation.setSystemPrompt(BASE_SYSTEM_PROMPT);
+if (userProfile) {
+    conversation.setUserProfile(userProfile);
+    console.log('Loaded user profile:', userProfile);
+}
+
+// Generate scene with memory
+async function generateWithMemory(userInput) {
+    // Add user message to history
+    conversation.addMessage('user', userInput);
+
+    // Get full conversation payload
+    const payload = conversation.getAPIPayload();
+
+    // Call API with conversation history
+    const response = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 4096,
+        temperature: 0.3,
+        ...payload
+    });
+
+    const sceneJSON = response.content[0].text;
+
+    // Add assistant response to history
+    conversation.addMessage('assistant', sceneJSON);
+
+    return JSON.parse(sceneJSON);
+}
+
+// UI: Edit Profile button
+document.getElementById('edit-profile-btn').addEventListener('click', () =&gt; {
+    showProfileEditor();
+});
+
+// UI: Clear History button
+document.getElementById('clear-history-btn').addEventListener('click', () =&gt; {
+    conversation.clear();
+    console.log('Conversation history cleared');
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Every user input is added to conversation history. The AI sees the full conversation context and user profile with each request. Users can edit their profile or clear history.
+      </div>
+    </div>
+
+    <div class="callout-box" data-type="tip">
+      <div class="callout-icon">Try it</div>
+      <div class="callout-content">
+        <p>Set your profile to "Game Developer specializing in VR, prefers neon cyberpunk aesthetics" &mdash; watch how scene generation changes!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Add Conversation Memory</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Implement multi-turn conversation tracking</p>
+      <ol class="exercise-steps">
+        <li>Add the <code>ConversationManager</code> class from Example 1</li>
+        <li>Store each user input and AI response</li>
+        <li>Send full conversation history with each API call</li>
+        <li>Test: generate a scene, then make 3 modifications &mdash; verify AI remembers context</li>
+      </ol>
+      <p><strong>Expected Output:</strong> AI maintains context across multiple requests.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Build Profile System</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create persistent user profile storage</p>
+      <ol class="exercise-steps">
+        <li>Implement profile save/load from Example 2</li>
+        <li>Create profile editor UI (or simple form)</li>
+        <li>Inject profile into system prompt</li>
+        <li>Test: create a profile, generate scenes, note how they reflect your style</li>
+        <li>Reload page &mdash; verify profile persists</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Scenes consistently match your defined style.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Memory Optimization</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Keep conversation history manageable</p>
+      <ol class="exercise-steps">
+        <li>Add token counting (estimate ~4 chars = 1 token)</li>
+        <li>Limit conversation to last 10 messages</li>
+        <li>Add a "summarize and compress" function that condenses old messages</li>
+        <li>Display current memory usage in UI</li>
+        <li>Test with 20+ messages &mdash; verify it stays under token limits</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Conversation never exceeds API token limits.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://github.com/anthropics/anthropic-cookbook" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">Conversation Design &mdash; Anthropic Cookbook</span>
+        <span class="resource-meta">Anthropic &mdash; Best practices for building conversational AI apps</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why do we limit conversation history to recent messages instead of sending everything?</p>
+      <textarea placeholder="Think about token limits, cost, latency, and relevance of old messages..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you implement a "save this scene to my portfolio" feature?</p>
+      <textarea placeholder="Think about what data to persist: the JSON, a screenshot, the prompt that created it..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does the user profile concept relate to the system prompts from Day 12?</p>
+      <textarea placeholder="Think about how profiles extend the system prompt with personalized context..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's the risk of letting AI have long-term memory? Privacy? Bias?</p>
+      <textarea placeholder="Think about data persistence, user consent, and reinforcing biases from past interactions..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">After using profile-aware generation, how much better are the results?</p>
+      <textarea placeholder="Think about consistency, style coherence, and reduced need for corrections..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="19-advanced-prompting.html">Day 19: Advanced Prompting Techniques</a> &mdash; Chain-of-thought, self-critique, and multi-agent patterns.</p>
+
+    <p>You've built a portfolio AI that remembers. Tomorrow we'll make it even smarter with advanced prompting techniques.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can maintain conversation history across multiple requests</label>
+      <label><input type="checkbox"> I can store and load user profiles with localStorage</label>
+      <label><input type="checkbox"> I can inject profile context into system prompts</label>
+      <label><input type="checkbox"> I can manage memory to stay within token limits</label>
+      <label><input type="checkbox"> I can clear history when needed</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

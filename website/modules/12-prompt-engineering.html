@@ -1,0 +1,481 @@
+<section class="day-content" data-day="12">
+  <h2>Day 12: Intro to Prompt Engineering for 3D</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Understand what prompt engineering is and why it matters for AI-3D integration</li>
+      <li data-objective="2">Write structured prompts that produce consistent, parseable output</li>
+      <li data-objective="3">Use system prompts, few-shot examples, and output formatting</li>
+      <li data-objective="4">Design prompts specifically for generating 3D scene descriptions</li>
+      <li data-objective="5">Handle common prompt failure modes (hallucination, inconsistency, ambiguity)</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>What is Prompt Engineering?</h4>
+    <p>Prompt engineering is the skill of communicating with AI language models (like Claude and GPT) to get useful, reliable output. It's not about magic words &mdash; it's about being clear, specific, and structured in your instructions.</p>
+
+    <p>For our AI portfolio project, prompt engineering is the bridge between natural language ("create a futuristic workspace") and Three.js code (position, rotation, material parameters). The better your prompts, the more reliably your AI agent can generate 3D scenes.</p>
+
+    <h4>The Anatomy of a Good Prompt</h4>
+    <p>A well-structured prompt has several layers:</p>
+
+    <p><strong>1. System Prompt (Role &amp; Rules)</strong></p>
+    <p>Sets the AI's behavior, constraints, and output format.</p>
+    <pre><code class="language-javascript">You are a 3D scene designer that converts text descriptions into
+Three.js scene parameters. You ALWAYS output valid JSON. You NEVER
+include explanatory text outside the JSON block.</code></pre>
+
+    <p><strong>2. Context (What the AI Needs to Know)</strong></p>
+    <p>Provide the vocabulary of available objects, materials, and constraints.</p>
+    <pre><code class="language-javascript">Available geometries: box, sphere, cylinder, cone, torus, plane
+Available materials: standard, physical, basic
+Color format: hex string (e.g., "#ff4444")
+Position range: -10 to 10 on each axis</code></pre>
+
+    <p><strong>3. Task (What You Want)</strong></p>
+    <p>Be specific about the desired output.</p>
+    <pre><code class="language-javascript">Convert this description into a scene: "A red cube floating above a blue floor"</code></pre>
+
+    <p><strong>4. Format (How to Structure Output)</strong></p>
+    <p>Show exactly what the output should look like.</p>
+    <pre><code class="language-javascript">{
+  "objects": [
+    {
+      "name": "string",
+      "geometry": "box|sphere|cylinder|...",
+      "position": [x, y, z],
+      "rotation": [x, y, z],
+      "scale": [x, y, z],
+      "material": {
+        "type": "standard",
+        "color": "#hex",
+        "roughness": 0-1,
+        "metalness": 0-1
+      }
+    }
+  ],
+  "lights": [...],
+  "camera": {...}
+}</code></pre>
+
+    <h4>Few-Shot Prompting</h4>
+    <p>Give examples of input &rarr; output pairs so the AI learns the pattern:</p>
+
+    <pre><code class="language-javascript">Example 1:
+Input: "A green sphere on a white table"
+Output: {
+  "objects": [
+    { "name": "table", "geometry": "box", "position": [0, 0.5, 0],
+      "scale": [3, 0.1, 2], "material": { "color": "#ffffff" } },
+    { "name": "sphere", "geometry": "sphere", "position": [0, 1.5, 0],
+      "scale": [0.5, 0.5, 0.5], "material": { "color": "#44aa44" } }
+  ]
+}
+
+Example 2:
+Input: "A tall red cylinder next to a blue cube"
+Output: {
+  "objects": [
+    { "name": "cylinder", "geometry": "cylinder", "position": [-1, 1.5, 0],
+      "scale": [0.5, 3, 0.5], "material": { "color": "#ff4444" } },
+    { "name": "cube", "geometry": "box", "position": [1, 0.5, 0],
+      "scale": [1, 1, 1], "material": { "color": "#4444ff" } }
+  ]
+}
+
+Now convert: "A golden ring hovering above a dark platform"</code></pre>
+
+    <h4>Common Prompt Failure Modes</h4>
+
+    <p><strong>Hallucination:</strong> AI invents geometries or properties that don't exist in Three.js.</p>
+    <p><strong>Fix:</strong> Explicitly list what's available. "Choose ONLY from: box, sphere, cylinder, cone, torus, plane"</p>
+
+    <p><strong>Inconsistency:</strong> Same prompt gives wildly different outputs each time.</p>
+    <p><strong>Fix:</strong> Use structured JSON output, provide examples, lower temperature.</p>
+
+    <p><strong>Ambiguity:</strong> "Make it look nice" doesn't translate to specific numbers.</p>
+    <p><strong>Fix:</strong> Constrain ranges. "roughness must be between 0.0 and 1.0"</p>
+
+    <p><strong>Format Breaking:</strong> AI adds explanation text mixed into JSON.</p>
+    <p><strong>Fix:</strong> "Output ONLY valid JSON. No text before or after the JSON block."</p>
+
+    <h4>Temperature and Determinism</h4>
+    <p>When calling LLM APIs, <code>temperature</code> controls randomness:</p>
+    <ul>
+      <li><strong>temperature: 0</strong> &mdash; Most deterministic (same input = same output)</li>
+      <li><strong>temperature: 0.3-0.5</strong> &mdash; Slight variation, still structured</li>
+      <li><strong>temperature: 0.7-1.0</strong> &mdash; Creative, varied outputs</li>
+      <li><strong>temperature: 1.5+</strong> &mdash; Chaotic, unpredictable</li>
+    </ul>
+
+    <p>For 3D scene generation, start with <strong>temperature: 0.3</strong> &mdash; creative enough to produce interesting scenes, structured enough to produce valid JSON.</p>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>Prompt engineering for code generation (which includes 3D parameters) is fundamentally about constraining outputs. The more you specify what's valid, the more reliable your results.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day12-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>System Prompt</dt></div>
+        <div class="flashcard-back"><dd>Instructions that set the AI's role and rules. Example: "You are a 3D scene designer..." Defines behavior, constraints, and output format before the user's request.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Few-Shot Prompting</dt></div>
+        <div class="flashcard-back"><dd>Providing examples of desired input-to-output pairs so the AI learns the pattern. Typically 2-3 example scene conversions improve consistency dramatically.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Zero-Shot Prompting</dt></div>
+        <div class="flashcard-back"><dd>Asking the AI to perform a task without providing any examples. Example: "Convert this to a 3D scene" with no sample output shown.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Temperature</dt></div>
+        <div class="flashcard-back"><dd>Controls output randomness on a scale of 0-2. Use 0.3 for structured output like JSON scene descriptions. Use 1.0 for creative, varied results.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Hallucination</dt></div>
+        <div class="flashcard-back"><dd>When the AI invents things that don't exist. Example: generating a "ConeGeometry" when only BoxGeometry is in the allowed list. Fixed by explicitly listing valid options.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Schema</dt></div>
+        <div class="flashcard-back"><dd>A defined structure for output. In our case, a JSON format with specific fields like objects, lights, camera, and environment that maps directly to Three.js constructors.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Structured Output</dt></div>
+        <div class="flashcard-back"><dd>Forcing the AI's response into a specific format like JSON-only responses. Eliminates explanation text and ensures parseable output.</dd></div>
+      </div>
+      <div class="flashcard" data-card="8">
+        <div class="flashcard-front"><dt>Chain of Thought</dt></div>
+        <div class="flashcard-back"><dd>Asking the AI to reason step-by-step before giving a final answer. Example: "First identify objects, then assign properties, then output JSON."</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 8</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Scene Description Schema</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">scene-schema.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Define the schema for 3D scene output
+const sceneSchema = {
+    objects: [
+        {
+            name: "descriptive-name",
+            geometry: "box | sphere | cylinder | cone | torus | plane",
+            position: [0, 0, 0],  // x, y, z
+            rotation: [0, 0, 0],  // radians
+            scale: [1, 1, 1],     // x, y, z multiplier
+            material: {
+                type: "standard",  // standard | physical | basic
+                color: "#ffffff",
+                roughness: 0.5,    // 0 (mirror) to 1 (matte)
+                metalness: 0.0,    // 0 (plastic) to 1 (metal)
+                opacity: 1.0       // 0 (invisible) to 1 (solid)
+            }
+        }
+    ],
+    lights: [
+        {
+            type: "directional | ambient | point | spot",
+            color: "#ffffff",
+            intensity: 1.0,
+            position: [5, 10, 5],  // Not needed for ambient
+            castShadow: false
+        }
+    ],
+    camera: {
+        position: [0, 5, 10],
+        lookAt: [0, 0, 0],
+        fov: 75
+    },
+    environment: {
+        background: "#1a1a2e",
+        fog: false
+    }
+};</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We define a clear schema for AI output. This becomes part of your prompt &mdash; tell the AI "output must match this exact structure." The schema maps directly to Three.js constructors, making parsing straightforward.
+      </div>
+    </div>
+
+    <h4>Example 2: Building a System Prompt</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">system-prompt.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const systemPrompt = `You are a Three.js scene designer. You convert natural language
+descriptions into structured JSON that can be directly used to create Three.js scenes.
+
+RULES:
+1. Output ONLY valid JSON - no markdown, no explanation, no code fences
+2. Use ONLY these geometries: box, sphere, cylinder, cone, torus, plane, icosahedron
+3. All positions must be within [-20, 20] range on each axis
+4. All colors must be valid hex strings (e.g., "#ff4444")
+5. roughness and metalness must be between 0.0 and 1.0
+6. Always include at least one light source
+7. Objects should be positioned logically (on surfaces, not floating randomly)
+8. Ground/floor plane should be at y=0
+
+OUTPUT SCHEMA:
+{
+  "objects": [{ "name", "geometry", "position", "rotation", "scale", "material" }],
+  "lights": [{ "type", "color", "intensity", "position", "castShadow" }],
+  "camera": { "position", "lookAt", "fov" },
+  "environment": { "background" }
+}
+
+EXAMPLES:
+Input: "A simple desk with a lamp"
+Output: {"objects":[{"name":"desk-top","geometry":"box","position":[0,0.75,0],
+"rotation":[0,0,0],"scale":[2,0.05,1],"material":{"type":"standard",
+"color":"#8B4513","roughness":0.7,"metalness":0.1}},{"name":"desk-leg-1",
+"geometry":"cylinder","position":[-0.9,0.375,-0.4],"rotation":[0,0,0],
+"scale":[0.05,0.75,0.05],"material":{"type":"standard","color":"#696969",
+"roughness":0.5,"metalness":0.8}},{"name":"lamp-base","geometry":"cylinder",
+"position":[0.7,0.8,0.3],"rotation":[0,0,0],"scale":[0.15,0.05,0.15],
+"material":{"type":"standard","color":"#333333","roughness":0.3,
+"metalness":0.9}},{"name":"lamp-shade","geometry":"cone",
+"position":[0.7,1.2,0.3],"rotation":[3.14,0,0],"scale":[0.2,0.3,0.2],
+"material":{"type":"standard","color":"#FFFDD0","roughness":0.9,
+"metalness":0.0}}],"lights":[{"type":"ambient","color":"#404060",
+"intensity":0.3},{"type":"point","color":"#FFE4B5","intensity":1.5,
+"position":[0.7,1.1,0.3],"castShadow":true}],"camera":{"position":[3,3,3],
+"lookAt":[0,0.75,0],"fov":60},"environment":{"background":"#1a1a2e"}}`;</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This system prompt is comprehensive: it defines the AI's role, constrains its options, specifies exact output format, and provides a worked example. The more detailed your system prompt, the more reliable the output.
+      </div>
+    </div>
+
+    <h4>Example 3: Prompt Testing Function</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">prompt-validator.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Test prompts locally before connecting to APIs
+function testPromptOutput(jsonString) {
+    try {
+        const scene = JSON.parse(jsonString);
+
+        // Validate structure
+        const errors = [];
+
+        if (!scene.objects || !Array.isArray(scene.objects)) {
+            errors.push('Missing or invalid "objects" array');
+        }
+
+        const validGeometries = [
+            'box', 'sphere', 'cylinder', 'cone',
+            'torus', 'plane', 'icosahedron'
+        ];
+
+        scene.objects?.forEach((obj, i) =&gt; {
+            if (!validGeometries.includes(obj.geometry)) {
+                errors.push(`Object ${i}: invalid geometry "${obj.geometry}"`);
+            }
+            if (!obj.position || obj.position.length !== 3) {
+                errors.push(`Object ${i}: invalid position`);
+            }
+            if (obj.material?.color &amp;&amp; !/^#[0-9a-fA-F]{6}$/.test(obj.material.color)) {
+                errors.push(`Object ${i}: invalid color "${obj.material.color}"`);
+            }
+        });
+
+        if (errors.length &gt; 0) {
+            console.error('Validation errors:', errors);
+            return { valid: false, errors };
+        }
+
+        console.log(`Valid scene with ${scene.objects.length} objects`);
+        return { valid: true, scene };
+    } catch (e) {
+        console.error('JSON parse error:', e.message);
+        return { valid: false, errors: [e.message] };
+    }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Before wiring up real AI APIs, build a validator. This catches issues early and helps you refine your prompt until the AI consistently produces valid output.
+      </div>
+    </div>
+
+    <div class="callout-box" data-type="tip">
+      <div class="callout-icon">Try it</div>
+      <div class="callout-content">
+        <p>Open Claude or ChatGPT. Paste the system prompt from Example 2, then ask: "Create a cozy reading corner with a bookshelf and armchair." Validate the JSON output with the validator from Example 3.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Prompt Design Workshop</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Write and test prompts for 3D scene generation</p>
+      <ol class="exercise-steps">
+        <li>Copy the system prompt from Example 2</li>
+        <li>Open Claude (claude.ai) or ChatGPT</li>
+        <li>Paste the system prompt, then try these inputs:
+          <ul>
+            <li>"A futuristic workspace with a holographic display"</li>
+            <li>"A zen garden with stones and a small bridge"</li>
+            <li>"A game trophy shelf with 3 awards"</li>
+          </ul>
+        </li>
+        <li>Check if each output is valid JSON</li>
+        <li>Check if geometries and values are within constraints</li>
+        <li>Note which prompts produce good vs. poor results</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Valid JSON scene descriptions for each input, with notes on what worked and what didn't.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Build a Validator</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create a robust JSON scene validator</p>
+      <ol class="exercise-steps">
+        <li>Implement the validator from Example 3 in your project</li>
+        <li>Add checks for: valid light types, camera within reasonable range, scale &gt; 0</li>
+        <li>Test with intentionally bad JSON (missing fields, wrong types)</li>
+        <li>Add a "fix" mode that fills in defaults for missing fields</li>
+        <li>Run validation on all your Exercise 1 outputs</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A reusable validation function that catches common AI output issues.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Prompt Iteration</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Improve prompts through testing</p>
+      <ol class="exercise-steps">
+        <li>Start with a minimal prompt: "Convert to 3D scene JSON: a castle on a hill"</li>
+        <li>Test it &mdash; note what goes wrong</li>
+        <li>Add constraints &mdash; test again</li>
+        <li>Add an example &mdash; test again</li>
+        <li>Document what each improvement fixed</li>
+        <li>Find the minimal prompt that produces consistently valid output</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A documented progression from bad to good prompt with specific improvement notes.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Prompt Engineering Guide</span>
+        <span class="resource-meta">Anthropic &mdash; Official best practices for writing prompts, directly applicable to our project</span>
+      </a>
+      <a class="resource-card" href="https://platform.openai.com/docs/guides/prompt-engineering" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">OpenAI Prompt Engineering Guide</span>
+        <span class="resource-meta">OpenAI &mdash; Complementary perspective on structured output prompting</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=QnZYrD5ia7c" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Prompt Engineering for Beginners: Full Workshop</span>
+        <span class="resource-meta">9x &mdash; Comprehensive workshop covering all prompt engineering fundamentals</span>
+      </a>
+      <a class="resource-card" href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">Structured Outputs</span>
+        <span class="resource-meta">OpenAI &mdash; Advanced technique for guaranteeing JSON output format</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why is few-shot prompting more reliable than zero-shot for structured output?</p>
+      <textarea placeholder="Think about how examples disambiguate what you want vs. relying on the AI to guess your format..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you modify the system prompt to support animated scenes (objects that move over time)?</p>
+      <textarea placeholder="Think about what additional properties or schema fields you'd need for animation keyframes..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does the schema from today map to the Three.js constructors you learned in Week 1?</p>
+      <textarea placeholder="Think about how 'geometry: box' becomes new THREE.BoxGeometry() and how material properties map..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What happens if a user asks for something outside your geometry list (e.g., "a detailed car")? How should the AI handle it?</p>
+      <textarea placeholder="Think about graceful fallbacks, approximations with primitive shapes, and communicating limitations..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What 5 scene descriptions would you want your portfolio AI to handle well?</p>
+      <textarea placeholder="Think about the kinds of scenes that would impress visitors to your portfolio..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="13-language-to-3d.html">Day 13: Mapping Natural Language to 3D Parameters</a> &mdash; Build the JavaScript that turns AI JSON output into actual Three.js objects.</p>
+
+    <p>Today you learned to talk to AI about 3D scenes. Tomorrow you'll build the code that listens &mdash; a parser that takes the JSON from your prompts and creates real Three.js objects in the browser.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can write a system prompt with role, rules, and format specification</label>
+      <label><input type="checkbox"> I can use few-shot examples to improve output consistency</label>
+      <label><input type="checkbox"> I can validate AI output against a schema</label>
+      <label><input type="checkbox"> I can identify and fix common prompt failure modes</label>
+      <label><input type="checkbox"> I can produce valid scene JSON from natural language descriptions</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

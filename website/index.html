@@ -3,189 +3,739 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Three.js + AI Portfolio Course</title>
+  <title>Three.js Learning</title>
   <meta name="description" content="21-Day Course — Build an AI-powered 3D portfolio generator">
   <meta name="theme-color" content="#c4825a">
-  
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="3JS">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Framework CSS (for interactive module elements) -->
   <link rel="stylesheet" href="styles.css">
-  
+
   <style>
-    :root { --accent: #c4825a; --accent-hover: #b07149; --cream: #f5f0eb; --white: #fff; --border: #e8e0d8; --text-primary: #2c2420; --text-secondary: #6b5c52; --radius: 12px; --max-w: 860px; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text-primary); line-height: 1.6; }
-    .hero { background: linear-gradient(135deg, var(--cream) 0%, #ede5db 100%); padding: 60px 20px 50px; text-align: center; border-bottom: 1px solid var(--border); }
-    .hero-emoji { font-size: 64px; margin-bottom: 16px; }
-    .hero h1 { font-family: 'Crimson Pro', serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 12px; }
-    .hero-subtitle { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 20px; }
-    .hero-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-    .hero-tag { background: rgba(196,130,90,0.12); color: var(--accent); border-radius: 20px; padding: 4px 14px; font-size: 0.85rem; font-weight: 500; }
+    /* ── Accent palette — replace all four ACCENT_* tokens ── */
+    :root {
+      /* Tab layout vars */
+      --accent:       #c4825a;
+      --accent-hover: #b07149;
+      --accent-light: rgba(196,130,90,0.12);
+      --accent-muted: rgba(196,130,90,0.06);
+      /* styles.css compat: module files use --color-accent-* and --color-text-* */
+      --color-accent:       #c4825a;
+      --color-accent-hover: #b07149;
+      --color-accent-light: rgba(196,130,90,0.12);
+      --color-accent-muted: rgba(196,130,90,0.06);
+      --color-text-secondary: #6b5c52;
+      --color-text-muted: #9e8e84;
+      --color-surface: #ffffff;
+      --color-border: #e8e0d8;
+
+      --cream: #f5f0eb; --white: #ffffff; --border: #e8e0d8;
+      --shadow: rgba(0,0,0,0.08); --text-primary: #2c2420;
+      --text-secondary: #6b5c52; --text-muted: #9e8e84;
+      --radius: 12px; --max-w: 860px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cream: #1a1614; --white: #242220; --border: #3a3430;
+        --shadow: rgba(0,0,0,0.3); --text-primary: #e8e0d8;
+        --text-secondary: #a09890; --text-muted: #706860;
+      }
+      .hero { background: linear-gradient(135deg, var(--cream) 0%, #221e1a 100%) !important; }
+    }
+
+    /* Optional: paste font-family overrides here for non-Latin courses */
+    
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--cream); color: var(--text-primary); line-height: 1.6; }
+
+    /* ── Tab Nav ── */
+    .tab-nav { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1px solid var(--border); box-shadow: 0 1px 4px var(--shadow); }
+    .tab-nav-inner { max-width: var(--max-w); margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .tab-nav-inner::-webkit-scrollbar { display: none; }
+    .tab-btn { flex-shrink: 0; padding: 14px 20px; border: none; background: none; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+    /* ── Layout ── */
     .container { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
-    .progress-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; margin: 24px 0; }
-    .progress-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .progress-track { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 20px; }
-    .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s; }
-    .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
-    .day-dot { aspect-ratio: 1; border-radius: 8px; background: var(--cream); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #9e8e84; cursor: pointer; transition: all 0.2s; }
-    .day-dot:hover { transform: scale(1.1); border-color: var(--accent); }
-    .day-dot.done { background: var(--accent); border-color: var(--accent); color: white; }
-    .week-section { margin-bottom: 32px; }
-    .week-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); color: var(--accent); }
-    .day-card { background: var(--white); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; padding: 16px 20px; transition: all 0.2s; }
-    .day-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .day-card-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-    .day-type { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
-    .type-foundations { background: #d1fae5; color: #065f46; }
-    .type-concepts { background: #fef3c7; color: #92400e; }
-    .type-project { background: #ede9fe; color: #5b21b6; }
-    .day-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 0.875rem; font-weight: 600; text-decoration: none; margin-top: 8px; }
-    .day-link:hover { text-decoration: underline; }
+    main > .section { display: none; padding: 32px 0 64px; }
+    main > .section.active { display: block; }
+
+    /* ── Week subtabs ── */
+    .week-subtabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid var(--border); }
+    .week-subtab { flex: 1; padding: 12px 16px; border: none; background: none; color: var(--text-secondary); font-size: 0.88rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .week-subtab:hover { color: var(--text-primary); }
+    .week-subtab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+    .week-subtitle { font-size: 0.82rem; color: var(--accent); font-weight: 600; padding: 10px 0 14px; }
+    .week-module-card { background: var(--white); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 8px; overflow: hidden; }
+    .week-module-card-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; cursor: pointer; user-select: none; transition: background 0.15s; }
+    .week-module-card-header:hover { background: var(--accent-muted); }
+    .week-module-card-title { font-weight: 600; font-size: 0.95rem; }
+    .week-module-card .chevron { font-size: 0.8rem; color: var(--text-muted); transition: transform 0.2s; }
+    .week-module-card.open .chevron { transform: rotate(180deg); }
+    .week-module-card-body { display: none; padding: 0 18px 16px; border-top: 1px solid var(--border); }
+    .week-module-card.open .week-module-card-body { display: block; }
+    .week-module-card-body .module-embed { padding-top: 12px; max-height: 70vh; overflow-y: auto; scroll-behavior: smooth; }
+    .module-nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 4px; margin-top: 16px; border-top: 1px solid var(--border); }
+    .module-nav-btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .module-nav-btn:hover { background: var(--accent-hover); }
+    .module-nav-btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .module-nav-btn.secondary:hover { background: var(--accent-muted); }
+    .module-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .section-heading { font-family: 'Crimson Pro', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, var(--cream) 0%, color-mix(in srgb, var(--accent) 8%, var(--cream)) 100%); padding: 48px 20px 40px; text-align: center; }
+    .hero-emoji { font-size: 3.5rem; margin-bottom: 16px; }
+    .hero h1 { font-family: 'Crimson Pro', serif; font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 700; margin-bottom: 12px; }
+    .hero-subtitle { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 20px; }
+    .hero-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px; }
+    .hero-tag { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-light); border-radius: 20px; padding: 4px 14px; font-size: 0.85rem; font-weight: 500; }
+    .install-btn-hero { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 24px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: none; transition: background 0.2s; }
+    .install-btn-hero:hover { background: var(--accent-hover); }
+    .install-btn-hero.visible { display: inline-block; }
+
+    /* ── Progress Card (ring + streak combo) ── */
+    .progress-card { background: var(--white); border-radius: 8px; border: 1px solid var(--border); padding: 14px 18px; margin: 12px 20px 0; max-width: var(--max-w); margin-inline: auto; }
+    .progress-layout { display: flex; align-items: center; gap: 18px; }
+    @media (max-width: 520px) { .progress-layout { flex-direction: column; gap: 12px; } }
+    /* Ring */
+    .progress-ring { position: relative; flex-shrink: 0; width: 90px; height: 90px; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring .ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+    .progress-ring .ring-fg { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+    .progress-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .progress-ring-pct { font-size: 20px; font-weight: 700; color: var(--accent); line-height: 1; }
+    .progress-ring-sub { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    /* Streak grid */
+    .progress-right { flex: 1; min-width: 0; }
+    .progress-right-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .progress-right-header h3 { font-size: 0.8rem; font-weight: 600; }
+    .progress-right-header span { font-size: 0.75rem; color: var(--text-muted); }
+    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .streak-cell { height: 23px; border-radius: 3px; background: var(--cream); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-muted); border: none; padding: 0; }
+    .streak-cell:hover { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .streak-cell.done { background: var(--accent); color: #fff; }
+
+    .chevron { font-size: 0.8rem; color: var(--text-muted); transition: transform 0.2s; }
+
+    /* ── Module overrides (embedded in tab, not full-viewport) ── */
+    .module { min-height: auto !important; padding: 32px 0; border-bottom: 1px solid var(--border); }
+    .module-inner { max-width: 100%; }
+    pre { color: #e0def4; position: relative; }
+    code { color: inherit; }
+
+    /* ── Copy button: top-right of code blocks ── */
+    .copy-btn-overlay { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.12); color: #ccc; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 12px; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; z-index: 2; }
+    .copy-btn-overlay:hover { background: rgba(255,255,255,0.22); color: #fff; }
+
+    /* ── Flashcards ── */
+    .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .fc { perspective: 800px; height: 180px; cursor: pointer; }
+    .fc-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; }
+    .fc.flipped .fc-inner { transform: rotateY(180deg); }
+    .fc-front, .fc-back { position: absolute; inset: 0; border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; }
+    .fc-front { background: var(--white); }
+    .fc-back { background: var(--accent); color: white; transform: rotateY(180deg); }
+    .fc-term { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; }
+    .fc-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: auto; }
+
+    /* ── Quiz ── */
+    .quiz-block { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+    .quiz-q { font-weight: 600; margin-bottom: 16px; line-height: 1.5; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt { background: var(--cream); border: 2px solid var(--border); border-radius: 8px; padding: 10px 16px; text-align: left; cursor: pointer; transition: all 0.15s; font-size: 0.9rem; }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-muted); }
+    .quiz-opt.correct { border-color: #10b981; background: #d1fae5; color: #065f46; }
+    .quiz-opt.wrong   { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+    .quiz-explanation { margin-top: 12px; padding: 12px; background: var(--accent-muted); border-radius: 8px; font-size: 0.875rem; display: none; }
+    .quiz-explanation.visible { display: block; }
+
+    /* ── Diagrams ── */
+    .diagram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .diagram-card { cursor: pointer; transition: transform 0.15s; }
+    .diagram-card:hover { transform: scale(1.02); }
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 24px; }
+    .lightbox.open { display: flex; }
+    .lightbox-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.7; transition: opacity 0.15s; }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox img { max-width: 95vw; max-height: 85vh; object-fit: contain; background: white; border-radius: 8px; padding: 20px; }
+    .diagram-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+    .diagram-card img { width: 100%; height: 200px; object-fit: contain; background: white; padding: 12px; }
+    .diagram-label { padding: 12px 16px; font-weight: 600; font-size: 0.9rem; border-top: 1px solid var(--border); }
+
+    /* ── Resources ── */
+    .resource-group { margin-bottom: 32px; }
+    .resource-group h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--accent); }
+    .resource-link { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; transition: opacity 0.15s; }
+    .resource-link:hover { opacity: 0.75; }
+    .resource-link:last-child { border-bottom: none; }
+    .resource-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+    .resource-text strong { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+    .resource-text span { font-size: 0.85rem; color: var(--text-secondary); }
+
+    /* ── Terminology sections: compact layout ── */
+    .section.terminology { max-height: 300px; overflow-y: auto; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; }
+    .section.terminology .term-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    .section.terminology .term-card { padding: 10px 12px !important; font-size: 0.85rem; }
+    .section.terminology .flashcard { font-size: 0.85rem; }
+    .section.terminology .flashcard-set { max-height: none; }
+    @media (max-width: 600px) {
+      .section.terminology .term-grid { grid-template-columns: 1fr !important; }
+    }
+
+    /* ── Module tables: compact styling ── */
+    .module table { font-size: 0.85rem; border-collapse: collapse; width: 100%; }
+    .module table th,
+    .module table td { padding: 8px 12px; border: 1px solid var(--border); }
+    .module table tr:nth-child(even) { background: var(--cream, #f9f7f3); }
+    .module table tr:nth-child(odd) { background: var(--white, #fff); }
+    .module table th { background: var(--accent-muted, #ede9fe); font-weight: 600; }
+
+    /* ── Utility ── */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
   </style>
+
+  <script src="main.js" defer></script>
 </head>
 <body>
 
+<!-- ── Tab Nav ── -->
+<nav class="tab-nav" aria-label="Course sections">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active"  data-tab="modules"     id="tab-modules">📖 Learning Content</button>
+    <button class="tab-btn"        data-tab="diagrams"    id="tab-diagrams">🗺 Diagrams</button>
+    <button class="tab-btn"        data-tab="flashcards"  id="tab-flashcards">🃏 Flashcards</button>
+    <button class="tab-btn"        data-tab="quiz"        id="tab-quiz">✅ Quiz</button>
+    <button class="tab-btn"        data-tab="resources"   id="tab-resources">🔗 Resources</button>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
 <div class="hero">
   <div class="hero-emoji">🎨</div>
-  <h1>Three.js + AI Portfolio Course</h1>
+  <h1>Three.js Learning</h1>
   <p class="hero-subtitle">21-Day Course · 1 hour/day</p>
   <div class="hero-tags">
     <span class="hero-tag">🟢 Beginner-Friendly</span>
     <span class="hero-tag">🎯 Project-Based</span>
     <span class="hero-tag">🤖 AI-Powered</span>
+    <span class="hero-tag">📱 PWA</span>
+  </div>
+  <button class="install-btn-hero" id="install-btn-hero">📲 Install App</button>
+</div>
+
+<!-- ── Progress Card ── -->
+<div class="progress-card">
+  <div class="progress-layout">
+    <div class="progress-ring">
+      <svg width="90" height="90">
+        <circle class="ring-bg" cx="45" cy="45" r="37"/>
+        <circle class="ring-fg" id="progress-ring-fg" cx="45" cy="45" r="37" stroke-dasharray="232.5" stroke-dashoffset="232.5"/>
+      </svg>
+      <div class="progress-ring-text">
+        <span class="progress-ring-pct" id="progress-pct">0%</span>
+        <span class="progress-ring-sub" id="progress-text">0/21</span>
+      </div>
+    </div>
+    <div class="progress-right">
+      <div class="progress-right-header">
+        <h3>Your Progress</h3>
+        <span id="progress-remaining">21 days left</span>
+      </div>
+      <div class="streak-grid" id="day-grid"></div>
+    </div>
   </div>
 </div>
 
-<div class="container">
-  <div class="progress-card">
-    <div class="progress-header">
-      <h3>📊 Your Progress</h3>
-      <span id="progress-text">0 / 21 days</span>
-    </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="progress-bar"></div>
-    </div>
-    <div class="day-grid" id="day-grid"></div>
-  </div>
+<main>
 
-  <div class="week-section">
-    <h3>Week 1: Three.js Foundations</h3>
+  <!-- curriculum section removed — content lives in Learning Content accordion -->
+  <section class="section active container" id="section-modules" aria-labelledby="tab-modules">
+    <div class="week-subtabs" id="week-subtabs">
+      <button class="week-subtab active" data-week="1" onclick="switchWeek(1)">Week 1</button>
+      <button class="week-subtab" data-week="2" onclick="switchWeek(2)">Week 2</button>
+      <button class="week-subtab" data-week="3" onclick="switchWeek(3)">Week 3</button>
+    </div>
+    <div class="week-subtitle" id="week-subtitle">Week 1: Three.js Foundations</div>
+    <div id="modules-container"></div>
+    <div class="empty-state" id="modules-loading">Loading modules…</div>
+  </section>
+
+  <!-- ── 3. Diagrams ── -->
+  <section class="section container" id="section-diagrams" aria-labelledby="tab-diagrams">
+    <h2 class="section-heading">Diagrams</h2>
+    <div class="diagram-grid" id="diagram-grid">
+      <!-- Diagrams loaded dynamically -->
+    </div>
+  </section>
+
+  <!-- ── 4. Flashcards ── -->
+  <section class="section container" id="section-flashcards" aria-labelledby="tab-flashcards">
+    <h2 class="section-heading">Flashcards</h2>
+    <div class="flashcard-grid" id="flashcard-grid"><p class="empty-state">Loading…</p></div>
+  </section>
+
+  <!-- ── 5. Quiz ── -->
+  <section class="section container" id="section-quiz" aria-labelledby="tab-quiz">
+    <h2 class="section-heading">Knowledge Check</h2>
+    <div id="quiz-container"><p class="empty-state">Loading…</p></div>
+  </section>
+
+  <!-- ── 6. Resources ── -->
+  <section class="section container" id="section-resources" aria-labelledby="tab-resources">
+    <h2 class="section-heading">Resources</h2>
     
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 1: Introduction to 3D on the Web
-        <span class="day-type type-foundations">Foundations</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Learn what Three.js is, how WebGL works, and set up your first 3D environment.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-01-intro-threejs.md" target="_blank">Read Full Guide →</a>
+    <div class="resource-group">
+      <h3>📚 Official Documentation</h3>
+      <a class="resource-link" href="https://threejs.org/docs/" target="_blank">
+        <div class="resource-icon">📖</div>
+        <div class="resource-text">
+          <strong>Three.js Documentation</strong>
+          <span>Complete API reference and guides</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://threejs.org/examples/" target="_blank">
+        <div class="resource-icon">🎨</div>
+        <div class="resource-text">
+          <strong>Three.js Examples</strong>
+          <span>Hundreds of interactive examples and demos</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://docs.anthropic.com/" target="_blank">
+        <div class="resource-icon">🤖</div>
+        <div class="resource-text">
+          <strong>Anthropic API Docs</strong>
+          <span>Claude API reference, guides, and best practices</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://platform.openai.com/docs/" target="_blank">
+        <div class="resource-icon">🧠</div>
+        <div class="resource-text">
+          <strong>OpenAI API Docs</strong>
+          <span>GPT API reference and integration guides</span>
+        </div>
+      </a>
     </div>
 
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 2: Setting Up Your First Scene
-        <span class="day-type type-foundations">Foundations</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Create your first rotating cube with Scene, Camera, Renderer.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-02-first-scene.md" target="_blank">Read Full Guide →</a>
+    <div class="resource-group">
+      <h3>🎓 Learning Resources</h3>
+      <a class="resource-link" href="https://threejs-journey.com/" target="_blank">
+        <div class="resource-icon">🚀</div>
+        <div class="resource-text">
+          <strong>Three.js Journey (Bruno Simon)</strong>
+          <span>Comprehensive course by the master himself</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://www.youtube.com/@Fireship" target="_blank">
+        <div class="resource-icon">🔥</div>
+        <div class="resource-text">
+          <strong>Fireship - YouTube</strong>
+          <span>Quick tutorials and modern web dev insights</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://www.youtube.com/@DesignCourse" target="_blank">
+        <div class="resource-icon">🎬</div>
+        <div class="resource-text">
+          <strong>DesignCourse - YouTube</strong>
+          <span>Creative coding and 3D web design</span>
+        </div>
+      </a>
     </div>
 
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 3: Exploring Geometries & Materials
-        <span class="day-type type-foundations">Foundations</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Work with 5+ geometry types and use Groups to build complex objects.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-03-geometries-materials.md" target="_blank">Read Full Guide →</a>
+    <div class="resource-group">
+      <h3>🛠 Tools & Assets</h3>
+      <a class="resource-link" href="https://www.blender.org/" target="_blank">
+        <div class="resource-icon">🎭</div>
+        <div class="resource-text">
+          <strong>Blender</strong>
+          <span>Free 3D modeling software for creating assets</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://polyhaven.com/" target="_blank">
+        <div class="resource-icon">🌄</div>
+        <div class="resource-text">
+          <strong>Poly Haven</strong>
+          <span>Free HDRIs, textures, and 3D models</span>
+        </div>
+      </a>
+      <a class="resource-link" href="https://www.kenney.nl/assets" target="_blank">
+        <div class="resource-icon">🎮</div>
+        <div class="resource-text">
+          <strong>Kenney Assets</strong>
+          <span>Free game assets including 3D models</span>
+        </div>
+      </a>
     </div>
 
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 4: Materials & Textures
-        <span class="day-type type-concepts">Concepts</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Master material types, texture loading, UV mapping, and PBR workflows.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-04-materials-textures.md" target="_blank">Read Full Guide →</a>
+    <div class="resource-group">
+      <h3>💻 GitHub Repository</h3>
+      <a class="resource-link" href="https://github.com/CeciliaW888/threejs-learning" target="_blank">
+        <div class="resource-icon">⭐</div>
+        <div class="resource-text">
+          <strong>Course GitHub Repo</strong>
+          <span>Source code, examples, and project files</span>
+        </div>
+      </a>
     </div>
+  </section>
 
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 5: Lighting Fundamentals
-        <span class="day-type type-concepts">Concepts</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Learn 4 light types, shadow setup, and three-point lighting.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-05-lighting.md" target="_blank">Read Full Guide →</a>
-    </div>
-
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 6: Cameras & OrbitControls
-        <span class="day-type type-concepts">Concepts</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Master camera types, OrbitControls, and smooth animations.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-06-textures.md" target="_blank">Read Full Guide →</a>
-    </div>
-
-    <div class="day-card">
-      <div class="day-card-title">
-        Day 7: Week 1 Review & Mini-Project
-        <span class="day-type type-project">Project</span>
-      </div>
-      <p style="color: #6b5c52; font-size: 0.9rem; margin-bottom: 8px;">Build an interactive 3D gallery combining all Week 1 skills.</p>
-      <a class="day-link" href="https://github.com/CeciliaW888/threejs-ai-portfolio/blob/main/week-01/day-07-mini-project.md" target="_blank">Read Full Guide →</a>
-    </div>
-  </div>
-
-  <div class="week-section">
-    <h3>Week 2: Advanced Three.js + Prompt Engineering</h3>
-    <p style="color: #6b5c52;">Coming soon! Days 8-14 cover animation, models, shaders, and AI prompting.</p>
-  </div>
-
-  <div class="week-section">
-    <h3>Week 3: AI-Powered Portfolio Builder</h3>
-    <p style="color: #6b5c52;">Coming soon! Days 15-21 cover LLM APIs, text-to-3D, and deployment.</p>
-  </div>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" src="" alt="">
 </div>
+
+</main>
 
 <script>
-const KEY = 'threejs-course-progress';
-let progress = JSON.parse(localStorage.getItem(KEY) || '{"days": []}');
+/* ── Configuration: replace these four values per course ── */
+const DAY_COUNT    = 21;                   /* integer, e.g. 15 */
+const MODULE_FILES = ['modules/01-intro-threejs.html', 'modules/02-first-scene.html', 'modules/03-geometries-materials.html', 'modules/04-materials-textures.html', 'modules/05-lighting.html', 'modules/06-textures.html', 'modules/07-mini-project.html', 'modules/08-animation.html', 'modules/09-loading-models.html', 'modules/10-shadows-lighting.html', 'modules/11-performance.html', 'modules/12-prompt-engineering.html', 'modules/13-language-to-3d.html', 'modules/14-mini-project.html', 'modules/15-llm-apis.html', 'modules/16-text-to-3d-pipeline.html', 'modules/17-realtime-modifications.html', 'modules/18-memory-context.html', 'modules/19-advanced-prompting.html', 'modules/20-deployment.html', 'modules/21-final-project.html'];
+const DIAGRAM_FILES = ['diagrams/scene-graph.svg', 'diagrams/render-pipeline.svg', 'diagrams/ai-to-3d-pipeline.svg'];
+const STORAGE_KEY  = 'threejs-course-progress';             /* unique string, e.g. 'course-ai-agents-progress' */
 
-function updateProgress() {
-  const done = progress.days.length;
-  document.getElementById('progress-text').textContent = `${done} / 21 days`;
-  document.getElementById('progress-bar').style.width = `${(done / 21) * 100}%`;
+/* ── Tab switching ── */
+const tabs     = document.querySelectorAll('.tab-btn');
+/* Only select top-level tab sections (not .section inside loaded modules) */
+const tabSections = document.querySelectorAll('main > [id^="section-"]');
+let modulesLoaded = false;
+
+tabs.forEach(btn => {
+  btn.addEventListener('click', async () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tabSections.forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('section-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'modules'    && !modulesLoaded) { await loadModules(); modulesLoaded = true; }
+    if (btn.dataset.tab === 'flashcards') loadFlashcards();
+    if (btn.dataset.tab === 'quiz')       loadQuiz();
+    if (btn.dataset.tab === 'diagrams')   renderDiagrams();
+  });
+});
+
+/* ── Streak grid + ring progress ── */
+function buildDayGrid() {
+  const grid = document.getElementById('day-grid');
+  const done = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  for (let i = 1; i <= DAY_COUNT; i++) {
+    const cell = document.createElement('button');
+    cell.className = 'streak-cell' + (done.includes(i) ? ' done' : '');
+    cell.textContent = i;
+    cell.title = 'Day ' + i;
+    cell.addEventListener('click', () => toggleDay(i, cell));
+    grid.appendChild(cell);
+  }
+  updateProgress(done.length);
+}
+function toggleDay(n, el) {
+  const done = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const idx = done.indexOf(n);
+  if (idx === -1) done.push(n); else done.splice(idx, 1);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(done));
+  el.classList.toggle('done');
+  updateProgress(done.length);
+}
+function updateProgress(count) {
+  const pct = Math.round(count / DAY_COUNT * 100);
+  const circ = 2 * Math.PI * 37; // r=37
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-text').textContent = count + '/' + DAY_COUNT;
+  document.getElementById('progress-ring-fg').style.strokeDashoffset = circ - (circ * pct / 100);
+  document.getElementById('progress-remaining').textContent = (DAY_COUNT - count) + ' days left';
+}
+buildDayGrid();
+
+
+
+/* ── Module config ── */
+const WEEK_NAMES = { 1: 'Week 1: Three.js Foundations', 2: 'Week 2: Advanced Techniques + Prompt Engineering', 3: 'Week 3: AI Integration & Portfolio' };
+const WEEK_RANGES = { 1: [0,7], 2: [7,14], 3: [14,21] };
+const MODULE_TITLES = [
+  'Day 1: Introduction to Three.js','Day 2: Your First Scene','Day 3: Geometries & Materials',
+  'Day 4: Materials Deep Dive','Day 5: Lighting Fundamentals','Day 6: Textures & Asset Loading','Day 7: Mini Project — 3D Product Showcase',
+  'Day 8: Animation Fundamentals','Day 9: Loading 3D Models (GLTF/GLB)','Day 10: Shadows & Realistic Lighting',
+  'Day 11: Performance Optimization','Day 12: Intro to Prompt Engineering for 3D','Day 13: Mapping Language to 3D Parameters','Day 14: Mini Project — Prompt-Driven Scene Generator',
+  'Day 15: Introduction to LLM APIs','Day 16: Building a Text-to-3D Pipeline','Day 17: Real-Time Scene Modifications',
+  'Day 18: Memory & Context for AI Agent','Day 19: Advanced Prompting Techniques','Day 20: Deployment & Production','Day 21: Final Project — AI Portfolio Generator'
+];
+let currentWeek = 1;
+
+/* ── Lazy-load modules ── */
+async function loadModules() {
+  await switchWeek(1);
 }
 
-const grid = document.getElementById('day-grid');
-for (let i = 1; i <= 21; i++) {
-  const dot = document.createElement('div');
-  dot.className = 'day-dot';
-  dot.innerHTML = `<span>${i}</span>`;
-  if (progress.days.includes(i)) dot.classList.add('done');
-  
-  dot.onclick = () => {
-    if (dot.classList.contains('done')) {
-      progress.days = progress.days.filter(d => d !== i);
-      dot.classList.remove('done');
+async function switchWeek(week) {
+  currentWeek = week;
+  document.querySelectorAll('.week-subtab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.week) === week));
+  document.getElementById('week-subtitle').textContent = WEEK_NAMES[week];
+  const container = document.getElementById('modules-container');
+  const loading   = document.getElementById('modules-loading');
+  container.innerHTML = '';
+  loading.style.display = 'block';
+
+  const [start, end] = WEEK_RANGES[week];
+  for (let i = start; i < end; i++) {
+    const card = document.createElement('div');
+    card.className = 'week-module-card';
+    card.id = 'module-card-' + (i + 1);
+    card.innerHTML = `
+      <div class="week-module-card-header" onclick="this.parentElement.classList.toggle('open'); loadModuleContent(${i}, this.parentElement);">
+        <span class="week-module-card-title">${MODULE_TITLES[i]}</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="week-module-card-body">
+        <div class="module-embed" id="module-embed-${i}"><p class="empty-state" style="padding:12px 0;">Click to expand…</p></div>
+      </div>`;
+    container.appendChild(card);
+  }
+  loading.style.display = 'none';
+}
+
+async function loadModuleContent(idx, card) {
+  const embed = document.getElementById('module-embed-' + idx);
+  if (embed.dataset.loaded) return;
+  embed.innerHTML = '<p class="empty-state" style="padding:12px 0;">Loading…</p>';
+  try {
+    const resp = await fetch(MODULE_FILES[idx], { redirect: 'follow' });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    if (text && text.trim().length > 0) {
+      embed.innerHTML = text;
+      embed.dataset.loaded = '1';
+      /* Execute inline scripts only (skip external src like main.js — already loaded) */
+      embed.querySelectorAll('script').forEach(oldScript => {
+        if (oldScript.src) { oldScript.remove(); return; }
+        const newScript = document.createElement('script');
+        newScript.textContent = oldScript.textContent;
+        oldScript.replaceWith(newScript);
+      });
+      /* Override checkQuiz to also highlight correct answer on wrong selection */
+      window.checkQuiz = function(btn, result) {
+        const card = btn.closest('.quiz-card');
+        if (!card) return;
+        const feedback = card.querySelector('.quiz-feedback');
+        const buttons = card.querySelectorAll('button');
+        buttons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'default'; });
+        btn.style.opacity = '1';
+        if (result === 'correct') {
+          btn.style.background = '#d4edda';
+          btn.style.borderColor = '#28a745';
+          if (feedback) { feedback.textContent = 'Correct!'; feedback.style.background = '#d4edda'; feedback.style.display = 'block'; }
+        } else {
+          btn.style.background = '#f8d7da';
+          btn.style.borderColor = '#dc3545';
+          /* Highlight the correct answer in green */
+          buttons.forEach(b => {
+            if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'correct'")) {
+              b.style.background = '#d4edda';
+              b.style.borderColor = '#28a745';
+              b.style.opacity = '1';
+              b.style.fontWeight = '600';
+            }
+          });
+          if (feedback) { feedback.textContent = 'Incorrect. The correct answer is highlighted above.'; feedback.style.background = '#f8d7da'; feedback.style.display = 'block'; }
+        }
+      };
+      /* Remove module's own nav (replaced by our prev/next buttons) */
+      embed.querySelectorAll('.day-nav, nav.day-nav').forEach(nav => nav.remove());
+      /* Quiz answer reveal */
+      embed.querySelectorAll('.quiz-card').forEach(qc => {
+        qc.querySelectorAll('.quiz-option').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (qc.dataset.answered) return;
+            qc.dataset.answered = '1';
+            const isCorrect = btn.dataset.correct === 'true';
+            btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+            if (!isCorrect) qc.querySelectorAll('.quiz-option[data-correct="true"]').forEach(b => b.classList.add('correct'));
+            const exp = document.createElement('div');
+            exp.className = 'quiz-explanation visible';
+            exp.textContent = isCorrect ? (btn.dataset.explanationCorrect || 'Correct!') : (btn.dataset.explanationWrong || 'Incorrect.');
+            qc.appendChild(exp);
+            qc.querySelectorAll('.quiz-option').forEach(b => b.style.pointerEvents = 'none');
+          });
+        });
+      });
+      /* Flashcard flip */
+      embed.querySelectorAll('.flashcard').forEach(fc => {
+        if (!fc.querySelector('.flashcard-inner')) {
+          const inner = document.createElement('div');
+          inner.className = 'flashcard-inner';
+          while (fc.firstChild) inner.appendChild(fc.firstChild);
+          fc.appendChild(inner);
+        }
+        fc.addEventListener('click', () => fc.classList.toggle('flipped'));
+      });
+      /* Prev/Next navigation */
+      const nav = document.createElement('div');
+      nav.className = 'module-nav';
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'module-nav-btn secondary';
+      prevBtn.textContent = '\u2190 Previous';
+      prevBtn.disabled = idx === 0;
+      prevBtn.addEventListener('click', () => goToDay(idx));
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'module-nav-btn';
+      nextBtn.textContent = 'Next \u2192';
+      nextBtn.disabled = idx >= 20;
+      nextBtn.addEventListener('click', () => goToDay(idx + 2));
+      nav.appendChild(prevBtn);
+      nav.appendChild(nextBtn);
+      embed.appendChild(nav);
+
+      if (typeof initIndexQuizzes === 'function') initIndexQuizzes();
+      if (typeof initChatWindows === 'function') initChatWindows();
+      embed.querySelectorAll('pre').forEach(pre => {
+        const btn = document.createElement('button');
+        btn.textContent = 'Copy'; btn.className = 'copy-btn-overlay';
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText((pre.querySelector('code') || pre).textContent);
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+        });
+        pre.style.position = 'relative'; pre.appendChild(btn);
+      });
     } else {
-      progress.days.push(i);
-      dot.classList.add('done');
+      embed.innerHTML = '<p class="empty-state">Content is empty</p>';
     }
-    localStorage.setItem(KEY, JSON.stringify(progress));
-    updateProgress();
+  } catch(e) { console.error('Module load error:', e); embed.innerHTML = '<p class="empty-state">Failed to load: ' + e.message + '</p>'; }
+}
+
+/* ── Navigate to specific day ── */
+function goToDay(dayNum) {
+  const week = dayNum <= 7 ? 1 : dayNum <= 14 ? 2 : 3;
+  /* Close all currently open cards */
+  document.querySelectorAll('.week-module-card.open').forEach(c => c.classList.remove('open'));
+
+  const doOpen = () => {
+    const card = document.getElementById('module-card-' + dayNum);
+    if (card) {
+      card.classList.add('open');
+      loadModuleContent(dayNum - 1, card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
-  
-  grid.appendChild(dot);
+
+  if (currentWeek !== week) {
+    switchWeek(week).then(() => setTimeout(doOpen, 100));
+  } else {
+    doOpen();
+  }
 }
 
-updateProgress();
+/* ── Auto-load modules since it's the default tab ── */
+loadModules().then(() => { modulesLoaded = true; });
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
+/* ── Flashcards ── */
+let flashcardsLoaded = false;
+async function loadFlashcards() {
+  if (flashcardsLoaded) return;
+  const grid = document.getElementById('flashcard-grid');
+  try {
+    const cards = await (await fetch('./data/flashcards.json')).json();
+    grid.innerHTML = '';
+    cards.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'fc';
+      el.innerHTML = `<div class="fc-inner">
+        <div class="fc-front"><div class="fc-term">${c.term}</div><div class="fc-hint">Click to reveal</div></div>
+        <div class="fc-back"><div class="fc-term">${c.definition}</div></div>
+      </div>`;
+      el.addEventListener('click', () => el.classList.toggle('flipped'));
+      grid.appendChild(el);
+    });
+    flashcardsLoaded = true;
+  } catch(e) { grid.innerHTML = '<p class="empty-state">No flashcards found — add data/flashcards.json</p>'; }
 }
+
+/* ── Quiz ── */
+let quizLoaded = false;
+async function loadQuiz() {
+  if (quizLoaded) return;
+  const container = document.getElementById('quiz-container');
+  const urls = MODULE_FILES.map((_, i) => `./data/quiz-${String(i+1).padStart(2,'0')}.json`);
+  let allQ = [];
+  for (const url of urls) {
+    try { const r = await fetch(url); if (r.ok) { const d = await r.json(); allQ = allQ.concat(d.questions || d); } } catch(e) {}
+  }
+  if (!allQ.length) { container.innerHTML = '<p class="empty-state">No quiz data — add data/quiz-01.json etc.</p>'; return; }
+  container.innerHTML = '';
+  allQ.forEach((q, qi) => {
+    const block = document.createElement('div');
+    block.className = 'quiz-block';
+    const opts = q.options.map((o, oi) => `<button class="quiz-opt" data-idx="${oi}">${o}</button>`).join('');
+    block.innerHTML = `<div class="quiz-q">Q${qi+1}: ${q.question}</div><div class="quiz-opts">${opts}</div><div class="quiz-explanation"></div>`;
+    block.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        block.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+        const correct = parseInt(btn.dataset.idx) === q.answer;
+        btn.classList.add(correct ? 'correct' : 'wrong');
+        if (!correct) block.querySelectorAll('.quiz-opt')[q.answer].classList.add('correct');
+        const exp = block.querySelector('.quiz-explanation');
+        exp.textContent = q.explanation || (correct ? '✓ Correct!' : '✗ Incorrect.');
+        exp.classList.add('visible');
+      });
+    });
+    container.appendChild(block);
+  });
+  quizLoaded = true;
+}
+
+/* ── Diagrams ── */
+function renderDiagrams() {
+  const grid = document.getElementById('diagram-grid');
+  if (grid.children.length > 0) return;
+  if (!DIAGRAM_FILES.length) { grid.innerHTML = '<div class="empty-state"><p style="font-size:1.2rem;margin-bottom:8px;">Diagrams coming soon</p><p style="color:var(--text-muted);">Architecture diagrams and visual references will be added here.</p></div>'; return; }
+  DIAGRAM_FILES.forEach(f => {
+    const label = f.replace(/.*\//, '').replace(/\.[^.]+$/, '').replace(/-/g, ' ');
+    const card = document.createElement('div');
+    card.className = 'diagram-card';
+    card.innerHTML = `<img src="${f}" alt="${label}" loading="lazy"><div class="diagram-label">${label}</div>`;
+    card.addEventListener('click', () => openLightbox(f, label));
+    grid.appendChild(card);
+  });
+}
+function openLightbox(src, alt) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-img').alt = alt || '';
+  lb.classList.add('open');
+  document.addEventListener('keydown', lightboxEsc);
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.removeEventListener('keydown', lightboxEsc);
+}
+function lightboxEsc(e) { if (e.key === 'Escape') closeLightbox(); }
+
+/* ── PWA install prompt ── */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('install-btn-hero').classList.add('visible');
+});
+document.getElementById('install-btn-hero').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') document.getElementById('install-btn-hero').classList.remove('visible');
+  deferredPrompt = null;
+});
+
+/* Service worker registered by main.js */
 </script>
-
 </body>
 </html>

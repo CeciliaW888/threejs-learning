@@ -909,6 +909,7 @@
     init();
   }
 
-  // Expose initChatWindows globally for lazy-loaded modules
+  // Expose globally for lazy-loaded modules
   window.initChatWindows = initChatWindows;
+  window.initIndexQuizzes = initIndexQuizzes;
 })();

@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What class is used in Three.js to load image files as textures?",
+    "options": [
+      "ImageLoader",
+      "FileLoader",
+      "AssetLoader",
+      "TextureLoader"
+    ],
+    "answer": 3,
+    "explanation": "TextureLoader is the standard class for loading image files and converting them into textures that can be applied to materials."
+  },
+  {
+    "question": "What is UV mapping?",
+    "options": [
+      "The process of defining how a 2D texture wraps onto a 3D surface",
+      "A lighting technique for indirect illumination",
+      "A method for compressing texture files",
+      "A type of camera projection"
+    ],
+    "answer": 0,
+    "explanation": "UV mapping defines the correspondence between points on a 2D texture (U, V coordinates) and points on a 3D model's surface."
+  },
+  {
+    "question": "What do normal maps add to a material's appearance?",
+    "options": [
+      "Color variation across the surface",
+      "The illusion of surface detail and bumps without adding geometry",
+      "Transparency effects",
+      "Animated texture movement"
+    ],
+    "answer": 1,
+    "explanation": "Normal maps fake small surface details like bumps and dents by altering how light interacts with the surface, without increasing the polygon count."
+  }
+]

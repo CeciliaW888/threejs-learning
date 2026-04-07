@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is an 'additive' command in the context of real-time 3D scene modifications?",
+    "options": [
+      "A command that adds new objects to the existing scene",
+      "A command that removes objects from the scene",
+      "A command that changes the camera angle",
+      "A command that resets the entire scene"
+    ],
+    "answer": 0,
+    "explanation": "An additive command adds new objects to the scene without modifying or removing existing ones, like 'add a red sphere next to the cube'."
+  },
+  {
+    "question": "What is the advantage of streaming LLM responses for real-time 3D modifications?",
+    "options": [
+      "It uses less memory on the server",
+      "Objects can start appearing as the response arrives, rather than waiting for the full response",
+      "It produces higher quality 3D models",
+      "It eliminates the need for error handling"
+    ],
+    "answer": 1,
+    "explanation": "Streaming allows partial results to be processed immediately, so users see objects appear progressively rather than waiting for the complete LLM response."
+  },
+  {
+    "question": "What is a 'subtractive' command in scene modification?",
+    "options": [
+      "Adding a new object below existing ones",
+      "Reducing the polygon count of all objects",
+      "Removing or deleting specific objects from the scene",
+      "Subtracting colors from materials"
+    ],
+    "answer": 2,
+    "explanation": "A subtractive command removes specific objects from the scene, like 'remove the blue cube' or 'delete all spheres'."
+  }
+]

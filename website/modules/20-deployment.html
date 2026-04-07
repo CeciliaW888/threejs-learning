@@ -1,0 +1,466 @@
+<section class="day-content" data-day="20">
+  <h2>Day 20: Deployment &amp; Production Best Practices</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Deploy your Three.js + AI app to Vercel or Netlify</li>
+      <li data-objective="2">Set up environment variables securely in production</li>
+      <li data-objective="3">Implement error tracking and monitoring</li>
+      <li data-objective="4">Optimize build size and loading performance</li>
+      <li data-objective="5">Add analytics to track usage</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>Production vs Development</h4>
+
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">Dev</div>
+        <div class="step-content">
+          <strong>Development</strong>
+          <p>API keys in <code>.env.local</code>. Hot reload, verbose logging. Unminified code. No caching.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">Prod</div>
+        <div class="step-content">
+          <strong>Production</strong>
+          <p>Secure environment variables. Optimized builds, minimal logging. Minified, tree-shaken code. Aggressive caching.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>Deployment Platforms</h4>
+
+    <p><strong>Vercel (Recommended for this project)</strong> &mdash; Zero-config deployment for Vite projects. Built-in serverless functions (for API proxying). Automatic HTTPS, global CDN, and a generous free tier.</p>
+
+    <p><strong>Netlify (Alternative)</strong> &mdash; Similar features to Vercel. Great for static sites + serverless functions with easy custom domain setup.</p>
+
+    <p><strong>Self-Hosted (Advanced)</strong> &mdash; Full control, more complex. You need to manage SSL, scaling, and monitoring yourself.</p>
+
+    <h4>Environment Variables in Production</h4>
+    <p><strong>Never commit API keys to git!</strong></p>
+
+    <pre><code class="language-javascript">// .env.local (development, git-ignored)
+// VITE_CLAUDE_API_KEY=sk-ant-api03-xxx
+
+// Production: Set in hosting platform dashboard
+// Vercel: Project Settings &gt; Environment Variables
+// Netlify: Site Settings &gt; Build &amp; Deploy &gt; Environment
+
+// For Vite projects, prefix with VITE_ to expose to client:
+const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;</code></pre>
+
+    <p><strong>Best Practice:</strong> Use serverless functions to hide API keys:</p>
+
+    <pre><code class="language-javascript">// api/generate.js (Vercel function)
+import Anthropic from '@anthropic-ai/sdk';
+
+export default async function handler(req, res) {
+    const anthropic = new Anthropic({
+        apiKey: process.env.CLAUDE_API_KEY // Server-side only
+    });
+
+    const { prompt } = req.body;
+
+    // Call Claude, return result
+    const response = await anthropic.messages.create({...});
+    res.json({ scene: response.content[0].text });
+}</code></pre>
+
+    <h4>Build Optimization</h4>
+
+    <pre><code class="language-javascript">// vite.config.js
+export default {
+    build: {
+        minify: 'terser',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    three: ['three'],
+                    vendor: ['@anthropic-ai/sdk']
+                }
+            }
+        },
+        chunkSizeWarningLimit: 1000
+    }
+};</code></pre>
+
+    <h4>Error Monitoring</h4>
+    <p>Use Sentry for production error tracking:</p>
+
+    <pre><code class="language-javascript">import * as Sentry from "@sentry/browser";
+
+Sentry.init({
+    dsn: "https://xxx@sentry.io/xxx",
+    environment: import.meta.env.MODE,
+    tracesSampleRate: 0.1,
+});
+
+// Catch errors
+try {
+    await generateScene(prompt);
+} catch (error) {
+    Sentry.captureException(error);
+    throw error;
+}</code></pre>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>Production deployment is about security, performance, and reliability. You want fast load times, no exposed secrets, and visibility into errors when they happen.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day20-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Environment Variables</dt></div>
+        <div class="flashcard-back"><dd>Config values that change per environment. Examples: API keys, feature flags. Set in platform dashboards for production, in .env.local for development.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Serverless Function</dt></div>
+        <div class="flashcard-back"><dd>Backend code that runs on-demand without managing a server. Used as an API proxy to keep secrets server-side. Examples: Vercel Functions, Netlify Functions.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Tree Shaking</dt></div>
+        <div class="flashcard-back"><dd>Removing unused code from the production build. The bundler analyzes imports and eliminates dead code, reducing bundle size.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Code Splitting</dt></div>
+        <div class="flashcard-back"><dd>Breaking the bundle into smaller chunks that load on demand. Enables lazy loading of routes and heavy libraries like Three.js.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>CDN</dt></div>
+        <div class="flashcard-back"><dd>Content Delivery Network. Distributes your static files across global edge servers so users download from the closest location. Vercel and Netlify include this automatically.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Error Tracking</dt></div>
+        <div class="flashcard-back"><dd>Monitoring production errors in real-time with tools like Sentry or LogRocket. Captures stack traces, user context, and error frequency.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Vercel Deployment Setup</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Terminal + vercel.json</span>
+        <span class="badge">Setup</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Terminal commands:
+// 1. Install Vercel CLI:  npm install -g vercel
+// 2. Login:               vercel login
+// 3. Deploy:              vercel
+// 4. Production deploy:   vercel --prod
+
+// Follow prompts:
+// - Link to existing project? N
+// - What's your project's name? my-3d-portfolio
+// - In which directory is your code located? ./
+// - Want to override settings? N
+
+// vercel.json (optional config):
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "regions": ["sfo1"],
+  "env": {
+    "VITE_APP_NAME": "3D AI Portfolio"
+  }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Vercel auto-detects Vite projects and deploys them. It builds your app, serves it globally via CDN, and provides a <code>.vercel.app</code> domain.
+      </div>
+    </div>
+
+    <h4>Example 2: Serverless API Proxy</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">api/generate-scene.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// api/generate-scene.js (Vercel serverless function)
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+    apiKey: process.env.CLAUDE_API_KEY // Server-side only, not exposed to client
+});
+
+const SYSTEM_PROMPT = `[Your system prompt here]`;
+
+export default async function handler(req, res) {
+    // CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    try {
+        const { prompt, messages = [] } = req.body;
+
+        const response = await anthropic.messages.create({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 4096,
+            temperature: 0.3,
+            system: SYSTEM_PROMPT,
+            messages: [
+                ...messages,
+                { role: 'user', content: prompt }
+            ]
+        });
+
+        const sceneJSON = response.content[0].text;
+
+        res.status(200).json({
+            success: true,
+            scene: JSON.parse(sceneJSON),
+            usage: {
+                inputTokens: response.usage.input_tokens,
+                outputTokens: response.usage.output_tokens
+            }
+        });
+
+    } catch (error) {
+        console.error('Generation error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> The API key stays on the server. The browser sends prompts to your serverless function, which forwards them to Claude. This is production-safe.
+      </div>
+    </div>
+
+    <h4>Client-Side Call</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">client.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// In your browser code
+async function generateScene(prompt) {
+    const response = await fetch('/api/generate-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+    });
+
+    const data = await response.json();
+    return data.scene;
+}</code></pre>
+    </div>
+
+    <h4>Example 3: Production Build Optimization</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">vite.config.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// vite.config.js
+import { defineConfig } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+export default defineConfig({
+    build: {
+        minify: 'terser',
+        sourcemap: false, // Disable in production
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'three': ['three'],
+                    'three-addons': [
+                        'three/examples/jsm/controls/OrbitControls.js',
+                        'three/examples/jsm/loaders/GLTFLoader.js'
+                    ],
+                    'vendor': ['@anthropic-ai/sdk']
+                }
+            }
+        }
+    },
+    plugins: [
+        visualizer({ // Analyze bundle size
+            open: true,
+            gzipSize: true,
+            filename: 'dist/stats.html'
+        })
+    ]
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We split code into logical chunks: Three.js core, Three.js addons, and vendor libs. This enables better caching. The visualizer plugin shows you what's taking up space in your bundle.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Deploy to Vercel</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Get your app live on the internet</p>
+      <ol class="exercise-steps">
+        <li>Install Vercel CLI: <code>npm install -g vercel</code></li>
+        <li>Login: <code>vercel login</code></li>
+        <li>Run <code>vercel</code> in your project directory</li>
+        <li>Follow prompts to deploy</li>
+        <li>Test the deployed URL &mdash; verify Three.js scene loads</li>
+        <li>Make a change, redeploy: <code>vercel --prod</code></li>
+      </ol>
+      <p><strong>Expected Output:</strong> Live URL (e.g., <code>https://my-portfolio.vercel.app</code>) with working 3D scenes.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Secure API Keys</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Move API key to serverless function</p>
+      <ol class="exercise-steps">
+        <li>Create <code>api/generate-scene.js</code> from Example 2</li>
+        <li>Remove <code>VITE_CLAUDE_API_KEY</code> from client code</li>
+        <li>Update client to call <code>/api/generate-scene</code> instead of Claude directly</li>
+        <li>Set <code>CLAUDE_API_KEY</code> in Vercel dashboard (no <code>VITE_</code> prefix!)</li>
+        <li>Test: generate a scene from production URL</li>
+      </ol>
+      <p><strong>Expected Output:</strong> API key hidden from client, scenes still generate.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Performance Audit</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Measure and optimize production performance</p>
+      <ol class="exercise-steps">
+        <li>Open production URL in Chrome DevTools</li>
+        <li>Run Lighthouse audit (Performance tab)</li>
+        <li>Note: First Contentful Paint, Time to Interactive, bundle size</li>
+        <li>Implement code splitting from Example 3</li>
+        <li>Rebuild, redeploy, re-audit</li>
+        <li>Document before/after metrics</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Measurable performance improvement (target: &gt;90 Lighthouse score).</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://vitejs.dev/guide/build.html" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Vite Production Build</span>
+        <span class="resource-meta">Vite Documentation &mdash; Official guide to optimizing Vite builds</span>
+      </a>
+      <a class="resource-card" href="https://vercel.com/docs/deployments/overview" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Vercel Deployment Guide</span>
+        <span class="resource-meta">Vercel Docs &mdash; Comprehensive deployment documentation</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=qyZ48DAajE0" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">How to Deploy Three.js Projects</span>
+        <span class="resource-meta">Freddy Minn &mdash; Step-by-step Three.js deployment to Vercel</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=2x9AuM6xpxg" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Using Vite to Create a Three.js Project (+ Deploy on Netlify)</span>
+        <span class="resource-meta">Frederik De Bleser &mdash; Alternative deployment to Netlify</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why is a serverless function better than exposing API keys in client code?</p>
+      <textarea placeholder="Think about what anyone can see in browser DevTools..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you add a custom domain to your deployed portfolio?</p>
+      <textarea placeholder="Think about DNS settings and the hosting platform's domain configuration..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does code splitting relate to the performance optimization from Day 11?</p>
+      <textarea placeholder="Think about reducing initial load time and loading resources on demand..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's the security risk of CORS set to *? How would you restrict it?</p>
+      <textarea placeholder="Think about who can call your API endpoint and how to limit access..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's the URL of your deployed portfolio? Share it!</p>
+      <textarea placeholder="Paste your live URL here..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="21-final-project.html">Day 21: Final Project &mdash; AI Portfolio Generator</a> &mdash; Build the complete portfolio experience, combining everything from the entire course.</p>
+
+    <p>You've deployed your app! Tomorrow is the grand finale: combining everything into a complete AI-powered portfolio generator.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can deploy my app to Vercel or Netlify</label>
+      <label><input type="checkbox"> I can set environment variables securely</label>
+      <label><input type="checkbox"> I can use serverless functions to hide API keys</label>
+      <label><input type="checkbox"> I can optimize build size and performance</label>
+      <label><input type="checkbox"> I can monitor production errors</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,0 +1,35 @@
+[
+  {
+    "question": "When building a complete Three.js scene, what is the correct order of setup?",
+    "options": [
+      "Add lights, create camera, create scene, render",
+      "Create renderer, add meshes, create camera, create scene",
+      "Create scene, create camera, add lights and objects, create renderer",
+      "Create materials, create scene, add camera, render"
+    ],
+    "answer": 2,
+    "explanation": "The typical setup order is: create a Scene to hold everything, create a Camera for the viewpoint, add lights and objects to the scene, then create a Renderer to draw it."
+  },
+  {
+    "question": "Why might a MeshStandardMaterial appear completely black in a scene?",
+    "options": [
+      "The geometry has no UV coordinates",
+      "The material's color is set to black",
+      "The renderer is not initialized",
+      "There are no lights in the scene"
+    ],
+    "answer": 3,
+    "explanation": "MeshStandardMaterial responds to lighting. Without any lights in the scene, it receives no illumination and appears completely black."
+  },
+  {
+    "question": "What does camera.lookAt(0, 0, 0) do?",
+    "options": [
+      "Points the camera toward the origin of the scene",
+      "Moves the camera to the origin",
+      "Resets the camera's zoom level",
+      "Sets the camera's up direction"
+    ],
+    "answer": 0,
+    "explanation": "lookAt() rotates the camera so that it faces toward the specified point in 3D space, in this case the origin (0, 0, 0)."
+  }
+]

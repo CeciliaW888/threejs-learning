@@ -1,0 +1,438 @@
+<section class="day-content" data-day="16">
+  <h2>Day 16: Building a Text-to-3D Pipeline</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Connect Claude API responses directly to Three.js scene generation</li>
+      <li data-objective="2">Parse LLM JSON output and create 3D objects programmatically</li>
+      <li data-objective="3">Handle async API calls without blocking the UI</li>
+      <li data-objective="4">Build a complete text-to-3D pipeline (input &rarr; API &rarr; render)</li>
+      <li data-objective="5">Add loading states and error handling for production use</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>The Full Pipeline</h4>
+    <p>User types "cozy reading nook" &rarr; API generates JSON &rarr; Three.js creates scene. This is the core of our AI portfolio generator. Today we connect all the pieces.</p>
+
+    <h4>Key Components</h4>
+    <p>The pipeline has four distinct components, each with a clear responsibility:</p>
+
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <strong>API Client</strong>
+          <p>Calls Claude with structured prompts. Handles authentication, sends the user's text description along with a system prompt that enforces JSON output. The client manages rate limiting and retries so the rest of the pipeline doesn't have to worry about API reliability.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <strong>JSON Parser</strong>
+          <p>Validates and extracts scene data from the API response. This is your safety net &mdash; it catches malformed JSON, missing required fields, and unexpected data shapes before they crash your Three.js code. Always validate at this boundary.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <strong>Scene Builder</strong>
+          <p>Creates Three.js objects from the validated JSON. Maps geometry types (box, sphere, cylinder) to Three.js classes, applies materials and positions, sets up lights, and configures the camera. This is the bridge between data and visuals.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="4">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <strong>UI Controller</strong>
+          <p>Manages user interaction, loading states, and error display. Shows a spinner while the API call is in progress, displays error messages if something goes wrong, and disables the generate button to prevent duplicate requests.</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>How Async Calls Work Without Blocking the UI</h4>
+    <p>API calls take 1-5 seconds. If you block the main thread during that time, the 3D canvas freezes and the UI becomes unresponsive. The solution is <code>async/await</code> &mdash; JavaScript's way of saying "start this task, but keep the animation loop running while we wait."</p>
+
+    <p>The pipeline flow looks like this:</p>
+    <ol>
+      <li>User clicks "Generate" &rarr; UI shows loading state</li>
+      <li><code>await callAPI(prompt)</code> &rarr; browser continues rendering while waiting</li>
+      <li>API returns JSON &rarr; parser validates the data</li>
+      <li>Scene builder clears old objects and creates new ones</li>
+      <li>UI hides loading state &rarr; user sees the new scene</li>
+    </ol>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>The <code>async/await</code> pattern is essential here. The animation loop runs on <code>requestAnimationFrame</code> (separate from the main thread's microtask queue), so your 3D scene keeps rendering smoothly even while the API call is in progress.</p>
+      </div>
+    </div>
+
+    <h4>Clearing vs. Updating Scenes</h4>
+    <p>When a new scene is generated, you need to remove the old one first. Simply adding new objects without clearing creates a mess of overlapping geometry. The <code>clearScene()</code> method removes all children from the scene, including lights &mdash; so you must re-add everything from the new scene data.</p>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day16-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Text-to-3D Pipeline</dt></div>
+        <div class="flashcard-back"><dd>The complete flow from user text input through API call, JSON parsing, to rendered 3D scene. Each stage transforms data into a different format.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>API Client</dt></div>
+        <div class="flashcard-back"><dd>A wrapper class that manages communication with an external API. Handles authentication, request formatting, and error recovery.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>JSON Validation</dt></div>
+        <div class="flashcard-back"><dd>Checking that parsed JSON matches an expected schema (required fields, correct types) before using it. Prevents runtime crashes from malformed AI output.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Scene Builder</dt></div>
+        <div class="flashcard-back"><dd>A class that converts JSON scene descriptions into Three.js objects (meshes, lights, camera positions). The bridge between data and visuals.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Loading State</dt></div>
+        <div class="flashcard-back"><dd>Visual feedback shown to the user while an async operation (like an API call) is in progress. Prevents confusion and duplicate submissions.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Async/Await</dt></div>
+        <div class="flashcard-back"><dd>JavaScript syntax for handling asynchronous operations. Lets you write code that "waits" for results without blocking the main thread or freezing the UI.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Scene Clearing</dt></div>
+        <div class="flashcard-back"><dd>Removing all objects, lights, and helpers from a Three.js scene before building a new one. Essential to avoid overlapping geometry from previous generations.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 7</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Complete Pipeline: AISceneGenerator Class</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">AISceneGenerator.js</span>
+        <span class="badge">Complete Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import Anthropic from '@anthropic-ai/sdk';
+
+class AISceneGenerator {
+  constructor(apiKey) {
+    this.client = new Anthropic({ apiKey });
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(
+      75, window.innerWidth / window.innerHeight, 0.1, 1000
+    );
+    this.renderer = new THREE.WebGLRenderer();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(this.renderer.domElement);
+  }
+
+  async generateFromText(prompt) {
+    try {
+      // 1. Show loading state
+      this.showLoading();
+
+      // 2. Call API
+      const sceneData = await this.callAPI(prompt);
+
+      // 3. Clear existing scene
+      this.clearScene();
+
+      // 4. Build new scene from JSON
+      this.buildScene(sceneData);
+
+      // 5. Render
+      this.render();
+
+      this.hideLoading();
+      return { success: true };
+
+    } catch (error) {
+      this.hideLoading();
+      this.showError(error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async callAPI(prompt) {
+    const message = await this.client.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 1024,
+      system: `Generate 3D scene JSON. Schema:
+{
+  "objects": [{"type": "box"|"sphere"|"cylinder", "position": [x,y,z], "color": "#hex", "scale": [x,y,z]}],
+  "lights": [{"type": "ambient"|"directional"|"point", "position": [x,y,z], "intensity": number, "color": "#hex"}],
+  "camera": {"position": [x,y,z], "lookAt": [x,y,z]}
+}`,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    return JSON.parse(message.content[0].text);
+  }
+
+  buildScene(data) {
+    // Add objects
+    data.objects.forEach(obj =&gt; {
+      let geometry;
+      switch(obj.type) {
+        case 'box': geometry = new THREE.BoxGeometry(...obj.scale); break;
+        case 'sphere': geometry = new THREE.SphereGeometry(obj.scale[0]); break;
+        case 'cylinder': geometry = new THREE.CylinderGeometry(...obj.scale); break;
+      }
+
+      const material = new THREE.MeshStandardMaterial({ color: obj.color });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(...obj.position);
+      this.scene.add(mesh);
+    });
+
+    // Add lights
+    data.lights.forEach(light =&gt; {
+      let lightObj;
+      switch(light.type) {
+        case 'ambient':
+          lightObj = new THREE.AmbientLight(light.color, light.intensity);
+          break;
+        case 'directional':
+          lightObj = new THREE.DirectionalLight(light.color, light.intensity);
+          lightObj.position.set(...light.position);
+          break;
+        case 'point':
+          lightObj = new THREE.PointLight(light.color, light.intensity);
+          lightObj.position.set(...light.position);
+          break;
+      }
+      this.scene.add(lightObj);
+    });
+
+    // Position camera
+    this.camera.position.set(...data.camera.position);
+    this.camera.lookAt(new THREE.Vector3(...data.camera.lookAt));
+  }
+
+  clearScene() {
+    while(this.scene.children.length &gt; 0) {
+      this.scene.remove(this.scene.children[0]);
+    }
+  }
+
+  render() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  showLoading() {
+    document.getElementById('loading').style.display = 'block';
+  }
+
+  hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+  }
+
+  showError(message) {
+    const errorEl = document.getElementById('error');
+    errorEl.textContent = 'Error: ' + message;
+    errorEl.style.display = 'block';
+  }
+}
+
+// Usage
+const generator = new AISceneGenerator(process.env.ANTHROPIC_API_KEY);
+document.getElementById('generateBtn').onclick = () =&gt; {
+  const prompt = document.getElementById('prompt').value;
+  generator.generateFromText(prompt);
+};</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> The <code>AISceneGenerator</code> class encapsulates the entire pipeline. The <code>generateFromText</code> method orchestrates the flow: show loading &rarr; call API &rarr; clear scene &rarr; build scene &rarr; render &rarr; hide loading. Each method has a single responsibility.
+      </div>
+    </div>
+
+    <h4>Adding an Animation Loop</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">Animation loop addition</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Add this method to AISceneGenerator
+animate() {
+  requestAnimationFrame(() =&gt; this.animate());
+
+  // Rotate all meshes slowly for visual interest
+  this.scene.children.forEach(child =&gt; {
+    if (child.isMesh) {
+      child.rotation.y += 0.01;
+    }
+  });
+
+  this.renderer.render(this.scene, this.camera);
+}
+
+// Call after initialization:
+// generator.animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> After generating a scene, this animation loop keeps objects rotating slowly. It only affects meshes (not lights), creating a gentle showcase effect. The arrow function preserves the <code>this</code> context.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Build the Full Pipeline</h4>
+        <span class="time-estimate">~45 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create a working text-to-3D system from scratch</p>
+      <ol class="exercise-steps">
+        <li>Set up an HTML page with an input field, generate button, loading indicator, and error display</li>
+        <li>Implement the <code>AISceneGenerator</code> class from the code example above</li>
+        <li>Test with different prompts: "a forest clearing", "a modern kitchen", "floating geometric shapes"</li>
+        <li>Add error handling for invalid JSON &mdash; wrap <code>JSON.parse</code> in a try/catch and show the user a helpful message</li>
+        <li>Verify that the loading state appears and disappears correctly</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Type a description, click generate, see a loading indicator, then watch a 3D scene appear in the canvas.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Add the Animation Loop</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Make generated scenes more dynamic with continuous animation</p>
+      <ol class="exercise-steps">
+        <li>Add the <code>animate()</code> method to your <code>AISceneGenerator</code> class</li>
+        <li>Call <code>generator.animate()</code> after creating the instance</li>
+        <li>Experiment: try different rotation speeds, add bobbing (sine wave on Y position), or have objects scale up/down</li>
+        <li>Make sure the animation doesn't interfere with scene generation &mdash; new scenes should replace the old animated ones</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Add JSON Validation and Fallbacks</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Make the pipeline robust against malformed API responses</p>
+      <ol class="exercise-steps">
+        <li>Create a <code>validateSceneData(data)</code> function that checks for required fields: <code>objects</code> (array), <code>lights</code> (array), <code>camera</code> (object with position and lookAt)</li>
+        <li>If validation fails, fall back to a default scene (a single cube with ambient light)</li>
+        <li>Log the validation error so you can debug what the API actually returned</li>
+        <li>Test by temporarily breaking the system prompt to see how your fallback handles bad data</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Validation hint</summary>
+        <pre><code class="language-javascript">function validateSceneData(data) {
+  if (!data || typeof data !== 'object') return false;
+  if (!Array.isArray(data.objects)) return false;
+  if (!Array.isArray(data.lights)) return false;
+  if (!data.camera || !data.camera.position) return false;
+  return true;
+}</code></pre>
+      </details>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/docs/#api/en/scenes/Scene" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Three.js Scene Management</span>
+        <span class="resource-meta">Three.js &mdash; Official API reference for adding, removing, and traversing scene objects</span>
+      </a>
+      <a class="resource-card" href="https://javascript.info/async-await" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">Async/Await Best Practices</span>
+        <span class="resource-meta">javascript.info &mdash; Deep dive into async patterns essential for API integration</span>
+      </a>
+      <a class="resource-card" href="https://docs.anthropic.com/en/api/messages" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Claude Messages API Reference</span>
+        <span class="resource-meta">Anthropic &mdash; Complete reference for the messages endpoint used in the pipeline</span>
+      </a>
+      <a class="resource-card" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse" target="_blank" rel="noopener">
+        <span class="resource-type">Reference</span>
+        <span class="resource-title">JSON.parse() &mdash; MDN</span>
+        <span class="resource-meta">MDN &mdash; Understanding JSON parsing, error handling, and reviver functions</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why do we clear the scene before adding new objects? What would happen if we didn't?</p>
+      <textarea placeholder="Think about overlapping geometry, memory usage, and visual confusion..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you handle API timeouts (>30 seconds)? What should the user see?</p>
+      <textarea placeholder="Think about AbortController, timeout promises, and user feedback..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What happens if the AI returns invalid JSON? How does your pipeline recover?</p>
+      <textarea placeholder="Think about try/catch, fallback scenes, and user-friendly error messages..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How could you cache API responses to avoid redundant calls for similar prompts?</p>
+      <textarea placeholder="Think about storing results by prompt text, cache invalidation..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What are the tradeoffs between clearing the entire scene vs. updating individual objects?</p>
+      <textarea placeholder="Think about performance, transitions, and state management..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="17-realtime-modifications.html">Day 17: Real-Time Scene Modifications</a> &mdash; Add streaming API responses and handle incremental updates like "make it darker" or "add a table."</p>
+
+    <p>Today you built the foundation: a complete pipeline from text input to rendered 3D scene. Tomorrow we'll make it interactive &mdash; instead of regenerating entire scenes, you'll be able to modify them in real-time with natural language commands.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can generate a 3D scene from a text prompt via API</label>
+      <label><input type="checkbox"> I can handle API errors gracefully with user-friendly messages</label>
+      <label><input type="checkbox"> I can clear and rebuild scenes programmatically</label>
+      <label><input type="checkbox"> I understand how async/await keeps the UI responsive during API calls</label>
+      <label><input type="checkbox"> I can validate JSON schema before passing data to the scene builder</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

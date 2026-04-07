@@ -1,0 +1,466 @@
+<section class="day-content" data-day="19">
+  <h2>Day 19: Advanced Prompting Techniques</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Use chain-of-thought prompting for better scene generation</li>
+      <li data-objective="2">Implement self-critique and refinement loops</li>
+      <li data-objective="3">Apply few-shot learning patterns effectively</li>
+      <li data-objective="4">Use structured output modes (JSON schema enforcement)</li>
+      <li data-objective="5">Debug and improve prompts systematically</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>Chain-of-Thought Prompting</h4>
+    <p>Instead of asking for the final output directly, ask the AI to "think out loud" first:</p>
+
+    <p><strong>Basic Prompt:</strong></p>
+    <pre><code class="language-javascript">Create a 3D scene for a workspace.</code></pre>
+
+    <p><strong>Chain-of-Thought Prompt:</strong></p>
+    <pre><code class="language-javascript">Create a 3D scene for a workspace.
+
+Before generating the JSON, think through:
+1. What objects are essential for a workspace?
+2. How should they be arranged logically?
+3. What lighting would make it feel productive?
+4. What colors and materials fit a professional setting?
+
+Then output the scene JSON.</code></pre>
+
+    <p>The AI produces better results when it reasons step-by-step.</p>
+
+    <h4>Self-Critique Pattern</h4>
+    <p>Make the AI review its own output:</p>
+
+    <pre><code class="language-javascript">// Step 1: Generate scene
+const scene = await generateScene("futuristic office");
+
+// Step 2: Critique
+const critique = await critiqueScene(scene, `
+Review this scene JSON for:
+- Realism: Are objects positioned logically?
+- Aesthetics: Does it look good?
+- Technical correctness: Valid values, sensible scales?
+
+Output: {"issues": ["list of problems"], "score": 0-10}
+`);
+
+// Step 3: Refine if needed
+if (critique.score &lt; 7) {
+    const improved = await refineScene(scene, critique.issues);
+    return improved;
+}</code></pre>
+
+    <p>This two-step process catches issues before rendering.</p>
+
+    <h4>JSON Schema Enforcement</h4>
+    <p>Some APIs support enforced structured output:</p>
+
+    <pre><code class="language-javascript">// OpenAI structured outputs (beta)
+const response = await openai.chat.completions.create({
+    model: "gpt-4o-2024-08-06",
+    messages: messages,
+    response_format: {
+        type: "json_schema",
+        json_schema: {
+            name: "scene_schema",
+            schema: {
+                type: "object",
+                properties: {
+                    objects: { type: "array", items: { ... } },
+                    lights: { type: "array", items: { ... } },
+                    // ...
+                },
+                required: ["objects", "lights", "camera"]
+            }
+        }
+    }
+});</code></pre>
+
+    <p>This <em>guarantees</em> valid JSON structure (but not semantic correctness).</p>
+
+    <h4>Few-Shot Optimization</h4>
+    <p>Quality examples &gt; quantity. 2-3 perfect examples beat 10 mediocre ones:</p>
+
+    <pre><code class="language-javascript">const fewShotExamples = [
+    {
+        input: "A zen meditation room",
+        output: {
+            objects: [
+                { name: "floor", geometry: "plane", position: [0,0,0],
+                  material: { color: "#e8d5b7", roughness: 0.9 } },
+                { name: "cushion", geometry: "cylinder", position: [0,0.1,0],
+                  scale: [0.8,0.2,0.8], material: { color: "#8b0000", roughness: 0.8 } },
+                { name: "incense-holder", geometry: "box", position: [1,0.05,0],
+                  scale: [0.15,0.05,0.05], material: { color: "#444", roughness: 0.6 } }
+            ],
+            lights: [
+                { type: "ambient", color: "#ffeedd", intensity: 0.6 },
+                { type: "directional", color: "#fffacd", intensity: 0.8,
+                  position: [3,8,5], castShadow: true }
+            ],
+            camera: { position: [3,2,3], lookAt: [0,0.3,0], fov: 50 },
+            environment: { background: "#f5e6d3" }
+        }
+    }
+    // 1-2 more high-quality examples
+];</code></pre>
+
+    <h4>Debugging Prompt Failures</h4>
+    <p>Systematic approach when prompts fail:</p>
+    <ol>
+      <li><strong>Test isolation</strong> &mdash; Remove all context, test with minimal prompt</li>
+      <li><strong>Add constraints gradually</strong> &mdash; Start simple, add rules one by one</li>
+      <li><strong>Log intermediate outputs</strong> &mdash; See AI's reasoning before final JSON</li>
+      <li><strong>Compare temperature settings</strong> &mdash; 0 vs 0.3 vs 0.7</li>
+      <li><strong>Try different models</strong> &mdash; Claude vs GPT-4 vs GPT-3.5</li>
+    </ol>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>Advanced prompting is about controlling AI behavior precisely. Chain-of-thought adds reasoning. Self-critique adds quality control. Few-shot adds examples. Together, they dramatically improve reliability.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day19-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Chain-of-Thought</dt></div>
+        <div class="flashcard-back"><dd>Ask AI to reason before answering. Example: "Think step-by-step, then output JSON." This produces more thoughtful, coherent outputs.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Self-Critique</dt></div>
+        <div class="flashcard-back"><dd>AI reviews its own output and rates quality. Example: "Rate this scene 0-10 and list issues." Catches problems before rendering.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Few-Shot Learning</dt></div>
+        <div class="flashcard-back"><dd>Providing example input-output pairs in the prompt. 2-3 perfect scene examples teach the AI your expected quality level and conventions.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>JSON Schema</dt></div>
+        <div class="flashcard-back"><dd>Strict output format enforcement supported by some APIs. Guarantees valid JSON structure but not semantic correctness of values.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Temperature Sweep</dt></div>
+        <div class="flashcard-back"><dd>Testing multiple temperature values (0, 0.3, 0.5, 0.7, 1.0) to find the best creativity-consistency balance for your use case.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Prompt Decomposition</dt></div>
+        <div class="flashcard-back"><dd>Breaking complex tasks into sequential steps. Example: Generate, then Critique, then Refine. Each step is simpler and more reliable than doing everything at once.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Chain-of-Thought Scene Generator</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">cot-generator.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">async function generateSceneWithReasoning(prompt) {
+    const enhancedPrompt = `Generate a 3D scene for: "${prompt}"
+
+REASONING STEPS (think through these before outputting JSON):
+1. Scene Purpose: What is this scene for? What mood should it convey?
+2. Essential Objects: What 3-5 objects are absolutely necessary?
+3. Spatial Layout: How should objects be arranged? What's the focal point?
+4. Lighting Strategy: What type of lighting best suits this scene?
+5. Color Palette: What colors support the mood and purpose?
+6. Material Choices: Rough/smooth? Metallic/matte? Why?
+
+After reasoning through the above, output the complete scene JSON.`;
+
+    const response = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 6000, // More tokens for reasoning + output
+        temperature: 0.3,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: enhancedPrompt }]
+    });
+
+    const fullText = response.content[0].text;
+
+    // Extract JSON (AI will output reasoning text + JSON)
+    const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+    const sceneData = JSON.parse(jsonMatch[0]);
+
+    // Log reasoning for debugging
+    const reasoning = fullText.substring(0, fullText.indexOf('{'));
+    console.log('AI Reasoning:', reasoning);
+
+    return sceneData;
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We ask the AI to think through design decisions before generating JSON. This produces more thoughtful, coherent scenes. The reasoning is logged for debugging but not used in rendering.
+      </div>
+    </div>
+
+    <h4>Example 2: Self-Critique Loop</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">self-critique.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">async function generateWithSelfCritique(prompt, maxIterations = 2) {
+    let scene = await generateScene(prompt);
+    let iteration = 1;
+
+    while (iteration &lt;= maxIterations) {
+        // Critique the scene
+        const critiquePrompt = `Review this 3D scene JSON:
+${JSON.stringify(scene, null, 2)}
+
+Rate it on these criteria (0-10 each):
+- Realism: Are positions/scales logical?
+- Aesthetics: Does it look good?
+- Completeness: All necessary elements present?
+- Technical: Valid values, no errors?
+
+Output:
+{
+  "scores": {"realism": X, "aesthetics": X, "completeness": X, "technical": X},
+  "issues": ["list specific problems"],
+  "suggestions": ["list improvements"]
+}`;
+
+        const critiqueResponse = await anthropic.messages.create({
+            model: 'claude-3-5-sonnet-20241022',
+            max_tokens: 2000,
+            temperature: 0.2,
+            messages: [{ role: 'user', content: critiquePrompt }]
+        });
+
+        const critique = JSON.parse(critiqueResponse.content[0].text);
+        const avgScore = Object.values(critique.scores).reduce((a,b) =&gt; a+b, 0) / 4;
+
+        console.log(`Iteration ${iteration} - Score: ${avgScore.toFixed(1)}/10`);
+        console.log('Issues:', critique.issues);
+
+        if (avgScore &gt;= 8.0 || iteration === maxIterations) {
+            return scene; // Good enough or max iterations reached
+        }
+
+        // Refine based on critique
+        const refinePrompt = `The scene has these issues:
+${critique.issues.join('\n')}
+
+Suggestions:
+${critique.suggestions.join('\n')}
+
+Generate an improved version of the scene addressing these problems.
+
+Original scene:
+${JSON.stringify(scene, null, 2)}`;
+
+        const refinedResponse = await generateScene(refinePrompt);
+        scene = refinedResponse;
+        iteration++;
+    }
+
+    return scene;
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Generate a scene, critique it, refine it, repeat until score &gt;= 8/10 or max iterations. This catches common issues like objects floating in mid-air or bad scaling.
+      </div>
+    </div>
+
+    <h4>Example 3: Optimized Few-Shot System</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">few-shot-system.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const HIGH_QUALITY_EXAMPLES = [
+    {
+        description: "minimal tech workspace",
+        scene: {
+            objects: [
+                { name: "desk", geometry: "box", position: [0,0.75,0], scale: [2.5,0.08,1.2],
+                  material: { color: "#2a2a2a", roughness: 0.7, metalness: 0.1 } },
+                { name: "monitor", geometry: "box", position: [0,1.4,-0.4], scale: [1.2,0.7,0.05],
+                  material: { color: "#111111", roughness: 0.2, metalness: 0.8 } },
+                { name: "screen-glow", geometry: "box", position: [0,1.4,-0.38], scale: [1.1,0.6,0.01],
+                  material: { color: "#4488ff", emissive: "#4488ff", emissiveIntensity: 0.4 } },
+                { name: "keyboard", geometry: "box", position: [0,0.82,0.15], scale: [0.6,0.03,0.25],
+                  material: { color: "#1a1a1a", roughness: 0.5 } }
+            ],
+            lights: [
+                { type: "ambient", color: "#404060", intensity: 0.3 },
+                { type: "directional", color: "#ffffff", intensity: 0.8, position: [5,10,5], castShadow: true },
+                { type: "point", color: "#4488ff", intensity: 0.6, position: [0,1.5,-0.3] }
+            ],
+            camera: { position: [3,2.5,3], lookAt: [0,1,0], fov: 60 },
+            environment: { background: "#0a0a1a" }
+        }
+    }
+];
+
+function buildFewShotPrompt(userRequest) {
+    let prompt = `You are an expert 3D scene designer. Study these examples:\n\n`;
+
+    HIGH_QUALITY_EXAMPLES.forEach((ex, i) =&gt; {
+        prompt += `EXAMPLE ${i+1}:\n`;
+        prompt += `Description: "${ex.description}"\n`;
+        prompt += `Scene: ${JSON.stringify(ex.scene)}\n\n`;
+    });
+
+    prompt += `Now create a scene for: "${userRequest}"\n`;
+    prompt += `Follow the same structure and quality as the examples above.`;
+
+    return prompt;
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We provide 1-2 perfect example scenes. The AI learns the expected quality level, object naming conventions, material choices, and lighting patterns. Results are much more consistent.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Chain-of-Thought</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Implement reasoning-before-output</p>
+      <ol class="exercise-steps">
+        <li>Add chain-of-thought prompting from Example 1</li>
+        <li>Test with complex requests: "a cozy library," "futuristic lab," "outdoor caf&eacute;"</li>
+        <li>Compare output quality with/without reasoning</li>
+        <li>Log and read the AI's reasoning &mdash; does it make sense?</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Better scene coherence and thoughtful design decisions.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Self-Critique Loop</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Add quality control through self-review</p>
+      <ol class="exercise-steps">
+        <li>Implement the self-critique function from Example 2</li>
+        <li>Test with 5 different scenes</li>
+        <li>Log scores and issues for each iteration</li>
+        <li>Calculate average improvement (iteration 1 vs final score)</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Measurable quality improvement through iteration.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Few-Shot Optimization</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Build a library of high-quality example scenes</p>
+      <ol class="exercise-steps">
+        <li>Create 3 perfect example scenes for different use cases</li>
+        <li>Implement few-shot prompt building from Example 3</li>
+        <li>Test scene generation with/without examples</li>
+        <li>Compare consistency and quality</li>
+      </ol>
+      <p><strong>Expected Output:</strong> More consistent outputs that match example quality.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Prompt Engineering Guide</span>
+        <span class="resource-meta">Anthropic &mdash; Comprehensive guide to all prompting techniques</span>
+      </a>
+      <a class="resource-card" href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">
+        <span class="resource-type">Research</span>
+        <span class="resource-title">Chain-of-Thought Prompting</span>
+        <span class="resource-meta">Research Paper &mdash; Original research on reasoning prompts (optional deep dive)</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why does chain-of-thought improve output quality?</p>
+      <textarea placeholder="Think about how reasoning step-by-step changes the AI's generation process..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you use self-critique for validating portfolio content (text, project descriptions)?</p>
+      <textarea placeholder="Think about applying the generate-critique-refine loop beyond 3D scenes..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does few-shot learning relate to the examples we used in Day 12?</p>
+      <textarea placeholder="Think about how providing examples in prompts has evolved throughout this course..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What's the cost trade-off of self-critique loops? (2x API calls, longer wait)</p>
+      <textarea placeholder="Think about when the quality improvement justifies the extra time and cost..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Which technique improved your scenes most: chain-of-thought, self-critique, or few-shot?</p>
+      <textarea placeholder="Reflect on your hands-on experience with each technique..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="20-deployment.html">Day 20: Deployment &amp; Production Best Practices</a> &mdash; Prepare your app for real users with hosting, environment variables, error monitoring, and production optimization.</p>
+
+    <p>You've mastered advanced prompting. Tomorrow we'll focus on deployment: hosting, environment variables, error monitoring, and making your app production-ready.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can use chain-of-thought for complex scene generation</label>
+      <label><input type="checkbox"> I can implement self-critique and refinement loops</label>
+      <label><input type="checkbox"> I can build effective few-shot prompt libraries</label>
+      <label><input type="checkbox"> I can debug prompts systematically</label>
+      <label><input type="checkbox"> I can measure quality improvements from advanced techniques</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,198 +1,154 @@
-# Three.js + AI Portfolio Course
+# Three.js Learning
 
-**Build an AI-powered 3D portfolio generator in 21 days**
+> Build an AI-powered 3D portfolio generator in 21 days
 
-🎨 **Live Course:** https://ceciliaw888.github.io/threejs-ai-portfolio/
+[![PWA Ready](https://img.shields.io/badge/PWA-Ready-c4825a)](https://CeciliaW888.github.io/threejs-learning/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Days](https://img.shields.io/badge/Course-21_Days-blue.svg)](#course-outline)
 
----
+## About This Course
 
-## 📚 What You'll Learn
+Learn Three.js from the ground up and build an AI-powered 3D portfolio generator. Starting with 3D fundamentals (scenes, cameras, lighting, materials), progressing through advanced techniques (models, shadows, performance), then integrating AI (prompt engineering, LLM APIs, text-to-3D pipelines) to create a portfolio that generates 3D scenes from natural language descriptions.
 
-By the end of this course, you'll build a web app where users describe their portfolio in natural language ("futuristic tech vibe with floating code blocks") and AI generates + renders the 3D scene automatically.
+**Duration:** 21 days (3 weeks)
+**Daily commitment:** 1 hour
+**Language:** English
+**Level:** Beginner → Advanced
 
-### Week 1: Three.js Foundations (Days 1-7)
-Learn 3D basics, scene setup, geometries, materials, lighting, textures, and camera controls.
+## Learning Goals
 
-**Mini Project:** Interactive 3D product showcase
+By the end of this course, you will be able to:
 
-### Week 2: Advanced Three.js + Prompt Engineering (Days 8-14)
-Master animation, GLTF models, shaders, performance optimization, and AI prompt patterns for 3D scenes.
+- Build interactive 3D scenes with Three.js (scenes, cameras, lighting, materials, textures)
+- Load and display 3D models (GLTF/GLB) with professional lighting and shadows
+- Optimize 3D scenes for 60fps performance on any device
+- Write structured prompts that generate parseable 3D scene descriptions
+- Build a JSON-to-Three.js scene builder (text → 3D pipeline)
+- Integrate Claude/OpenAI APIs for AI-powered scene generation
+- Add conversation memory and user profiles to your AI agent
+- Deploy a production-ready 3D portfolio with serverless API proxy
 
-**Mini Project:** Prompt-driven scene generator
-
-### Week 3: AI-Powered Portfolio Builder (Days 15-21)
-Integrate LLM APIs (Claude/GPT), build text-to-3D pipelines, add real-time modifications, and deploy to production.
-
-**Final Project:** AI portfolio generator (deployed and shareable!)
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Basic JavaScript knowledge
-- A code editor (VS Code recommended)
-- Modern browser (Chrome/Firefox/Safari)
-
-### Installation
-```bash
-git clone https://github.com/CeciliaW888/threejs-ai-portfolio.git
-cd threejs-ai-portfolio
-npm install
-```
-
-### Course Structure
-```
-threejs-ai-portfolio/
-├── week-01/          # Days 1-7: Foundations
-├── week-02/          # Days 8-14: Advanced + AI prompting
-├── week-03/          # Days 15-21: AI integration
-├── projects/         # Hands-on projects
-├── website/          # Installable PWA course app
-└── briefs/           # Day-by-day content outlines
-```
-
----
-
-## 📖 Daily Study Guides
+## Course Outline
 
 ### Week 1: Three.js Foundations
 
-- **[Day 1: Introduction to 3D on the Web](./week-01/day-01-intro-threejs.md)** 🟢
-- **[Day 2: Setting Up Your First Scene](./week-01/day-02-first-scene.md)** 🟢
-- **[Day 3: Geometries & Materials](./week-01/day-03-geometries-materials.md)** 🟢
-- **[Day 4: Lighting Fundamentals](./week-01/day-04-lighting.md)** 🟢
-- **[Day 5: Camera Controls](./week-01/day-05-camera-controls.md)** 🟢
-- **[Day 6: Textures & Asset Loading](./week-01/day-06-textures.md)** 🟢
-- **[Day 7: Mini Project - 3D Product Showcase](./week-01/day-07-mini-project.md)** 🟡
+| Day | Topic | Type |
+|-----|-------|------|
+| [1](./week-01/day-01-intro-threejs.md) | Introduction to 3D on the Web & Three.js | Foundations |
+| [2](./week-01/day-02-first-scene.md) | Setting Up Your First Scene | Foundations |
+| [3](./week-01/day-03-geometries-materials.md) | Geometries & Materials | Concepts |
+| [4](./week-01/day-04-materials-textures.md) | Materials Deep Dive | Concepts |
+| [5](./week-01/day-05-lighting.md) | Lighting Fundamentals | Concepts |
+| [6](./week-01/day-06-textures.md) | Textures & Asset Loading | Concepts |
+| [7](./week-01/day-07-mini-project.md) | Mini Project — 3D Product Showcase | Project |
 
-### Week 2: Advanced Three.js + Prompt Engineering
+### Week 2: Advanced Techniques + Prompt Engineering
 
-- **Day 8:** Animation Basics
-- **Day 9:** Loading 3D Models (GLTF/GLB)
-- **Day 10:** Shadows & Realistic Lighting
-- **Day 11:** Performance Optimization
-- **Day 12:** Intro to Prompt Engineering for 3D
-- **Day 13:** Mapping Natural Language to 3D Parameters
-- **Day 14:** Mini Project - Prompt-Driven Scene Generator
+| Day | Topic | Type |
+|-----|-------|------|
+| [8](./week-02/day-08-animation.md) | Animation Fundamentals | Concepts |
+| [9](./week-02/day-09-loading-models.md) | Loading 3D Models (GLTF/GLB) | Concepts |
+| [10](./week-02/day-10-shadows-lighting.md) | Shadows & Realistic Lighting | Concepts |
+| [11](./week-02/day-11-performance.md) | Performance Optimization | Advanced |
+| [12](./week-02/day-12-prompt-engineering.md) | Intro to Prompt Engineering for 3D | Concepts |
+| [13](./week-02/day-13-language-to-3d.md) | Mapping Natural Language to 3D Parameters | Advanced |
+| [14](./week-02/day-14-mini-project.md) | Mini Project — Prompt-Driven Scene Generator | Project |
 
-### Week 3: AI-Powered Portfolio Builder
+### Week 3: AI Integration & Portfolio
 
-- **Day 15:** Introduction to LLM APIs (Claude & OpenAI)
-- **Day 16:** Building a Text-to-3D Pipeline
-- **Day 17:** Real-Time Scene Modifications
-- **Day 18:** Adding Memory & Context
-- **Day 19:** Advanced Prompting Techniques
-- **Day 20:** Deployment & Production Best Practices
-- **Day 21:** Final Project - AI Portfolio Generator
+| Day | Topic | Type |
+|-----|-------|------|
+| [15](./week-03/day-15-llm-apis.md) | Introduction to LLM APIs (Claude & OpenAI) | Concepts |
+| [16](./week-03/day-16-text-to-3d-pipeline.md) | Building a Text-to-3D Pipeline | Advanced |
+| [17](./week-03/day-17-realtime-modifications.md) | Real-Time Scene Modifications | Advanced |
+| [18](./week-03/day-18-memory-context.md) | Adding Memory & Context to AI Agent | Concepts |
+| [19](./week-03/day-19-advanced-prompting.md) | Advanced Prompting Techniques | Advanced |
+| [20](./week-03/day-20-deployment.md) | Deployment & Production Best Practices | Advanced |
+| [21](./week-03/day-21-final-project.md) | Final Project — AI Portfolio Generator | Project |
 
----
+## Get Started
 
-## 🎯 Learning Approach
+### Learn Online
 
-**Daily Structure (1 hour):**
-- 📚 30 min: Core concepts + code examples
-- ✏️ 20 min: Hands-on exercises
-- 🤔 10 min: Reflection + next steps prep
+Visit the PWA course website on GitHub Pages (installable, works offline):
 
-**Project-Based:**
-- Week 1 ends with a working 3D product showcase
-- Week 2 ends with a prompt-driven scene generator
-- Week 3 ends with a deployed AI portfolio generator
+```
+https://CeciliaW888.github.io/threejs-learning/
+```
 
-**Progressive Complexity:**
-- 🟢 Beginner (Days 1-7): Foundations
-- 🟡 Intermediate (Days 8-14): Building
-- 🔴 Advanced (Days 15-21): AI Integration
+### Learn Locally
 
----
+```bash
+# 1. Clone the course repo
+git clone https://github.com/CeciliaW888/threejs-learning.git
+cd threejs-learning
 
-## 🛠️ Tech Stack
+# 2. Open the daily study guides
+# macOS/Linux:
+open week-01/day-01-intro-threejs.md
+# Windows:
+start week-01/day-01-intro-threejs.md
 
-- **Three.js** - 3D rendering
-- **Claude API** (or OpenAI GPT) - Natural language → scene generation
-- **Vanilla JavaScript** - No frameworks required
-- **Vite** - Development server
-- **Vercel/Netlify** - Deployment
+# 3. Or run the course website locally (requires a server for module loading)
+cd website
+python -m http.server 8080
+# Then open http://localhost:8080 in your browser
+```
 
----
+### Deploy to Your Own GitHub Pages
 
-## 📱 Installable Course App
+1. Fork this repo to your GitHub account
+2. Go to **Settings → Pages**
+3. Set Source to **GitHub Actions**
+4. Push to `main` branch to trigger auto-deploy (workflow included)
+5. Visit `https://<your-username>.github.io/threejs-learning/`
 
-The course website is a Progressive Web App (PWA):
+### Install as PWA
 
-1. Visit https://ceciliaw888.github.io/threejs-ai-portfolio/
-2. Tap "Install" in your browser
-3. Access the course offline anytime
+1. Open the course website in Chrome/Edge
+2. Click the "Install" icon in the address bar, or the install prompt on the page
+3. Once installed, open directly from your desktop/home screen — works offline
 
-Features:
-- ✅ Tab-based navigation
-- ✅ Progress tracking
-- ✅ Interactive code examples
-- ✅ Quizzes and flashcards
-- ✅ Works offline
+## Repo Structure
 
----
+```
+threejs-learning/
+├── README.md
+├── .github/workflows/deploy.yml
+├── week-01/          # Days 1-7: Foundations
+│   ├── day-01-intro-threejs.md
+│   ├── day-02-first-scene.md
+│   └── ...
+├── week-02/          # Days 8-14: Advanced + Prompt Engineering
+│   ├── day-08-animation.md
+│   ├── day-09-loading-models.md
+│   └── ...
+├── week-03/          # Days 15-21: AI Integration
+│   ├── day-15-llm-apis.md
+│   ├── day-16-text-to-3d-pipeline.md
+│   └── ...
+├── diagrams/
+└── website/
+    ├── index.html
+    ├── styles.css
+    ├── main.js
+    ├── manifest.json
+    ├── sw.js
+    ├── offline.html
+    ├── modules/
+    ├── diagrams/
+    └── icons/
+```
 
-## 🎓 Who This Course Is For
+## Resources
 
-**Perfect for:**
-- Frontend developers wanting to add 3D to their skillset
-- Creative technologists building interactive experiences
-- Product designers prototyping 3D interfaces
-- AI enthusiasts exploring multimodal applications
+- [Three.js Documentation](https://threejs.org/docs/)
+- [Three.js Examples](https://threejs.org/examples/)
+- [Three.js Journey (Bruno Simon)](https://threejs-journey.com/)
+- [Anthropic API Docs](https://docs.anthropic.com/en/api/getting-started)
+- [Poly Haven — Free HDRIs & Textures](https://polyhaven.com/)
+- [Poly Pizza — Free 3D Models](https://poly.pizza/)
 
-**Not ideal if:**
-- You've never written JavaScript (take a JS fundamentals course first)
-- You're looking for game development (this focuses on web portfolios)
+## License
 
----
-
-## 💡 Learning Tips
-
-1. **Code along** - Don't just read, type the examples yourself
-2. **Experiment** - Break things and fix them, that's how you learn
-3. **Use the briefs** - Each day has a brief with pre-researched resources
-4. **Join the community** - Share your progress on Twitter/X with #ThreeJSAICourse
-5. **Build your own** - After Week 3, create your actual portfolio using what you learned
-
----
-
-## 🤝 Contributing
-
-Found a broken link? Have a better code example? Contributions welcome!
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b improve-day-5`
-3. Commit changes: `git commit -m "Add better camera example"`
-4. Push: `git push origin improve-day-5`
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-MIT License - feel free to use this course material for personal or commercial projects.
-
----
-
-## 🙏 Acknowledgments
-
-- **Bruno Simon** - Three.js Journey inspiration
-- **Anthropic** - Claude API for AI integration
-- **Three.js Community** - Amazing documentation and examples
-
----
-
-**Ready to start?** → [Day 1: Introduction to 3D on the Web](./week-01/day-01-intro-threejs.md)
-
----
-
-## 📊 Course Status
-
-**Current Version:** 1.0 (MVP)
-
-✅ Week 1 (Days 1-7): Complete with full guides
-⏳ Week 2-3: Briefs available, full guides coming soon
-
-**Want to expand this course?** Use the briefs in `/briefs/` to generate remaining days with the learning-to-course skill.
+MIT — See [LICENSE](./LICENSE).

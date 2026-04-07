@@ -1,0 +1,35 @@
+[
+  {
+    "question": "Why is delta time (from THREE.Clock) important for animations?",
+    "options": [
+      "It makes animations look more colorful",
+      "It ensures animations run at the same speed regardless of frame rate",
+      "It reduces GPU memory usage",
+      "It enables shadow rendering"
+    ],
+    "answer": 1,
+    "explanation": "Delta time measures the time between frames. Multiplying movement by delta time ensures consistent animation speed whether running at 30fps or 144fps."
+  },
+  {
+    "question": "What type of motion does Math.sin() produce when used in an animation loop?",
+    "options": [
+      "Linear motion in one direction",
+      "Random jittering",
+      "Smooth oscillating (back-and-forth) motion",
+      "Exponential acceleration"
+    ],
+    "answer": 2,
+    "explanation": "Math.sin() produces values that smoothly oscillate between -1 and 1, creating natural back-and-forth motions like bobbing or swaying."
+  },
+  {
+    "question": "What does 'lerp' (linear interpolation) do in animation?",
+    "options": [
+      "Instantly teleports an object to a target position",
+      "Applies physics-based gravity",
+      "Loops an animation sequence",
+      "Smoothly blends between a current value and a target value"
+    ],
+    "answer": 3,
+    "explanation": "Lerp smoothly transitions between two values by a given factor (0 to 1), commonly used for smooth camera movement or easing objects toward a target."
+  }
+]

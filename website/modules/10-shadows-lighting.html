@@ -1,0 +1,504 @@
+<section class="day-content" data-day="10">
+  <h2>Day 10: Shadows & Realistic Lighting</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>&#127919; Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Configure shadow maps for realistic shadows in Three.js</li>
+      <li data-objective="2">Understand shadow map resolution, bias, and performance trade-offs</li>
+      <li data-objective="3">Create mood and atmosphere with environment maps and HDR lighting</li>
+      <li data-objective="4">Use tone mapping to achieve cinematic or photorealistic looks</li>
+      <li data-objective="5">Combine multiple lighting techniques for production-quality scenes</li>
+    </ul>
+    <div class="difficulty-badge">&#128993; Intermediate</div>
+    <div class="time-estimate">&#9201;&#65039; ~1 hour (25 min reading + 35 min hands-on)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>&#128218; Core Concepts</h3>
+
+    <h4>The Shadow Pipeline</h4>
+    <p>Shadows in Three.js aren't free &mdash; they require extra rendering passes. Here's how it works:</p>
+    <ol>
+      <li><strong>Shadow Map Rendering</strong>: For each shadow-casting light, Three.js renders the scene from the light's perspective into a depth texture (shadow map)</li>
+      <li><strong>Shadow Comparison</strong>: During the main render, each pixel checks whether it's "seen" by the light using the shadow map</li>
+      <li><strong>Shadow Display</strong>: Pixels in shadow are darkened; pixels lit by the light are bright</li>
+    </ol>
+    <p>This means: more shadow-casting lights = more render passes = lower performance.</p>
+
+    <h4>Enabling Shadows (The Three Steps)</h4>
+    <p>Every shadow setup requires three things:</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">shadow-setup.js</span>
+        <span class="badge">Three Steps</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Step 1: Enable shadows on the renderer
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
+
+// Step 2: Light must cast shadows
+directionalLight.castShadow = true;
+
+// Step 3: Objects must cast AND/OR receive shadows
+model.castShadow = true;    // This object creates shadows
+floor.receiveShadow = true;  // This object shows shadows on its surface</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Miss any step and shadows won't appear. This is the #1 debugging issue.
+      </div>
+    </div>
+
+    <h4>Shadow Map Quality</h4>
+    <p>Shadow maps are textures &mdash; their resolution determines shadow sharpness:</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">shadow-quality.js</span>
+        <span class="badge">Configuration</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">directionalLight.shadow.mapSize.width = 2048;   // Default: 512
+directionalLight.shadow.mapSize.height = 2048;
+
+// Camera frustum (what area the shadow covers)
+directionalLight.shadow.camera.near = 0.5;
+directionalLight.shadow.camera.far = 50;
+directionalLight.shadow.camera.left = -10;
+directionalLight.shadow.camera.right = 10;
+directionalLight.shadow.camera.top = 10;
+directionalLight.shadow.camera.bottom = -10;</code></pre>
+    </div>
+
+    <p><strong>Shadow bias</strong> prevents "shadow acne" (weird striping patterns):</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">shadow-bias.js</span>
+        <span class="badge">Anti-Artifact</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">directionalLight.shadow.bias = -0.0001;
+directionalLight.shadow.normalBias = 0.02;</code></pre>
+    </div>
+
+    <h4>Environment Maps &amp; HDR Lighting</h4>
+    <p>The most dramatic upgrade to scene quality comes from environment maps. Instead of placing individual lights, you wrap the entire scene in a high-dynamic-range (HDR) image that provides natural, omnidirectional lighting.</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">environment-map.js</span>
+        <span class="badge">HDR Lighting</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/textures/environment.hdr', (environmentMap) => {
+    environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+
+    scene.background = environmentMap;     // Visible background
+    scene.environment = environmentMap;     // Lighting for all PBR materials
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This single change makes PBR materials (MeshStandardMaterial, MeshPhysicalMaterial) look dramatically better because they now have realistic reflections and indirect lighting.
+      </div>
+    </div>
+
+    <h4>Tone Mapping</h4>
+    <p>HDR lighting produces values above 1.0 (brighter than white). Tone mapping compresses these values into the displayable range:</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">tone-mapping.js</span>
+        <span class="badge">Post-Processing</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">renderer.toneMapping = THREE.ACESFilmicToneMapping; // Cinematic look
+renderer.toneMappingExposure = 1.0;                  // Brightness control</code></pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tone Mapping</th>
+          <th>Look</th>
+          <th>Use Case</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>NoToneMapping</code></td>
+          <td>Raw, washed out</td>
+          <td>Debugging</td>
+        </tr>
+        <tr>
+          <td><code>LinearToneMapping</code></td>
+          <td>Even, flat</td>
+          <td>Neutral scenes</td>
+        </tr>
+        <tr>
+          <td><code>ReinhardToneMapping</code></td>
+          <td>Soft, gentle</td>
+          <td>Product shots</td>
+        </tr>
+        <tr>
+          <td><code>ACESFilmicToneMapping</code></td>
+          <td>Cinematic, contrasty</td>
+          <td>Portfolio, showcase</td>
+        </tr>
+        <tr>
+          <td><code>AgXToneMapping</code></td>
+          <td>Modern cinema, accurate</td>
+          <td>Best overall quality</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">&#128161;</div>
+      <div class="callout-content">
+        <strong>Key Insight</strong>
+        <p>The combination of HDR environment map + ACES tone mapping + PBR materials is what makes Three.js scenes look "professional" vs "hobby project." It's often the single biggest quality upgrade.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>&#128273; Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day10-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Shadow Map</dt></div>
+        <div class="flashcard-back"><dd>Depth texture rendered from light's perspective. Higher resolution = sharper shadows.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>PCFSoftShadowMap</dt></div>
+        <div class="flashcard-back"><dd>Smooth shadow edges via percentage-closer filtering. Set with <code>renderer.shadowMap.type</code>.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Shadow Bias</dt></div>
+        <div class="flashcard-back"><dd>Offset to prevent shadow acne artifacts. Typical values: <code>-0.0001</code> to <code>-0.001</code>.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Environment Map</dt></div>
+        <div class="flashcard-back"><dd>HDR image wrapping the scene for lighting. Uses <code>.hdr</code> or <code>.exr</code> files.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>HDR</dt></div>
+        <div class="flashcard-back"><dd>High Dynamic Range &mdash; brightness values above 1.0. Captures real-world light intensity.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Tone Mapping</dt></div>
+        <div class="flashcard-back"><dd>Compressing HDR values to displayable range. Options include ACES, Reinhard, and AgX.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Exposure</dt></div>
+        <div class="flashcard-back"><dd>Overall brightness multiplier. Controlled via <code>renderer.toneMappingExposure</code>.</dd></div>
+      </div>
+      <div class="flashcard" data-card="8">
+        <div class="flashcard-front"><dt>Contact Shadows</dt></div>
+        <div class="flashcard-back"><dd>Soft shadows where objects meet surfaces. Adds grounding to objects.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 8</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>&#128187; Code Examples</h3>
+
+    <h4>Example 1: Production Shadow Setup</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">production-shadows.js</span>
+        <span class="badge">Complete Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(5, 5, 5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Shadow setup
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// Tone mapping
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+document.body.appendChild(renderer.domElement);
+
+// Directional light (sun)
+const sunLight = new THREE.DirectionalLight(0xfff5e6, 2);
+sunLight.position.set(10, 15, 10);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 50;
+sunLight.shadow.camera.left = -15;
+sunLight.shadow.camera.right = 15;
+sunLight.shadow.camera.top = 15;
+sunLight.shadow.camera.bottom = -15;
+sunLight.shadow.bias = -0.0001;
+sunLight.shadow.normalBias = 0.02;
+scene.add(sunLight);
+
+// Ambient fill
+const ambientLight = new THREE.AmbientLight(0x6688cc, 0.4);
+scene.add(ambientLight);
+
+// Floor
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 30),
+    new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.8 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// Objects with shadows
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.3, metalness: 0.7 })
+);
+sphere.position.y = 1;
+sphere.castShadow = true;
+scene.add(sphere);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This sets up production-quality shadows with soft edges, correct bias to prevent artifacts, and a large enough shadow camera to cover the scene. The ACES tone mapping adds a cinematic feel.
+      </div>
+    </div>
+
+    <h4>Example 2: HDR Environment Lighting</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">hdr-environment.js</span>
+        <span class="badge">Environment Map</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+
+// Load HDR environment
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/textures/studio_small.hdr', (texture) => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+
+    // Use for both background and lighting
+    scene.background = texture;
+    scene.environment = texture;
+
+    // Or use a solid color background with HDR lighting only
+    // scene.background = new THREE.Color(0x1a1a2e);
+    // scene.environment = texture;
+});
+
+// With environment map, PBR materials look incredible
+const chrome = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.05,
+    metalness: 1.0
+});
+
+const matte = new THREE.MeshStandardMaterial({
+    color: 0xff6644,
+    roughness: 0.9,
+    metalness: 0.0
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> The HDR environment map provides natural lighting from all directions. Setting <code>scene.environment</code> automatically lights all PBR materials. Chrome (low roughness, high metalness) reflects the environment clearly. Matte materials (high roughness) get soft diffuse lighting.
+      </div>
+    </div>
+
+    <h4>Example 3: Shadow Helper for Debugging</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">shadow-helpers.js</span>
+        <span class="badge">Debugging</span>
+        <button class="copy-btn" onclick="copyCode(this)">&#128203; Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Visualize shadow camera frustum
+const shadowHelper = new THREE.CameraHelper(sunLight.shadow.camera);
+scene.add(shadowHelper);
+
+// Visualize light direction
+const lightHelper = new THREE.DirectionalLightHelper(sunLight, 2);
+scene.add(lightHelper);
+
+// Remove helpers in production
+// scene.remove(shadowHelper);
+// scene.remove(lightHelper);</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Helpers are essential for debugging shadows. The CameraHelper shows exactly what area the shadow map covers. If objects are outside this frustum, they won't cast shadows. Adjust the shadow camera bounds to fit your scene.
+      </div>
+    </div>
+
+    <div class="try-it">
+      &#128161; <strong>Try it:</strong> Download a free HDR from <a href="https://polyhaven.com/hdris" target="_blank" rel="noopener">https://polyhaven.com/hdris</a> and use it as your scene's environment map. Compare the difference with and without it.
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>&#9999;&#65039; Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Shadow Configuration</h4>
+        <span class="time-estimate">&#9201;&#65039; ~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Set up production-quality shadows</p>
+      <ol class="exercise-steps">
+        <li>Create a scene with a floor plane and 3-5 objects at different heights</li>
+        <li>Add a directional light with shadow casting enabled</li>
+        <li>Configure shadow map resolution to 2048x2048</li>
+        <li>Add shadow helpers to visualize the shadow camera</li>
+        <li>Adjust shadow camera bounds to fit your scene exactly</li>
+        <li>Fine-tune shadow bias to eliminate shadow acne</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Clean, soft shadows with no artifacts on all objects.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: HDR Environment Setup</h4>
+        <span class="time-estimate">&#9201;&#65039; ~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Transform your scene with environment-based lighting</p>
+      <ol class="exercise-steps">
+        <li>Download a free HDR from <a href="https://polyhaven.com/hdris" target="_blank" rel="noopener">https://polyhaven.com/hdris</a> (try "studio_small" or "venice_sunset")</li>
+        <li>Load it with RGBELoader</li>
+        <li>Apply as both background and environment</li>
+        <li>Create 5 spheres with different roughness values (0, 0.25, 0.5, 0.75, 1.0)</li>
+        <li>Set all to metalness 1.0 and observe reflections</li>
+        <li>Try different tone mapping modes and compare</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A row of spheres ranging from mirror-like to matte, all naturally lit by the HDR.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Portfolio Lighting</h4>
+        <span class="time-estimate">&#9201;&#65039; ~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Light your Day 9 portfolio scene professionally</p>
+      <ol class="exercise-steps">
+        <li>Start from your Day 9 exercise (loaded model on floor)</li>
+        <li>Add HDR environment lighting</li>
+        <li>Configure shadows on your model (traverse and enable castShadow)</li>
+        <li>Use ACES tone mapping with 1.0-1.5 exposure</li>
+        <li>Add a subtle ambient light for fill</li>
+        <li>Compare before/after &mdash; screenshot both!</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Your portfolio scene looking dramatically better with professional lighting.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>&#128214; Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/shadows" target="_blank" rel="noopener">
+        <span class="resource-type">&#128196; Docs</span>
+        <span class="resource-title">Shadows &mdash; Three.js Manual</span>
+        <span class="resource-meta">~15 min read &mdash; Comprehensive guide to shadow configuration and debugging</span>
+      </a>
+      <a class="resource-card" href="https://polyhaven.com/hdris" target="_blank" rel="noopener">
+        <span class="resource-type">&#128279; Resource</span>
+        <span class="resource-title">Poly Haven &mdash; Free HDR Environment Maps</span>
+        <span class="resource-meta">High-quality, free HDRIs for your projects (CC0 license)</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=7GGNzryHfTw" target="_blank" rel="noopener">
+        <span class="resource-type">&#127909; Video</span>
+        <span class="resource-title">Three.js Realistic Lighting Setup Tutorial &mdash; Red Stapler</span>
+        <span class="resource-meta">Practical walkthrough of achieving realistic lighting in Three.js</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=Q7AOvWpIVHU" target="_blank" rel="noopener">
+        <span class="resource-type">&#127909; Video</span>
+        <span class="resource-title">Build a Mindblowing 3D Portfolio Website &mdash; Fireship</span>
+        <span class="resource-meta">12 min &mdash; See lighting techniques applied in a real portfolio project</span>
+      </a>
+      <a class="resource-card" href="https://learnopengl.com/PBR/Theory" target="_blank" rel="noopener">
+        <span class="resource-type">&#128218; Deep Dive</span>
+        <span class="resource-title">Physically Based Rendering &mdash; Learn OpenGL</span>
+        <span class="resource-meta">Optional &mdash; Understand the math behind why HDR + PBR materials look so good</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>&#129300; Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Comprehension:</strong> Why does enabling shadows require changes to the renderer, the light, AND the objects?</p>
+      <textarea placeholder="Think about what role each component plays in the shadow pipeline..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Application:</strong> If your shadows look blurry, what two settings would you adjust first?</p>
+      <textarea placeholder="Think about shadow map resolution and shadow camera bounds..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Connection:</strong> How does tone mapping relate to the material concepts from Day 4?</p>
+      <textarea placeholder="Think about how PBR materials interact with HDR lighting values..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Critical Thinking:</strong> Why might you want to use an HDR for lighting but NOT as the visible background?</p>
+      <textarea placeholder="Think about artistic control over background vs lighting quality..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Personal:</strong> What mood/atmosphere do you want for your portfolio? Warm studio? Cool minimal? Dark dramatic?</p>
+      <textarea placeholder="Think about what feeling you want visitors to experience..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>&#10145;&#65039; Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="11-performance.html">Day 11: Performance Optimization Basics</a> &mdash; Learn to keep your scene running at 60fps as you add more content.</p>
+    <p>Your scene is starting to look professional. But as you add more models, higher-resolution shadows, and HDR environments, performance becomes critical. Tomorrow we'll learn how to measure and optimize.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can configure shadow maps with proper resolution and bias</label>
+      <label><input type="checkbox"> I can use CameraHelper to debug shadow frustum</label>
+      <label><input type="checkbox"> I can load and apply HDR environment maps</label>
+      <label><input type="checkbox"> I can set up tone mapping for cinematic looks</label>
+      <label><input type="checkbox"> I can light a scene that looks professional</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

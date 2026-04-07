@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is a 'draw call' in 3D rendering?",
+    "options": [
+      "A function that draws lines on screen",
+      "A method for loading textures",
+      "A single command sent to the GPU to render a batch of geometry",
+      "A type of animation frame"
+    ],
+    "answer": 2,
+    "explanation": "A draw call is a command from the CPU to the GPU to render geometry. Too many draw calls is a common performance bottleneck in 3D applications."
+  },
+  {
+    "question": "When should you use InstancedMesh instead of creating many individual meshes?",
+    "options": [
+      "When each object needs a unique geometry",
+      "When you need transparent materials",
+      "When loading external 3D models",
+      "When rendering many copies of the same geometry with different transforms"
+    ],
+    "answer": 3,
+    "explanation": "InstancedMesh renders many copies of the same geometry in a single draw call, each with its own position/rotation/scale, dramatically improving performance."
+  },
+  {
+    "question": "Why is it important to call dispose() on geometries, materials, and textures you no longer need?",
+    "options": [
+      "It frees GPU memory and prevents memory leaks",
+      "It makes them animate faster",
+      "It saves them to disk for later use",
+      "It converts them to a more efficient format"
+    ],
+    "answer": 0,
+    "explanation": "Three.js objects consume GPU memory. Calling dispose() releases that memory. Without it, unused resources accumulate and cause memory leaks."
+  }
+]

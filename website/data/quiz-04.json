@@ -1,0 +1,35 @@
+[
+  {
+    "question": "In PBR (Physically Based Rendering), what does the 'metalness' property control?",
+    "options": [
+      "How shiny the surface appears",
+      "How much the surface behaves like a metal vs a non-metal",
+      "The color of the material",
+      "The transparency of the material"
+    ],
+    "answer": 1,
+    "explanation": "Metalness controls whether a surface behaves like a metal (1.0) or a non-metal/dielectric (0.0), affecting how it reflects light and color."
+  },
+  {
+    "question": "What does a roughness value of 0 produce on a MeshStandardMaterial?",
+    "options": [
+      "A completely matte, diffuse surface",
+      "An invisible surface",
+      "A perfectly smooth, mirror-like surface",
+      "A wireframe appearance"
+    ],
+    "answer": 2,
+    "explanation": "Roughness of 0 means the surface is perfectly smooth, producing sharp, mirror-like reflections. A value of 1 creates a fully matte surface."
+  },
+  {
+    "question": "Which property must you also set to true when using the 'opacity' property on a material?",
+    "options": [
+      "visible",
+      "alphaTest",
+      "depthWrite",
+      "transparent"
+    ],
+    "answer": 3,
+    "explanation": "You must set transparent: true on the material for the opacity property to take effect. Without it, the material will remain fully opaque."
+  }
+]

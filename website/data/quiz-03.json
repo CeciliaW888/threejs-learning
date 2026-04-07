@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What parameters does BoxGeometry accept to define its shape?",
+    "options": [
+      "radius, segments",
+      "size, resolution",
+      "width, height, depth",
+      "scale, offset"
+    ],
+    "answer": 2,
+    "explanation": "BoxGeometry takes width, height, and depth parameters to define the dimensions of the box, along with optional segment counts."
+  },
+  {
+    "question": "What is the key difference between MeshBasicMaterial and MeshStandardMaterial?",
+    "options": [
+      "MeshBasicMaterial supports textures, MeshStandardMaterial does not",
+      "MeshBasicMaterial is affected by lights, MeshStandardMaterial is not",
+      "There is no difference, they are aliases",
+      "MeshBasicMaterial is NOT affected by lights, MeshStandardMaterial IS affected by lights"
+    ],
+    "answer": 3,
+    "explanation": "MeshBasicMaterial renders a flat color regardless of lighting, while MeshStandardMaterial uses physically-based rendering and responds to lights in the scene."
+  },
+  {
+    "question": "Which geometry would you use to create a ball shape in Three.js?",
+    "options": [
+      "SphereGeometry",
+      "CircleGeometry",
+      "CylinderGeometry",
+      "RingGeometry"
+    ],
+    "answer": 0,
+    "explanation": "SphereGeometry creates a 3D sphere shape, defined by its radius and the number of width/height segments for smoothness."
+  }
+]

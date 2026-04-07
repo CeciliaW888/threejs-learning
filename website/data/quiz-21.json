@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is 'intent classification' in an AI-powered 3D application?",
+    "options": [
+      "Determining what the user wants to do (create, modify, delete, query) from their natural language input",
+      "Classifying 3D objects by their polygon count",
+      "Sorting objects in the scene by size",
+      "Categorizing textures by resolution"
+    ],
+    "answer": 0,
+    "explanation": "Intent classification analyzes user input to determine the action type (e.g., create a scene, modify an object, ask a question), routing it to the appropriate handler."
+  },
+  {
+    "question": "Why is a modular architecture important for a portfolio-quality final project?",
+    "options": [
+      "It makes the file sizes smaller",
+      "It allows each component to be developed, tested, and maintained independently",
+      "It is required by Three.js",
+      "It eliminates the need for a build step"
+    ],
+    "answer": 1,
+    "explanation": "Modular architecture separates concerns (rendering, AI integration, UI, state management) so each piece can evolve independently and the codebase stays maintainable."
+  },
+  {
+    "question": "What makes a Three.js project 'portfolio-ready'?",
+    "options": [
+      "Using as many features as possible",
+      "Having the most complex 3D scene possible",
+      "Clean code, polished UI, good performance, error handling, and clear documentation",
+      "Using only default Three.js settings"
+    ],
+    "answer": 2,
+    "explanation": "Portfolio-quality projects demonstrate clean architecture, polished user experience, thoughtful error handling, good performance, and clear code organization."
+  }
+]

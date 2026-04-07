@@ -1,5 +1,5 @@
-// Service Worker for Three.js + AI Portfolio Course PWA
-const CACHE_NAME = 'threejs-ai-course-v1';
+// Service Worker for Three.js Learning PWA
+const CACHE_NAME = 'threejs-course-v3';
 const urlsToCache = [
   './',
   './index.html',
@@ -19,7 +19,6 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(async (cache) => {
-        console.log('[SW] Caching core assets');
         await cache.addAll(urlsToCache);
       })
   );
@@ -40,37 +39,33 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for HTML, cache-first for static assets
 self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate' || event.request.url.endsWith('.html')) {
+    // Network-first for HTML pages (always get latest content)
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then(r => r || caches.match('./offline.html')))
+    );
+    return;
+  }
+  // Cache-first for static assets (CSS, JS, images, fonts)
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Cache hit - return response
-        if (response) {
+        if (response) return response;
+        return fetch(event.request).then((response) => {
+          if (!response || response.status !== 200 || response.type !== 'basic') return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           return response;
-        }
-        
-        // Clone request - can only be consumed once
-        const fetchRequest = event.request.clone();
-        
-        return fetch(fetchRequest).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          
-          // Clone response - can only be consumed once
-          const responseToCache = response.clone();
-          
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-          
-          return response;
-        }).catch(() => {
-          // Network failed, return offline page
-          return caches.match('./offline.html');
         });
       })
+      .catch(() => { /* no fallback for non-navigation requests */ })
   );
 });

@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What file formats does GLTFLoader support for loading 3D models?",
+    "options": [
+      "GLTF and GLB",
+      "OBJ and FBX",
+      "STL and PLY",
+      "DAE and 3DS"
+    ],
+    "answer": 0,
+    "explanation": "GLTFLoader loads GLTF (JSON-based) and GLB (binary) files, which are the recommended formats for Three.js due to their efficiency and wide support."
+  },
+  {
+    "question": "What is the purpose of DRACOLoader when used with GLTFLoader?",
+    "options": [
+      "It adds animations to static models",
+      "It decompresses Draco-compressed geometry for smaller file sizes",
+      "It converts models to a different format",
+      "It applies default materials to models"
+    ],
+    "answer": 1,
+    "explanation": "DRACOLoader decodes Draco-compressed geometry data, which can dramatically reduce GLTF/GLB file sizes while preserving model quality."
+  },
+  {
+    "question": "What does the traverse() method do on a loaded GLTF scene?",
+    "options": [
+      "Animates the model along a path",
+      "Removes all materials from the model",
+      "Visits every child object in the model's hierarchy",
+      "Exports the model to a new format"
+    ],
+    "answer": 2,
+    "explanation": "traverse() recursively visits every node in the object hierarchy, allowing you to inspect or modify individual meshes, materials, or other properties."
+  }
+]

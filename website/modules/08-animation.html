@@ -1,0 +1,422 @@
+<section class="day-content" data-day="8">
+  <h2>Day 8: Animation Fundamentals</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>🎯 Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Animate object properties (position, rotation, scale) smoothly</li>
+      <li data-objective="2">Use THREE.Clock for time-based animation</li>
+      <li data-objective="3">Create looping animations with Math.sin/cos</li>
+      <li data-objective="4">Implement easing functions for natural movement</li>
+      <li data-objective="5">Understand delta time and frame-independent animation</li>
+    </ul>
+    <div class="difficulty-badge">🟡 Intermediate</div>
+    <div class="time-estimate">⏱️ ~1 hour (25 min reading + 35 min hands-on)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>📚 Core Concepts</h3>
+
+    <h4>Time-Based vs Frame-Based Animation</h4>
+    <p><strong>Frame-based</strong> animation increments values by a fixed amount each frame:</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">frame-based.js</span>
+        <span class="badge">Problem</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">cube.rotation.y += 0.01; // Rotates different speeds on different devices!</code></pre>
+      <div class="code-explanation">
+        <strong>Problem:</strong> On a 120Hz monitor, this runs twice as fast as on 60Hz. Not good for consistent user experience.
+      </div>
+    </div>
+
+    <p><strong>Time-based</strong> animation uses delta time (seconds since last frame):</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">time-based.js</span>
+        <span class="badge">Solution</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">const clock = new THREE.Clock();
+function animate() {
+    const deltaTime = clock.getDelta();
+    cube.rotation.y += deltaTime * 1; // 1 radian per second, consistent across devices
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Delta time ensures animation speed is consistent regardless of frame rate.
+      </div>
+    </div>
+
+    <h4>THREE.Clock for Animation Timing</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">clock-usage.js</span>
+        <span class="badge">Reference</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">const clock = new THREE.Clock();
+
+function animate() {
+    const elapsedTime = clock.getElapsedTime(); // Total time since clock started
+    const deltaTime = clock.getDelta();          // Time since last frame
+
+    // Use elapsedTime for repeating patterns
+    cube.position.y = Math.sin(elapsedTime) * 2;
+
+    // Use deltaTime for incremental movement
+    cube.rotation.x += deltaTime * 0.5;
+}</code></pre>
+    </div>
+
+    <h4>Oscillating Motion with Math Functions</h4>
+    <p><code>Math.sin()</code> and <code>Math.cos()</code> create smooth back-and-forth motion:</p>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">oscillation.js</span>
+        <span class="badge">Patterns</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Bobbing up and down
+object.position.y = Math.sin(elapsedTime * speed) * amplitude;
+
+// Circular motion
+object.position.x = Math.cos(elapsedTime) * radius;
+object.position.z = Math.sin(elapsedTime) * radius;
+
+// Figure-8 pattern
+object.position.x = Math.sin(elapsedTime) * 3;
+object.position.z = Math.sin(elapsedTime * 2) * 3;</code></pre>
+    </div>
+
+    <h4>Easing Functions</h4>
+    <p>Easing makes motion feel natural — objects accelerate and decelerate smoothly rather than moving at constant speed.</p>
+    <ul>
+      <li><strong>Linear:</strong> Constant speed (boring)</li>
+      <li><strong>Ease In:</strong> Slow start, fast end</li>
+      <li><strong>Ease Out:</strong> Fast start, slow end</li>
+      <li><strong>Ease In-Out:</strong> Slow start and end, fast middle</li>
+    </ul>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">easing.js</span>
+        <span class="badge">Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Ease-out function
+function easeOut(t) {
+    return 1 - Math.pow(1 - t, 3);
+}
+
+// Usage in animation
+const progress = (elapsedTime % 2) / 2; // 0 to 1 over 2 seconds, repeating
+const eased = easeOut(progress);
+cube.position.x = eased * 5; // Moves 0 to 5 with ease-out</code></pre>
+    </div>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <strong>Key Insight</strong>
+        <p>Animation is about controlling change over time. Master time-based animation for smooth, professional-looking motion.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>🔑 Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day8-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Delta Time</dt></div>
+        <div class="flashcard-back"><dd>Time elapsed since last frame (seconds). Example: 0.016s at 60 FPS.</dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Elapsed Time</dt></div>
+        <div class="flashcard-back"><dd>Total time since animation start. Example: 5.2 seconds.</dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>THREE.Clock</dt></div>
+        <div class="flashcard-back"><dd>Utility for tracking time. Use <code>clock.getElapsedTime()</code> for total time and <code>clock.getDelta()</code> for time since last frame.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Easing</dt></div>
+        <div class="flashcard-back"><dd>Non-linear interpolation for natural motion. Types: ease-in, ease-out, ease-in-out.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Oscillation</dt></div>
+        <div class="flashcard-back"><dd>Back-and-forth motion, like a pendulum or waves. Created with Math.sin/cos.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Linear Interpolation (Lerp)</dt></div>
+        <div class="flashcard-back"><dd>Blend between two values using the formula: <code>a + (b - a) * t</code>.</dd></div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front"><dt>Frame Independence</dt></div>
+        <div class="flashcard-back"><dd>Animation speed not tied to FPS. Achieved by using deltaTime to scale movement.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">←</button>
+      <span class="flashcard-counter">1 / 7</span>
+      <button class="flashcard-next" aria-label="Next card">→</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>💻 Code Examples</h3>
+
+    <h4>Example 1: Basic Time-Based Animation</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">basic-animation.js</span>
+        <span class="badge">Complete Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const cube = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+);
+scene.add(cube);
+
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const elapsedTime = clock.getElapsedTime();
+
+    // Rotate at constant speed (1 revolution per 2π seconds)
+    cube.rotation.y = elapsedTime;
+
+    // Bob up and down
+    cube.position.y = Math.sin(elapsedTime * 2) * 0.5;
+
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Using <code>elapsedTime</code> creates time-based animations that look identical on any device. The cube rotates at 1 radian/second and bobs at 2 cycles/second with 0.5 unit amplitude.
+      </div>
+    </div>
+
+    <h4>Example 2: Circular Motion and Patterns</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">circular-motion.js</span>
+        <span class="badge">Complete Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.3, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+);
+scene.add(sphere);
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const elapsedTime = clock.getElapsedTime();
+
+    // Circular orbit
+    const radius = 3;
+    sphere.position.x = Math.cos(elapsedTime) * radius;
+    sphere.position.z = Math.sin(elapsedTime) * radius;
+
+    // Also rotate the sphere itself
+    sphere.rotation.y = elapsedTime * 2;
+
+    renderer.render(scene, camera);
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> <code>Math.cos</code> and <code>Math.sin</code> create circular motion. The sphere orbits around the origin at radius 3 while also spinning on its own axis.
+      </div>
+    </div>
+
+    <h4>Example 3: Smooth Transitions with Lerp</h4>
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">lerp-transition.js</span>
+        <span class="badge">Interactive</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">let targetPosition = new THREE.Vector3(0, 0, 0);
+const cube = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshBasicMaterial({ color: 0x0000ff })
+);
+scene.add(cube);
+
+// Click to set new target position
+window.addEventListener('click', (event) => {
+    targetPosition.set(
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+        0
+    );
+});
+
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const deltaTime = clock.getDelta();
+
+    // Lerp toward target (smooth follow)
+    const lerpSpeed = 2; // Higher = faster
+    cube.position.lerp(targetPosition, deltaTime * lerpSpeed);
+
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> <code>lerp()</code> smoothly interpolates between current and target position. The cube "chases" the target position with a spring-like effect. Click anywhere to set new targets.
+      </div>
+    </div>
+
+    <div class="try-it">
+      💡 <strong>Try it:</strong> Create a spiral animation by combining circular motion with vertical movement: <code>y = elapsedTime</code>, <code>x/z = circular</code>.
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>✏️ Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Animation Playground</h4>
+        <span class="time-estimate">⏱️ ~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create multiple animated objects with different patterns</p>
+      <ol class="exercise-steps">
+        <li>Create 3 cubes in different positions</li>
+        <li>Cube 1: Rotate continuously on Y-axis</li>
+        <li>Cube 2: Scale up/down using Math.sin (1 to 2 scale)</li>
+        <li>Cube 3: Move in a figure-8 pattern</li>
+        <li>Ensure all animations use time-based approach (THREE.Clock)</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Three cubes with distinct, smooth animation patterns.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Easing Showcase</h4>
+        <span class="time-estimate">⏱️ ~25 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Implement and compare different easing functions</p>
+      <ol class="exercise-steps">
+        <li>Create 4 spheres in a row</li>
+        <li>Implement: linear, ease-in, ease-out, ease-in-out</li>
+        <li>Make all spheres move 0 to 5 on X-axis over 2 seconds, looping</li>
+        <li>Observe how easing changes the feel of motion</li>
+        <li>Label each sphere with console.log to identify easing type</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Hint</summary>
+        <p>Use <code>(elapsedTime % duration) / duration</code> to get 0-1 progress that loops.</p>
+      </details>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Interactive Animation</h4>
+        <span class="time-estimate">⏱️ ~25 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create animation that responds to user input</p>
+      <ol class="exercise-steps">
+        <li>Create a cube</li>
+        <li>On mouse move, set a target rotation</li>
+        <li>Use lerp to smoothly rotate toward target</li>
+        <li>Add color change based on rotation amount</li>
+        <li>Make sure motion feels smooth and responsive</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Cube that smoothly follows mouse movement with color feedback.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>📖 Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/animation" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">Animation System — Three.js Manual</span>
+        <span class="resource-meta">Official guide to animation techniques</span>
+      </a>
+      <a class="resource-card" href="https://easings.net/" target="_blank" rel="noopener">
+        <span class="resource-type">🔗 Reference</span>
+        <span class="resource-title">Easing Functions Cheat Sheet</span>
+        <span class="resource-meta">easings.net — Visual reference for all easing types</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>🤔 Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Comprehension:</strong> Why is delta-time animation better than frame-based?</p>
+      <textarea placeholder="Think about what happens on devices with different refresh rates..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Application:</strong> How would you create a pendulum swing animation?</p>
+      <textarea placeholder="Which math function would you use? What properties would you animate?"></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Connection:</strong> How do easing functions make animations feel more natural?</p>
+      <textarea placeholder="Think about how real-world objects move — do they start and stop instantly?"></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Critical Thinking:</strong> When would you use <code>getElapsedTime()</code> vs <code>getDelta()</code>?</p>
+      <textarea placeholder="Consider repeating patterns vs incremental movement..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt"><strong>Personal:</strong> What animations will you use in your AI portfolio?</p>
+      <textarea placeholder="Floating elements, smooth transitions, interactive motion..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>➡️ Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="09-loading-models.html">Day 9: Advanced Animation with Tweening</a> — Learn GSAP library for complex animation sequences.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can use THREE.Clock for time-based animation</label>
+      <label><input type="checkbox"> I can create oscillating motion with Math.sin/cos</label>
+      <label><input type="checkbox"> I can implement basic easing functions</label>
+      <label><input type="checkbox"> I can animate position, rotation, and scale</label>
+      <label><input type="checkbox"> I understand delta time vs elapsed time</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#c4825a"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="18" font-weight="700">AI-to-3D Pipeline</text>
+
+  <!-- Box 1: User Input -->
+  <rect x="10" y="70" width="105" height="50" rx="6" fill="#c4825a" stroke="#c4825a" stroke-width="2"/>
+  <text x="62" y="100" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="600">User Input</text>
+
+  <!-- Arrow 1 -->
+  <line x1="115" y1="95" x2="137" y2="95" stroke="#c4825a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Box 2: Prompt Template -->
+  <rect x="147" y="70" width="115" height="50" rx="6" fill="#ffffff" stroke="#e8e0d8" stroke-width="2"/>
+  <text x="204" y="93" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Prompt</text>
+  <text x="204" y="107" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Template</text>
+
+  <!-- Arrow 2 -->
+  <line x1="262" y1="95" x2="284" y2="95" stroke="#c4825a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Box 3: Claude API -->
+  <rect x="294" y="70" width="105" height="50" rx="6" fill="#ffffff" stroke="#c4825a" stroke-width="2"/>
+  <text x="346" y="100" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Claude API</text>
+
+  <!-- Arrow 3 -->
+  <line x1="399" y1="95" x2="421" y2="95" stroke="#c4825a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Box 4: JSON Parser -->
+  <rect x="431" y="70" width="105" height="50" rx="6" fill="#ffffff" stroke="#e8e0d8" stroke-width="2"/>
+  <text x="483" y="100" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="12" font-weight="600">JSON Parser</text>
+
+  <!-- Arrow 4 -->
+  <line x1="536" y1="95" x2="558" y2="95" stroke="#c4825a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Box 5: SceneBuilder -->
+  <rect x="568" y="70" width="105" height="50" rx="6" fill="#ffffff" stroke="#e8e0d8" stroke-width="2"/>
+  <text x="620" y="100" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="12" font-weight="600">SceneBuilder</text>
+
+  <!-- Arrow 5 -->
+  <line x1="673" y1="95" x2="695" y2="95" stroke="#c4825a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Box 6: 3D Scene -->
+  <rect x="705" y="70" width="85" height="50" rx="6" fill="#c4825a" stroke="#c4825a" stroke-width="2"/>
+  <text x="747" y="100" text-anchor="middle" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="600">3D Scene</text>
+
+  <!-- Annotations -->
+  <text x="62" y="145" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="10" opacity="0.6">Natural Language</text>
+  <text x="346" y="145" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="10" opacity="0.6">LLM Processing</text>
+  <text x="620" y="145" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="10" opacity="0.6">Three.js Builder</text>
+  <text x="747" y="145" text-anchor="middle" fill="#2c2420" font-family="system-ui, sans-serif" font-size="10" opacity="0.6">WebGL Output</text>
+</svg>

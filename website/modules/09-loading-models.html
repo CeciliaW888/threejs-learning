@@ -1,0 +1,572 @@
+<section class="day-content" data-day="9">
+  <h2>Day 9: Loading & Using 3D Models (GLTF/GLB Format)</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>🎯 Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Understand the GLTF/GLB file format and why it's the "JPEG of 3D"</li>
+      <li data-objective="2">Load external 3D models into a Three.js scene using GLTFLoader</li>
+      <li data-objective="3">Navigate model structure (scenes, meshes, animations)</li>
+      <li data-objective="4">Position, scale, and rotate loaded models</li>
+      <li data-objective="5">Find and use free 3D models from online repositories</li>
+    </ul>
+    <div class="difficulty-badge">🟡 Intermediate</div>
+    <div class="time-estimate">⏱️ ~1 hour (25 min reading + 35 min hands-on)</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>📚 Core Concepts</h3>
+
+    <h4>Why Load External Models?</h4>
+    <p>So far, you've built 3D objects with code — boxes, spheres, torus knots. That's great for learning, but real-world 3D applications use models created in tools like Blender, Maya, or Cinema 4D. These models have far more detail than what you'd want to write by hand: intricate meshes, baked textures, animation rigs, and complex material setups.</p>
+    <p>For our AI portfolio, we'll need models to make the scene look professional. Think of it like web development: you don't draw every icon pixel-by-pixel — you use SVG files. Similarly, you load 3D models rather than coding every vertex.</p>
+
+    <h4>The GLTF Format</h4>
+    <p><strong>glTF</strong> (GL Transmission Format) is the standard file format for 3D on the web, maintained by the Khronos Group (the same people behind WebGL and OpenGL). It's often called the "JPEG of 3D" because it's designed to be efficient, compact, and universally supported.</p>
+
+    <p><strong>Two variants:</strong></p>
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Format</th>
+          <th>Extension</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>glTF</strong></td>
+          <td><code>.gltf</code> + <code>.bin</code> + textures</td>
+          <td>Separate files — JSON descriptor, binary geometry data, and image textures. Good for debugging.</td>
+        </tr>
+        <tr>
+          <td><strong>GLB</strong></td>
+          <td><code>.glb</code></td>
+          <td>Single binary file containing everything. Smaller, faster to load. Best for production.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>What's inside a GLTF file:</strong></p>
+    <ul>
+      <li><strong>Meshes</strong>: The 3D geometry (vertices, faces)</li>
+      <li><strong>Materials</strong>: Surface appearance (colors, textures, PBR properties)</li>
+      <li><strong>Textures</strong>: Image files mapped onto surfaces</li>
+      <li><strong>Animations</strong>: Keyframe data for movement</li>
+      <li><strong>Scene hierarchy</strong>: Parent-child relationships between objects</li>
+      <li><strong>Cameras & Lights</strong>: Optional scene configuration</li>
+    </ul>
+
+    <h4>GLTFLoader: Your Model Loading Tool</h4>
+    <p>Three.js provides <code>GLTFLoader</code> as an addon (not part of the core library). When you load a GLTF file, it returns a structured object containing the entire scene graph.</p>
+
+    <pre><code class="language-javascript">import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+const loader = new GLTFLoader();
+loader.load(
+    '/models/my-model.glb',     // Path to model
+    (gltf) => {                  // Success callback
+        scene.add(gltf.scene);   // Add to your scene
+    },
+    (progress) => {              // Progress callback
+        console.log(`${(progress.loaded / progress.total * 100)}% loaded`);
+    },
+    (error) => {                 // Error callback
+        console.error('Model loading failed:', error);
+    }
+);</code></pre>
+
+    <div class="callout-box" data-type="concept">
+      <div class="callout-icon">📦</div>
+      <div class="callout-content">
+        <strong>The Loaded GLTF Object Structure</strong>
+        <ul>
+          <li><code>gltf.scene</code> — The root <code>THREE.Group</code> containing all meshes</li>
+          <li><code>gltf.scenes</code> — Array of all scenes in the file</li>
+          <li><code>gltf.animations</code> — Array of <code>THREE.AnimationClip</code> objects</li>
+          <li><code>gltf.cameras</code> — Array of cameras defined in the file</li>
+          <li><code>gltf.asset</code> — Metadata (version, generator, copyright)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>DRACOLoader: Compressed Models</h4>
+    <p>For large models, DRACO compression can reduce file sizes by 90%+. Three.js supports this through <code>DRACOLoader</code>:</p>
+
+    <pre><code class="language-javascript">import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('/draco/');  // Path to DRACO decoder files
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);</code></pre>
+
+    <h4>Where to Find Free 3D Models</h4>
+    <table class="info-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>URL</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Sketchfab</strong></td>
+          <td>sketchfab.com</td>
+          <td>Huge library, filter by "downloadable"</td>
+        </tr>
+        <tr>
+          <td><strong>Poly Pizza</strong></td>
+          <td>poly.pizza</td>
+          <td>Simple low-poly models, great for web</td>
+        </tr>
+        <tr>
+          <td><strong>Kenney</strong></td>
+          <td>kenney.nl</td>
+          <td>Game-ready asset packs, CC0 license</td>
+        </tr>
+        <tr>
+          <td><strong>Three.js Examples</strong></td>
+          <td>github.com/mrdoob/three.js/tree/dev/examples/models</td>
+          <td>Official example models</td>
+        </tr>
+        <tr>
+          <td><strong>glTF Sample Models</strong></td>
+          <td>github.com/KhronosGroup/glTF-Sample-Models</td>
+          <td>Reference models for testing</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <strong>Key Insight</strong>
+        <p>Always check model licenses before using them in your portfolio. CC0 and CC-BY are safest. GLB format loads fastest on the web — prefer it over separate .gltf files.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>🔑 Key Terminology</h3>
+
+    <!-- Flashcard Set -->
+    <div class="flashcard-set" data-set="day9-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front">
+          <dt>GLTF</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>GL Transmission Format — standard 3D file format for web. <code>.gltf</code> (JSON) + <code>.bin</code> (data).</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front">
+          <dt>GLB</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Binary GLTF — single-file variant. <code>model.glb</code> (all-in-one). Smaller and faster to load than separate .gltf files.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front">
+          <dt>GLTFLoader</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Three.js addon for loading GLTF/GLB files. Usage: <code>new GLTFLoader()</code>. Returns a structured object with scene, animations, and metadata.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front">
+          <dt>DRACOLoader</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Decoder for DRACO-compressed meshes. Can achieve 90%+ file size reduction for large 3D models.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front">
+          <dt>Scene Graph</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Tree structure of parent-child 3D objects. <code>gltf.scene</code> contains child meshes arranged hierarchically.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front">
+          <dt>Animation Clip</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Recorded animation data from the model. Includes walk cycles, idle animations, and other keyframe sequences.</dd>
+        </div>
+      </div>
+      <div class="flashcard" data-card="7">
+        <div class="flashcard-front">
+          <dt>Asset Pipeline</dt>
+        </div>
+        <div class="flashcard-back">
+          <dd>Process of getting models from creation to web. Blender → Export GLB → Load in Three.js.</dd>
+        </div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">←</button>
+      <span class="flashcard-counter">1 / 7</span>
+      <button class="flashcard-next" aria-label="Next card">→</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>💻 Code Examples</h3>
+
+    <!-- Code Block 1: Basic Model Loading -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">basic-model-loading.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+// Scene setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Lighting (models need light to be visible!)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 10, 5);
+scene.add(directionalLight);
+
+// Load model
+const loader = new GLTFLoader();
+loader.load('/models/robot.glb', (gltf) => {
+    const model = gltf.scene;
+
+    // Adjust model transform
+    model.position.set(0, 0, 0);
+    model.scale.set(1, 1, 1);  // Adjust if model is too big/small
+
+    scene.add(model);
+    console.log('Model loaded!', model);
+});
+
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+}
+animate();</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We import GLTFLoader, create an instance, and use <code>.load()</code> to asynchronously fetch the model. Once loaded, <code>gltf.scene</code> is a standard Three.js Group that we add to our scene. Lighting is essential — without it, PBR materials on the model will appear black.
+      </div>
+    </div>
+
+    <!-- Code/English Translation Block -->
+    <div class="code-translate" data-example="model-loading">
+      <h4>📖 Model Loading in Plain English</h4>
+      <div class="translate-grid">
+        <div class="translate-row">
+          <div class="translate-code"><code>new GLTFLoader()</code></div>
+          <div class="translate-english">"Create a tool that knows how to read GLTF/GLB 3D model files"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>loader.load('/models/robot.glb', callback)</code></div>
+          <div class="translate-english">"Fetch this model file from the server, and when it arrives, run this function"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>gltf.scene</code></div>
+          <div class="translate-english">"The root container holding all the 3D objects that were inside the model file"</div>
+        </div>
+        <div class="translate-row">
+          <div class="translate-code"><code>model.traverse((child) => { ... })</code></div>
+          <div class="translate-english">"Walk through every single object inside this model, one by one"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Block 2: Exploring Model Structure -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">exploring-model-structure.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">loader.load('/models/character.glb', (gltf) => {
+    const model = gltf.scene;
+
+    // Traverse all objects in the model
+    model.traverse((child) => {
+        console.log(child.name, child.type);
+
+        // Find meshes specifically
+        if (child.isMesh) {
+            console.log('  Material:', child.material.name);
+            console.log('  Vertices:', child.geometry.attributes.position.count);
+
+            // Enable shadows on all meshes
+            child.castShadow = true;
+            child.receiveShadow = true;
+        }
+    });
+
+    // Access specific parts by name
+    const head = model.getObjectByName('Head');
+    if (head) {
+        head.material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    }
+
+    scene.add(model);
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> <code>traverse()</code> walks through every object in the model's hierarchy. This lets you enable shadows on all meshes, swap materials, or find specific named parts. Model parts are named by the 3D artist in their modeling software.
+      </div>
+    </div>
+
+    <!-- Code Block 3: Loading with Progress & Error Handling -->
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">loading-manager.js</span>
+        <span class="badge">Working Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre><code class="language-javascript">// Loading manager for tracking multiple models
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onStart = () => {
+    console.log('Loading started');
+    document.getElementById('loading').style.display = 'flex';
+};
+
+loadingManager.onProgress = (url, loaded, total) => {
+    const progress = (loaded / total) * 100;
+    document.getElementById('progress').textContent = `${Math.round(progress)}%`;
+};
+
+loadingManager.onLoad = () => {
+    console.log('All assets loaded');
+    document.getElementById('loading').style.display = 'none';
+};
+
+loadingManager.onError = (url) => {
+    console.error('Failed to load:', url);
+};
+
+const loader = new GLTFLoader(loadingManager);
+
+// Load multiple models
+const modelPaths = ['/models/desk.glb', '/models/laptop.glb', '/models/plant.glb'];
+
+modelPaths.forEach((path) => {
+    loader.load(path, (gltf) => {
+        scene.add(gltf.scene);
+    });
+});</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> <code>THREE.LoadingManager</code> tracks progress across multiple assets. This is essential for showing loading screens — users shouldn't see a blank screen while models download. The progress callback fires as each asset completes.
+      </div>
+      <div class="try-it">
+        💡 <strong>Try it:</strong> Download a free model from Poly Pizza (poly.pizza), put the .glb file in your project's <code>public/models/</code> folder, and load it into your scene.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>✏️ Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Load Your First Model</h4>
+        <span class="time-estimate">⏱️ ~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Successfully load an external 3D model into your scene</p>
+      <ol class="exercise-steps">
+        <li>Download a free GLB model from <a href="https://poly.pizza" target="_blank" rel="noopener">poly.pizza</a> (search "robot" or "desk")</li>
+        <li>Create a <code>public/models/</code> folder in your project</li>
+        <li>Place the <code>.glb</code> file inside</li>
+        <li>Use GLTFLoader to load it into your scene</li>
+        <li>Add appropriate lighting (ambient + directional)</li>
+        <li>Add OrbitControls to inspect the model</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A 3D model visible in your browser that you can orbit around with the mouse.</p>
+      <p><strong>Stretch Goal:</strong> Load 3 different models and position them like a room.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Model Inspector</h4>
+        <span class="time-estimate">⏱️ ~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Explore and modify a loaded model's properties</p>
+      <ol class="exercise-steps">
+        <li>Load any GLTF model</li>
+        <li>Use <code>traverse()</code> to log all object names and types</li>
+        <li>Find a specific mesh by name and change its material color</li>
+        <li>Enable shadow casting on all meshes</li>
+        <li>Scale the model to fit nicely in a 10x10x10 bounding box</li>
+      </ol>
+      <details class="exercise-hints">
+        <summary>Need a hint?</summary>
+        <p>To auto-scale a model: compute its bounding box with <code>new THREE.Box3().setFromObject(model)</code>, get the size, then scale by <code>desiredSize / maxDimension</code>.</p>
+      </details>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Portfolio Scene Setup</h4>
+        <span class="time-estimate">⏱️ ~25 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Create the foundation for your portfolio's 3D scene</p>
+      <ol class="exercise-steps">
+        <li>Load a desk/workspace model (or create a simple one with primitives)</li>
+        <li>Add a floor plane with a grid material</li>
+        <li>Position the camera for a nice default view</li>
+        <li>Add a loading progress indicator (HTML overlay)</li>
+        <li>Handle loading errors gracefully with a fallback message</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A workspace scene with smooth loading experience and error handling.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>📖 Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/load-gltf" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">Loading 3D Models — Three.js Manual</span>
+        <span class="resource-meta">~10 min read — Official guide covering GLTF loading patterns and best practices</span>
+      </a>
+      <a class="resource-card" href="https://threejs.org/docs/#examples/en/loaders/GLTFLoader" target="_blank" rel="noopener">
+        <span class="resource-type">📄 Docs</span>
+        <span class="resource-title">GLTFLoader Documentation</span>
+        <span class="resource-meta">Three.js — API reference for all GLTFLoader options</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=yPA2z7fl4J8" target="_blank" rel="noopener">
+        <span class="resource-type">🎥 Video</span>
+        <span class="resource-title">How to Load a 3D model in Three.js — Knightcube 3D</span>
+        <span class="resource-meta">Clear walkthrough of GLTF vs GLB and loading process</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=WBe3xrV4CPM" target="_blank" rel="noopener">
+        <span class="resource-type">🎥 Video</span>
+        <span class="resource-title">Three.js Importing Models Tutorial — Suboptimal Engineer</span>
+        <span class="resource-meta">Comprehensive guide covering model import, positioning, and common issues</span>
+      </a>
+      <a class="resource-card" href="https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html" target="_blank" rel="noopener">
+        <span class="resource-type">🔗 Deep Dive</span>
+        <span class="resource-title">glTF 2.0 Specification — Khronos Group</span>
+        <span class="resource-meta">Optional — Understand what's actually inside a GLTF file</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>🤔 Reflection Questions</h3>
+
+    <!-- Quiz -->
+    <div class="quiz" data-quiz="day9">
+      <div class="quiz-question" data-question="1">
+        <p><strong>Q1:</strong> What's the difference between .gltf and .glb formats? When would you use each?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q1" value="a"> .gltf is newer and always better than .glb</label>
+          <label><input type="radio" name="q1" value="b" data-correct> .gltf uses separate files (JSON + binary + textures) for debugging; .glb bundles everything into one binary file for production</label>
+          <label><input type="radio" name="q1" value="c"> .glb only supports meshes, while .gltf supports animations too</label>
+          <label><input type="radio" name="q1" value="d"> They are identical — the extension doesn't matter</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! .gltf splits data into separate files which is easier to debug and inspect, while .glb packs everything into a single binary — smaller and faster for production use.</p>
+          <p class="incorrect-feedback">❌ .gltf uses separate files (JSON descriptor + .bin data + image textures) which is great for debugging. .glb bundles everything into one binary file, making it smaller and faster to load in production.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="2">
+        <p><strong>Q2:</strong> How would you handle loading a large model (50MB+) without making users wait on a blank screen?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q2" value="a"> Just load it — users will wait</label>
+          <label><input type="radio" name="q2" value="b"> Split it into 50 tiny files</label>
+          <label><input type="radio" name="q2" value="c" data-correct> Use LoadingManager with a progress indicator, and consider DRACO compression to reduce file size</label>
+          <label><input type="radio" name="q2" value="d"> Embed the model data directly in JavaScript</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! THREE.LoadingManager lets you show progress updates, and DRACO compression can reduce file sizes by 90%+. Together they create a smooth loading experience.</p>
+          <p class="incorrect-feedback">❌ The best approach is using THREE.LoadingManager to display loading progress, combined with DRACO compression to significantly reduce the file size users need to download.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="3">
+        <p><strong>Q3:</strong> How does a loaded model's scene graph relate to the Three.js scene graph?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q3" value="a"> They are separate systems that don't interact</label>
+          <label><input type="radio" name="q3" value="b"> The model replaces the existing scene graph</label>
+          <label><input type="radio" name="q3" value="c" data-correct> gltf.scene is a standard THREE.Group that gets added as a child of your scene — it becomes part of the same hierarchy</label>
+          <label><input type="radio" name="q3" value="d"> You need to manually convert each mesh before adding it</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! The loaded model's scene is just a THREE.Group — once you call <code>scene.add(gltf.scene)</code>, all its children become part of your scene's hierarchy, just like any object you create in code.</p>
+          <p class="incorrect-feedback">❌ <code>gltf.scene</code> is a standard THREE.Group containing the model's meshes. When you add it to your scene, it becomes part of the same parent-child hierarchy — no conversion needed.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question" data-question="4">
+        <p><strong>Q4:</strong> What could go wrong when loading a model created in Blender into Three.js? How would you debug it?</p>
+        <div class="quiz-options">
+          <label><input type="radio" name="q4" value="a"> Nothing — Blender exports work perfectly every time</label>
+          <label><input type="radio" name="q4" value="b" data-correct> Scale issues, missing textures, black materials (no lights), or wrong axis orientation — use traverse() and console.log to inspect</label>
+          <label><input type="radio" name="q4" value="c"> Three.js can't load Blender files</label>
+          <label><input type="radio" name="q4" value="d"> You need a special Blender plugin that costs money</label>
+        </div>
+        <div class="quiz-feedback" hidden>
+          <p class="correct-feedback">✅ Correct! Common issues include scale mismatches, missing texture paths, materials appearing black without proper lighting, and Y/Z axis differences. Using <code>traverse()</code> to inspect the model hierarchy is the best debugging tool.</p>
+          <p class="incorrect-feedback">❌ Common issues include: models being too big/small (scale), materials appearing black (missing lights), textures not loading (wrong paths), and axis orientation differences. Use <code>traverse()</code> to log and inspect the model's structure.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What kind of 3D models would best represent your skills and projects in a portfolio?</p>
+      <textarea placeholder="Think about: desk setups, floating objects, abstract shapes, themed environments..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>➡️ Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="10-shadows-lighting.html">Day 10: Shadows & Realistic Lighting</a> — Make your models and scenes look professional with advanced lighting and shadow techniques.</p>
+    <p>Now that you can load external models, tomorrow we'll make them look great. Professional 3D scenes rely on careful lighting and shadow configuration — the same model can look amateur or stunning depending on how it's lit.</p>
+    <div class="checklist">
+      <label><input type="checkbox"> I can load a GLTF/GLB model into a Three.js scene</label>
+      <label><input type="checkbox"> I can navigate the loaded model's structure with traverse()</label>
+      <label><input type="checkbox"> I can adjust position, scale, and rotation of loaded models</label>
+      <label><input type="checkbox"> I can set up a loading progress indicator</label>
+      <label><input type="checkbox"> I know where to find free 3D models online</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

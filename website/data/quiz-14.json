@@ -1,0 +1,35 @@
+[
+  {
+    "question": "In a text-to-3D generator mini project, what is 'template matching'?",
+    "options": [
+      "Finding duplicate textures in a scene",
+      "Comparing rendered output to a reference image",
+      "Matching geometry vertices to UV coordinates",
+      "Matching user input to pre-defined scene templates or patterns"
+    ],
+    "answer": 3,
+    "explanation": "Template matching maps user descriptions to pre-built scene templates or patterns, providing reliable results for common requests without needing full LLM parsing."
+  },
+  {
+    "question": "Why is it useful to combine template matching with LLM-based generation?",
+    "options": [
+      "Templates handle common cases reliably while LLMs handle creative or unusual requests",
+      "Templates are always better than LLMs",
+      "LLMs cannot generate 3D scenes at all",
+      "Templates reduce the number of lights needed"
+    ],
+    "answer": 0,
+    "explanation": "Templates provide fast, reliable results for common scenes. LLMs handle novel or complex requests. Together they balance reliability with flexibility."
+  },
+  {
+    "question": "What should happen in the UI when the 3D generation process takes time?",
+    "options": [
+      "The page should freeze until complete",
+      "Show a loading indicator so the user knows the system is working",
+      "Automatically refresh the browser",
+      "Hide the 3D canvas entirely"
+    ],
+    "answer": 1,
+    "explanation": "Showing a loading indicator or progress feedback keeps the user informed and prevents them from thinking the application has crashed."
+  }
+]

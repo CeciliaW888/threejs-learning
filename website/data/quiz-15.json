@@ -1,0 +1,35 @@
+[
+  {
+    "question": "Why should API keys never be included in frontend/client-side code?",
+    "options": [
+      "They slow down the browser",
+      "They conflict with JavaScript syntax",
+      "Anyone can view the source code and steal the keys",
+      "They make the page load slower"
+    ],
+    "answer": 2,
+    "explanation": "Client-side code is visible to anyone using the browser. Exposed API keys can be stolen and used to make unauthorized requests at your expense."
+  },
+  {
+    "question": "What is 'rate limiting' in the context of LLM APIs?",
+    "options": [
+      "Limiting the size of the 3D scene",
+      "Controlling the speed of animations",
+      "Limiting the number of users on a website",
+      "Restrictions on how many API requests you can make in a given time period"
+    ],
+    "answer": 3,
+    "explanation": "Rate limits restrict how many requests you can send to an API per minute/hour, preventing abuse and managing costs. Exceeding them returns error responses."
+  },
+  {
+    "question": "What is 'structured output' when working with LLM APIs?",
+    "options": [
+      "Requesting the LLM to respond in a specific format like JSON with defined fields",
+      "Output formatted as plain text paragraphs",
+      "Compressing the API response",
+      "Streaming the response word by word"
+    ],
+    "answer": 0,
+    "explanation": "Structured output means instructing the LLM to return data in a predictable format (like JSON with specific keys), making it easier to parse programmatically."
+  }
+]

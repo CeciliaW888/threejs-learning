@@ -1,0 +1,428 @@
+<section class="day-content" data-day="21">
+  <h2>Day 21: Final Project &mdash; AI Portfolio Generator</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Build a complete AI-powered 3D portfolio from scratch</li>
+      <li data-objective="2">Integrate all 20 days of learning into one cohesive project</li>
+      <li data-objective="3">Create a portfolio that showcases your skills through AI-generated 3D scenes</li>
+      <li data-objective="4">Add portfolio-specific features: project showcases, about section, contact</li>
+      <li data-objective="5">Polish the user experience and prepare for real-world use</li>
+    </ul>
+    <div class="difficulty-badge">Advanced</div>
+    <div class="time-estimate">2-3 hours</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Project Requirements</h3>
+
+    <h4>What We're Building</h4>
+    <p>An AI-powered 3D portfolio where:</p>
+    <ol>
+      <li><strong>Landing Scene</strong> &mdash; User arrives at a personalized 3D workspace that represents YOU</li>
+      <li><strong>Conversational Interface</strong> &mdash; Chat with AI to explore your portfolio</li>
+      <li><strong>Project Showcases</strong> &mdash; 3D representations of your projects (e.g., "show me your React work")</li>
+      <li><strong>Dynamic Scenes</strong> &mdash; AI generates different scenes based on what the user wants to see</li>
+      <li><strong>About/Contact</strong> &mdash; AI-driven storytelling of your background and skills</li>
+    </ol>
+
+    <h4>Core Features Checklist</h4>
+
+    <div class="step-cards">
+      <div class="step-card" data-step="1">
+        <div class="step-number">3D</div>
+        <div class="step-content">
+          <strong>Scene Generation (Week 1-2)</strong>
+          <p>Three.js scene with lighting, materials, shadows. Load 3D models (optional: your logo, custom objects). Performance optimized (60fps, &lt;500 draw calls). Responsive (works on desktop + mobile).</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-number">AI</div>
+        <div class="step-content">
+          <strong>AI Integration (Week 3)</strong>
+          <p>Claude/OpenAI API integration via serverless function. Conversational scene modification. Memory of user preferences and conversation history. Chain-of-thought scene generation.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-number">Content</div>
+        <div class="step-content">
+          <strong>Portfolio Content</strong>
+          <p>User profile with skills, projects, bio. Project database (3-5 real projects). AI generates scenes representing each project. Contact information accessible.</p>
+        </div>
+      </div>
+      <div class="step-card" data-step="4">
+        <div class="step-number">Polish</div>
+        <div class="step-content">
+          <strong>Polish</strong>
+          <p>Loading states, error handling. Smooth scene transitions. UI/UX: clean input, readable text. Analytics (optional: track popular scenes).</p>
+        </div>
+      </div>
+    </div>
+
+    <h4>Architecture Overview</h4>
+
+    <pre><code class="language-javascript">// Architecture Layers:
+//
+// USER INTERFACE
+//   - Chat Input
+//   - 3D Canvas (Three.js)
+//   - Project Menu
+//   - Loading States
+//         |
+//         +--&gt; Text Input --&gt; Intent Classifier
+//                                  |
+//                  "Show project X" --&gt; Load Project Scene
+//                  "About you"     --&gt; Bio Scene
+//                  "Modify scene"  --&gt; Scene Modifier
+//                  Custom request  --&gt; AI Generator
+//
+// AI LAYER
+//   - Conversation Manager (memory)
+//   - Intent Classifier
+//   - Scene Generator (Claude API)
+//   - User Profile Context
+//
+// 3D LAYER
+//   - SceneBuilder (JSON --&gt; Three.js)
+//   - Scene Transition Manager
+//   - Portfolio Content Database
+//   - Camera Controller</code></pre>
+
+    <h4>Project Showcase Scenes</h4>
+    <p>When the user says "show me your React projects," generate a scene representing that work:</p>
+
+    <pre><code class="language-javascript">const projectScenes = {
+    "react-chat-app": {
+        theme: "communication, real-time",
+        objects: [
+            // Chat bubbles floating in space
+            { name: "bubble-1", geometry: "sphere", material: { color: "#4488ff" } },
+            // Desktop with React logo
+            { name: "laptop", geometry: "box" },
+            // Animated particles representing messages
+            { name: "particles" }
+        ],
+        description: "Real-time chat app with WebSocket, React hooks, and TypeScript"
+    },
+    "3d-product-configurator": {
+        theme: "customization, e-commerce",
+        objects: [
+            // Product on pedestal
+            { name: "product", geometry: "torus", material: { metalness: 0.9 } },
+            // Color swatches
+            // Interactive UI elements
+        ],
+        description: "Three.js product configurator with 50+ customization options"
+    }
+};</code></pre>
+
+    <p>AI generates scenes that visually represent the nature of each project.</p>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Complete Feature Breakdown</h3>
+
+    <h4>1. Landing Experience</h4>
+    <p><strong>First visit:</strong> A 3D workspace scene fades in. The AI greets the user: "Hi! I'm an AI-powered portfolio. Ask me about your projects, skills, or tell me what kind of scene you'd like to see."</p>
+    <p>Users can type natural language requests, click pre-made prompts ("Show me React projects", "Tell me about you"), or explore the 3D scene with the mouse.</p>
+
+    <h4>2. Intent Classification</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">intent-classifier.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">function classifyIntent(userInput) {
+    const input = userInput.toLowerCase();
+
+    if (input.includes('project') || input.includes('work')) {
+        return { intent: 'show-projects', extract: extractProjectKeywords(input) };
+    }
+    if (input.includes('about') || input.includes('who')) {
+        return { intent: 'show-bio' };
+    }
+    if (input.includes('contact') || input.includes('email')) {
+        return { intent: 'show-contact' };
+    }
+    if (input.includes('skill') || input.includes('tech')) {
+        return { intent: 'show-skills' };
+    }
+    if (input.includes('add') || input.includes('change') || input.includes('remove')) {
+        return { intent: 'modify-scene', modification: input };
+    }
+
+    return { intent: 'generate-custom', prompt: input };
+}</code></pre>
+    </div>
+
+    <h4>3. Portfolio Database</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">portfolio-data.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">const portfolioData = {
+    name: "Your Name",
+    role: "Creative Developer",
+    bio: "I build interactive experiences with Three.js, React, and AI...",
+    skills: ["Three.js", "React", "Claude API", "WebGL", "TypeScript"],
+    projects: [
+        {
+            id: "project-1",
+            name: "AI Chat Interface",
+            tech: ["React", "Claude API", "WebSocket"],
+            description: "...",
+            sceneTheme: "communication, real-time interaction",
+            link: "https://github.com/..."
+        },
+        // ... more projects
+    ],
+    contact: {
+        email: "you@example.com",
+        github: "github.com/yourname",
+        linkedin: "linkedin.com/in/yourname"
+    }
+};</code></pre>
+    </div>
+
+    <h4>4. Dynamic Scene Router</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">scene-router.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">async function handleUserInput(input) {
+    const { intent, ...data } = classifyIntent(input);
+
+    switch (intent) {
+        case 'show-projects':
+            const projects = filterProjects(data.extract);
+            await showProjectShowcase(projects);
+            break;
+        case 'show-bio':
+            await showBioScene();
+            break;
+        case 'show-contact':
+            await showContactScene();
+            break;
+        case 'modify-scene':
+            await modifyCurrentScene(data.modification);
+            break;
+        case 'generate-custom':
+            await generateCustomScene(data.prompt);
+            break;
+    }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples (used for architecture reference above) -->
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Final Project Tasks</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Phase 1: Setup &amp; Structure</h4>
+        <span class="time-estimate">~30 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Scaffold the project</p>
+      <ol class="exercise-steps">
+        <li>Create project repository</li>
+        <li>Set up Vite + Three.js + AI integration</li>
+        <li>Create folder structure: <code>/src/components</code>, <code>/src/ai</code>, <code>/src/scenes</code>, <code>/api</code></li>
+        <li>Configure environment variables</li>
+        <li>Deploy initial version to Vercel</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Phase 2: Portfolio Content</h4>
+        <span class="time-estimate">~45 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Define your portfolio data and scene templates</p>
+      <ol class="exercise-steps">
+        <li>Define your <code>portfolioData</code> object (bio, skills, 3-5 projects)</li>
+        <li>Create user profile for AI context</li>
+        <li>Design 3-5 pre-made scene templates for projects</li>
+        <li>Write welcome message and sample prompts</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Phase 3: AI Integration</h4>
+        <span class="time-estimate">~60 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Connect all AI features</p>
+      <ol class="exercise-steps">
+        <li>Set up serverless API endpoint</li>
+        <li>Implement intent classification</li>
+        <li>Connect Claude API with conversation memory</li>
+        <li>Add project-specific scene generation</li>
+        <li>Test all intent paths</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="4">
+      <div class="exercise-header">
+        <h4>Phase 4: Polish &amp; Testing</h4>
+        <span class="time-estimate">~45 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Production-quality user experience</p>
+      <ol class="exercise-steps">
+        <li>Add loading states and error handling</li>
+        <li>Implement scene transitions</li>
+        <li>Responsive design (test on mobile)</li>
+        <li>Performance audit (60fps target)</li>
+        <li>Test all features end-to-end</li>
+      </ol>
+    </div>
+
+    <div class="exercise-card" data-exercise="5">
+      <div class="exercise-header">
+        <h4>Phase 5: Deployment</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Ship it!</p>
+      <ol class="exercise-steps">
+        <li>Final deployment to production</li>
+        <li>Test on multiple devices/browsers</li>
+        <li>Share with 3-5 people for feedback</li>
+        <li>Add analytics (optional)</li>
+        <li>Create README with project description</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Stretch Goals &amp; Resources</h3>
+
+    <h4>Stretch Goals</h4>
+    <p>If you finish early, try adding:</p>
+    <ul>
+      <li><strong>Voice Input</strong> &mdash; Use Web Speech API for voice commands</li>
+      <li><strong>Share Scenes</strong> &mdash; Generate shareable URLs for specific scenes</li>
+      <li><strong>Project Gallery</strong> &mdash; Grid view of all projects before diving in</li>
+      <li><strong>Easter Eggs</strong> &mdash; Hidden scenes or interactions</li>
+      <li><strong>Multi-language</strong> &mdash; Support English + your native language</li>
+      <li><strong>Animations</strong> &mdash; Animated project transitions</li>
+      <li><strong>Music</strong> &mdash; Background ambient sound (toggle on/off)</li>
+      <li><strong>VR Mode</strong> &mdash; WebXR support for VR headsets</li>
+    </ul>
+
+    <h4>Course Reference</h4>
+    <div class="resource-cards">
+      <a class="resource-card" href="01-intro-threejs.html">
+        <span class="resource-type">Review</span>
+        <span class="resource-title">Days 1-8: Three.js Fundamentals</span>
+        <span class="resource-meta">Scenes, geometries, materials, lighting, textures</span>
+      </a>
+      <a class="resource-card" href="14-mini-project.html">
+        <span class="resource-type">Review</span>
+        <span class="resource-title">Days 12-14: Prompt Engineering &amp; Scene Builder</span>
+        <span class="resource-meta">System prompts, few-shot learning, JSON scene generation</span>
+      </a>
+      <a class="resource-card" href="15-llm-apis.html">
+        <span class="resource-type">Review</span>
+        <span class="resource-title">Days 15-19: AI Integration &amp; Advanced Prompting</span>
+        <span class="resource-meta">API calls, streaming, memory, chain-of-thought</span>
+      </a>
+      <a class="resource-card" href="20-deployment.html">
+        <span class="resource-type">Review</span>
+        <span class="resource-title">Day 20: Deployment</span>
+        <span class="resource-meta">Vercel, serverless functions, production optimization</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Final Reflection</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What are you most proud of in this project?</p>
+      <textarea placeholder="Reflect on your biggest achievement from the course..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What was the hardest part of the course? What clicked for you?</p>
+      <textarea placeholder="Think about your learning journey from Day 1 to now..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How will you use these skills in your career?</p>
+      <textarea placeholder="Think about Three.js, AI integration, and full-stack deployment..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What will you build next with Three.js + AI?</p>
+      <textarea placeholder="Think about projects that excite you..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What would you add to this course?</p>
+      <textarea placeholder="Your feedback helps improve future versions..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Congratulations!</h3>
+
+    <p>You've completed the <strong>Three.js Learning Course</strong>!</p>
+
+    <h4>What You've Built</h4>
+    <ul>
+      <li>Full-stack 3D web application</li>
+      <li>AI-powered scene generation</li>
+      <li>Conversational interface with memory</li>
+      <li>Production-ready deployment</li>
+      <li>Complete personal portfolio</li>
+    </ul>
+
+    <h4>Skills Acquired</h4>
+    <ul>
+      <li>Three.js (scenes, lighting, materials, models, performance)</li>
+      <li>Prompt engineering (system prompts, few-shot, chain-of-thought)</li>
+      <li>LLM API integration (Claude/OpenAI)</li>
+      <li>Full-stack JavaScript (frontend + serverless)</li>
+      <li>Deployment &amp; production best practices</li>
+    </ul>
+
+    <h4>Recommended Next Steps</h4>
+    <ol>
+      <li>Share your portfolio URL in the course community</li>
+      <li>Add it to your resume/LinkedIn</li>
+      <li>Build 2-3 more projects to solidify learning</li>
+      <li>Contribute to open-source Three.js projects</li>
+      <li>Help others learn!</li>
+    </ol>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I built a complete AI-powered 3D portfolio</label>
+      <label><input type="checkbox"> I integrated all course concepts into one project</label>
+      <label><input type="checkbox"> I deployed my portfolio to production</label>
+      <label><input type="checkbox"> I tested on multiple devices</label>
+      <label><input type="checkbox"> I shared my portfolio for feedback</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

@@ -1,6 +1,6 @@
 {
-  "name": "Three.js + AI Portfolio Course",
-  "short_name": "3JS+AI",
+  "name": "Three.js Learning",
+  "short_name": "3JS",
   "description": "21-Day Course — Build an AI-powered 3D portfolio generator",
   "start_url": "./index.html",
   "display": "standalone",

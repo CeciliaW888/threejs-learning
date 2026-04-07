@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is the role of a SceneBuilder in a language-to-3D pipeline?",
+    "options": [
+      "It takes structured data (like JSON) and creates Three.js objects from it",
+      "It translates user text directly into WebGL shaders",
+      "It renders the final scene to an image file",
+      "It trains the LLM on 3D concepts"
+    ],
+    "answer": 0,
+    "explanation": "A SceneBuilder takes parsed, structured descriptions (geometry type, position, color, etc.) and creates corresponding Three.js meshes, lights, and other objects."
+  },
+  {
+    "question": "Why is defensive parsing important when processing LLM output for 3D scenes?",
+    "options": [
+      "LLMs always produce perfect JSON output",
+      "LLM output can be malformed or unexpected, so you need fallbacks and validation",
+      "It makes the 3D scene render faster",
+      "It prevents the user from entering invalid prompts"
+    ],
+    "answer": 1,
+    "explanation": "LLMs may produce malformed JSON, missing fields, or unexpected values. Defensive parsing adds validation, defaults, and error handling to keep the app stable."
+  },
+  {
+    "question": "What is 'geometry mapping' in the context of text-to-3D?",
+    "options": [
+      "Converting UV coordinates to world space",
+      "Merging multiple geometries into one",
+      "Translating text descriptions like 'ball' or 'cube' to specific Three.js geometry classes",
+      "Applying textures based on keywords"
+    ],
+    "answer": 2,
+    "explanation": "Geometry mapping converts natural language shape names (e.g., 'sphere', 'box') to their corresponding Three.js geometry constructors (SphereGeometry, BoxGeometry)."
+  }
+]

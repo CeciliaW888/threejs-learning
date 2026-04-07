@@ -1,0 +1,616 @@
+<section class="day-content" data-day="13">
+  <h2>Day 13: Mapping Natural Language to 3D Parameters</h2>
+
+  <!-- Navigation -->
+  <!-- 1. Learning Objectives -->
+  <div class="section objectives">
+    <h3>Learning Objectives</h3>
+    <ul class="objective-list">
+      <li data-objective="1">Build a JSON-to-Three.js scene renderer (the "scene builder")</li>
+      <li data-objective="2">Parse AI-generated scene descriptions into live 3D objects</li>
+      <li data-objective="3">Handle edge cases: missing fields, invalid values, unknown geometries</li>
+      <li data-objective="4">Create a mapping layer between natural language concepts and Three.js parameters</li>
+      <li data-objective="5">Test the full pipeline: text &rarr; JSON &rarr; 3D scene</li>
+    </ul>
+    <div class="difficulty-badge">Intermediate</div>
+    <div class="time-estimate">1 hour</div>
+  </div>
+
+  <!-- 2. Core Concepts -->
+  <div class="section concepts">
+    <h3>Core Concepts</h3>
+
+    <h4>The Translation Layer</h4>
+    <p>Yesterday you learned to prompt AI for structured JSON. Today you build the other half: code that reads that JSON and creates actual Three.js objects. Think of it as a translator between two languages:</p>
+
+    <pre><code class="language-javascript">Human English &rarr; [AI/Prompt] &rarr; JSON Schema &rarr; [Scene Builder] &rarr; Three.js Objects</code></pre>
+
+    <p>The scene builder is deterministic &mdash; given the same JSON, it always produces the same scene. This makes it testable and debuggable, separate from the unpredictable AI layer.</p>
+
+    <h4>Architecture: The Scene Builder</h4>
+
+    <pre><code class="language-javascript">class SceneBuilder {
+    constructor(scene) {
+        this.scene = scene;
+        this.objects = new Map();  // Track created objects by name
+    }
+
+    build(sceneData) {
+        this.clear();                          // Remove old objects
+        this.createObjects(sceneData.objects);  // Build meshes
+        this.createLights(sceneData.lights);    // Add lights
+        this.setupCamera(sceneData.camera);     // Position camera
+        this.setupEnvironment(sceneData.environment);
+    }
+
+    clear() { /* dispose and remove everything */ }
+}</code></pre>
+
+    <p>This separation of concerns is important. The AI generates data. The scene builder creates visuals. They don't know about each other &mdash; only the JSON schema connects them.</p>
+
+    <h4>Geometry Mapping</h4>
+    <p>Map string names to Three.js geometry constructors:</p>
+
+    <pre><code class="language-javascript">const geometryMap = {
+    'box':          (s) =&gt; new THREE.BoxGeometry(s[0], s[1], s[2]),
+    'sphere':       (s) =&gt; new THREE.SphereGeometry(s[0] * 0.5, 32, 32),
+    'cylinder':     (s) =&gt; new THREE.CylinderGeometry(s[0] * 0.5, s[0] * 0.5, s[1], 32),
+    'cone':         (s) =&gt; new THREE.ConeGeometry(s[0] * 0.5, s[1], 32),
+    'torus':        (s) =&gt; new THREE.TorusGeometry(s[0] * 0.5, s[0] * 0.15, 16, 48),
+    'plane':        (s) =&gt; new THREE.PlaneGeometry(s[0], s[2] || s[1]),
+    'icosahedron':  (s) =&gt; new THREE.IcosahedronGeometry(s[0] * 0.5, 1),
+};</code></pre>
+
+    <p>The function takes the scale array, so the AI doesn't need to know about Three.js constructor parameters &mdash; it just says "box" with a scale of [2, 1, 3] and the builder handles the rest.</p>
+
+    <h4>Defensive Parsing</h4>
+    <p>AI output can be messy. Your parser needs to handle:</p>
+    <ul>
+      <li><strong>Missing fields</strong>: Use sensible defaults</li>
+      <li><strong>Invalid geometry names</strong>: Fall back to a box</li>
+      <li><strong>Out-of-range values</strong>: Clamp to valid ranges</li>
+      <li><strong>Non-numeric values</strong>: Parse or default</li>
+      <li><strong>Extra fields</strong>: Ignore them (don't crash)</li>
+    </ul>
+
+    <pre><code class="language-javascript">function safeParseObject(data) {
+    return {
+        name: data.name || `object-${Date.now()}`,
+        geometry: geometryMap[data.geometry] ? data.geometry : 'box',
+        position: parseVector3(data.position, [0, 0, 0]),
+        rotation: parseVector3(data.rotation, [0, 0, 0]),
+        scale: parseVector3(data.scale, [1, 1, 1]),
+        material: {
+            type: data.material?.type || 'standard',
+            color: parseColor(data.material?.color, '#888888'),
+            roughness: clamp(data.material?.roughness ?? 0.5, 0, 1),
+            metalness: clamp(data.material?.metalness ?? 0, 0, 1),
+            opacity: clamp(data.material?.opacity ?? 1, 0, 1),
+        }
+    };
+}</code></pre>
+
+    <h4>Semantic Mapping: Concepts to Parameters</h4>
+    <p>Some natural language concepts need translation beyond simple geometry:</p>
+
+    <table>
+      <thead>
+        <tr><th>Natural Language</th><th>3D Translation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>"floating"</td><td>position.y &gt; ground level</td></tr>
+        <tr><td>"tiny"</td><td>scale &times; 0.3</td></tr>
+        <tr><td>"huge"</td><td>scale &times; 3.0</td></tr>
+        <tr><td>"glowing"</td><td>emissive material + point light</td></tr>
+        <tr><td>"transparent"</td><td>opacity &lt; 1, transparent: true</td></tr>
+        <tr><td>"metallic"</td><td>metalness: 0.9, roughness: 0.1</td></tr>
+        <tr><td>"wooden"</td><td>color: brown, roughness: 0.8</td></tr>
+        <tr><td>"glass"</td><td>opacity: 0.3, metalness: 0.1, roughness: 0.0</td></tr>
+      </tbody>
+    </table>
+
+    <p>You can handle this either in the prompt (tell AI to use specific values for "glowing") or in the builder (detect special keywords and apply effects).</p>
+
+    <div class="callout-box" data-type="insight">
+      <div class="callout-icon">Key Insight</div>
+      <div class="callout-content">
+        <p>The scene builder should be forgiving. If the AI makes a small mistake, the builder should still produce something visible rather than crashing. Graceful degradation &gt; hard failures.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Key Terminology -->
+  <div class="section terminology">
+    <h3>Key Terminology</h3>
+
+    <div class="flashcard-set" data-set="day13-terms">
+      <div class="flashcard" data-card="1">
+        <div class="flashcard-front"><dt>Scene Builder</dt></div>
+        <div class="flashcard-back"><dd>Class that converts JSON to Three.js objects. Example: <code>sceneBuilder.build(jsonData)</code></dd></div>
+      </div>
+      <div class="flashcard" data-card="2">
+        <div class="flashcard-front"><dt>Geometry Map</dt></div>
+        <div class="flashcard-back"><dd>Dictionary mapping string names to Three.js geometry constructors. Example: <code>'sphere' &rarr; SphereGeometry</code></dd></div>
+      </div>
+      <div class="flashcard" data-card="3">
+        <div class="flashcard-front"><dt>Defensive Parsing</dt></div>
+        <div class="flashcard-back"><dd>Handling missing or invalid data gracefully with sensible defaults instead of crashing. Example: defaults for missing fields.</dd></div>
+      </div>
+      <div class="flashcard" data-card="4">
+        <div class="flashcard-front"><dt>Semantic Mapping</dt></div>
+        <div class="flashcard-back"><dd>Translating natural language concepts to specific 3D parameters. Example: "glowing" &rarr; emissive material with a point light.</dd></div>
+      </div>
+      <div class="flashcard" data-card="5">
+        <div class="flashcard-front"><dt>Clamping</dt></div>
+        <div class="flashcard-back"><dd>Restricting a value to a valid range. Example: <code>Math.max(0, Math.min(1, value))</code> keeps a value between 0 and 1.</dd></div>
+      </div>
+      <div class="flashcard" data-card="6">
+        <div class="flashcard-front"><dt>Schema Validation</dt></div>
+        <div class="flashcard-back"><dd>Checking that data matches an expected structure before processing it. Can use JSON Schema or custom validation functions.</dd></div>
+      </div>
+    </div>
+    <div class="flashcard-controls">
+      <button class="flashcard-prev" aria-label="Previous card">&larr;</button>
+      <span class="flashcard-counter">1 / 6</span>
+      <button class="flashcard-next" aria-label="Next card">&rarr;</button>
+      <button class="flashcard-flip" aria-label="Flip card">Flip</button>
+    </div>
+  </div>
+
+  <!-- 4. Code Examples -->
+  <div class="section code-examples">
+    <h3>Code Examples</h3>
+
+    <h4>Example 1: Complete Scene Builder</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">SceneBuilder.js</span>
+        <span class="badge">Core Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import * as THREE from 'three';
+
+class SceneBuilder {
+    constructor(scene, camera) {
+        this.scene = scene;
+        this.camera = camera;
+        this.createdObjects = [];
+    }
+
+    // Geometry factories
+    static geometryMap = {
+        'box': (s) =&gt; new THREE.BoxGeometry(s[0], s[1], s[2]),
+        'sphere': (s) =&gt; new THREE.SphereGeometry(Math.max(...s) * 0.5, 32, 32),
+        'cylinder': (s) =&gt; new THREE.CylinderGeometry(s[0] * 0.5, s[0] * 0.5, s[1], 32),
+        'cone': (s) =&gt; new THREE.ConeGeometry(s[0] * 0.5, s[1], 32),
+        'torus': (s) =&gt; new THREE.TorusGeometry(s[0] * 0.5, Math.min(...s) * 0.3, 16, 48),
+        'plane': (s) =&gt; new THREE.PlaneGeometry(s[0], s[2] || s[1]),
+        'icosahedron': (s) =&gt; new THREE.IcosahedronGeometry(Math.max(...s) * 0.5, 1),
+    };
+
+    // Material factory
+    createMaterial(matData) {
+        const params = {
+            color: new THREE.Color(matData.color || '#888888'),
+            roughness: this.clamp(matData.roughness ?? 0.5, 0, 1),
+            metalness: this.clamp(matData.metalness ?? 0, 0, 1),
+        };
+
+        if (matData.opacity !== undefined &amp;&amp; matData.opacity &lt; 1) {
+            params.transparent = true;
+            params.opacity = this.clamp(matData.opacity, 0, 1);
+        }
+
+        if (matData.emissive) {
+            params.emissive = new THREE.Color(matData.emissive);
+            params.emissiveIntensity = matData.emissiveIntensity || 0.5;
+        }
+
+        switch (matData.type) {
+            case 'physical':
+                return new THREE.MeshPhysicalMaterial(params);
+            case 'basic':
+                return new THREE.MeshBasicMaterial({
+                    color: params.color,
+                    transparent: params.transparent,
+                    opacity: params.opacity
+                });
+            default:
+                return new THREE.MeshStandardMaterial(params);
+        }
+    }
+
+    // Create a single object from JSON
+    createObject(data) {
+        const scale = this.parseVec3(data.scale, [1, 1, 1]);
+
+        // Get geometry (fall back to box)
+        const geoFactory = SceneBuilder.geometryMap[data.geometry]
+            || SceneBuilder.geometryMap['box'];
+        const geometry = geoFactory(scale);
+
+        // Create material
+        const material = this.createMaterial(data.material || {});
+
+        // Create mesh
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.name = data.name || 'unnamed';
+        mesh.position.fromArray(this.parseVec3(data.position, [0, 0, 0]));
+        mesh.rotation.fromArray(this.parseVec3(data.rotation, [0, 0, 0]));
+
+        // Shadows
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        return mesh;
+    }
+
+    // Create all objects
+    createObjects(objectsData) {
+        if (!Array.isArray(objectsData)) return;
+
+        objectsData.forEach((objData) =&gt; {
+            try {
+                const mesh = this.createObject(objData);
+                this.scene.add(mesh);
+                this.createdObjects.push(mesh);
+            } catch (e) {
+                console.warn(`Failed to create object "${objData.name}":`, e);
+            }
+        });
+    }
+
+    // Create lights
+    createLights(lightsData) {
+        if (!Array.isArray(lightsData)) {
+            // Default lighting if none specified
+            const ambient = new THREE.AmbientLight(0x404040, 0.5);
+            const dir = new THREE.DirectionalLight(0xffffff, 1);
+            dir.position.set(5, 10, 5);
+            this.scene.add(ambient, dir);
+            this.createdObjects.push(ambient, dir);
+            return;
+        }
+
+        lightsData.forEach((lightData) =&gt; {
+            let light;
+            const color = new THREE.Color(lightData.color || '#ffffff');
+            const intensity = lightData.intensity ?? 1;
+
+            switch (lightData.type) {
+                case 'ambient':
+                    light = new THREE.AmbientLight(color, intensity);
+                    break;
+                case 'point':
+                    light = new THREE.PointLight(color, intensity, 50);
+                    break;
+                case 'spot':
+                    light = new THREE.SpotLight(color, intensity);
+                    break;
+                case 'directional':
+                default:
+                    light = new THREE.DirectionalLight(color, intensity);
+                    break;
+            }
+
+            if (lightData.position &amp;&amp; light.position) {
+                light.position.fromArray(this.parseVec3(lightData.position, [5, 10, 5]));
+            }
+
+            if (lightData.castShadow &amp;&amp; light.castShadow !== undefined) {
+                light.castShadow = true;
+                if (light.shadow) {
+                    light.shadow.mapSize.set(1024, 1024);
+                }
+            }
+
+            this.scene.add(light);
+            this.createdObjects.push(light);
+        });
+    }
+
+    // Setup camera from data
+    setupCamera(cameraData) {
+        if (!cameraData) return;
+
+        if (cameraData.position) {
+            this.camera.position.fromArray(this.parseVec3(cameraData.position, [5, 5, 10]));
+        }
+        if (cameraData.lookAt) {
+            this.camera.lookAt(...this.parseVec3(cameraData.lookAt, [0, 0, 0]));
+        }
+        if (cameraData.fov) {
+            this.camera.fov = this.clamp(cameraData.fov, 30, 120);
+            this.camera.updateProjectionMatrix();
+        }
+    }
+
+    // Setup environment
+    setupEnvironment(envData) {
+        if (!envData) return;
+        if (envData.background) {
+            this.scene.background = new THREE.Color(envData.background);
+        }
+    }
+
+    // Build entire scene from JSON
+    build(sceneData) {
+        this.clear();
+        this.createObjects(sceneData.objects);
+        this.createLights(sceneData.lights);
+        this.setupCamera(sceneData.camera);
+        this.setupEnvironment(sceneData.environment);
+        console.log(`Scene built: ${this.createdObjects.length} objects created`);
+    }
+
+    // Clean up previous scene
+    clear() {
+        this.createdObjects.forEach((obj) =&gt; {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) {
+                if (Array.isArray(obj.material)) {
+                    obj.material.forEach(m =&gt; m.dispose());
+                } else {
+                    obj.material.dispose();
+                }
+            }
+            this.scene.remove(obj);
+        });
+        this.createdObjects = [];
+    }
+
+    // Utility: parse array to Vector3 values
+    parseVec3(arr, fallback) {
+        if (!Array.isArray(arr) || arr.length &lt; 3) return [...fallback];
+        return arr.map((v, i) =&gt; (typeof v === 'number' &amp;&amp; isFinite(v)) ? v : fallback[i]);
+    }
+
+    // Utility: clamp value to range
+    clamp(value, min, max) {
+        return Math.max(min, Math.min(max, Number(value) || min));
+    }
+}
+
+export { SceneBuilder };</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> This is the complete scene builder class. It handles geometry creation, material creation, lighting, camera setup, and cleanup. Every method has fallback defaults and error handling. You'll reuse this class throughout the rest of the course.
+      </div>
+    </div>
+
+    <h4>Example 2: Using the Scene Builder</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">test-scene.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">import { SceneBuilder } from './SceneBuilder.js';
+
+// Setup Three.js (abbreviated)
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+// ... renderer, controls setup ...
+
+const builder = new SceneBuilder(scene, camera);
+
+// Test with hardcoded JSON (simulating AI output)
+const testScene = {
+    objects: [
+        {
+            name: "floor",
+            geometry: "plane",
+            position: [0, 0, 0],
+            rotation: [-1.5708, 0, 0],
+            scale: [20, 20, 1],
+            material: { type: "standard", color: "#333333", roughness: 0.8, metalness: 0.2 }
+        },
+        {
+            name: "pedestal",
+            geometry: "cylinder",
+            position: [0, 0.5, 0],
+            rotation: [0, 0, 0],
+            scale: [1.5, 1, 1.5],
+            material: { type: "standard", color: "#ffffff", roughness: 0.3, metalness: 0.1 }
+        },
+        {
+            name: "trophy",
+            geometry: "icosahedron",
+            position: [0, 1.5, 0],
+            rotation: [0, 0.5, 0],
+            scale: [0.8, 0.8, 0.8],
+            material: { type: "standard", color: "#FFD700", roughness: 0.1, metalness: 0.9 }
+        }
+    ],
+    lights: [
+        { type: "ambient", color: "#404060", intensity: 0.4 },
+        { type: "directional", color: "#ffffff", intensity: 1.5, position: [5, 10, 5], castShadow: true },
+        { type: "point", color: "#4488ff", intensity: 0.8, position: [-3, 3, -3] }
+    ],
+    camera: { position: [4, 3, 4], lookAt: [0, 1, 0], fov: 60 },
+    environment: { background: "#0a0a1a" }
+};
+
+builder.build(testScene);</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> We test the builder with hardcoded JSON before connecting AI. This ensures the builder works correctly, independent of AI output quality. Tomorrow's mini-project will connect real AI output to this builder.
+      </div>
+    </div>
+
+    <h4>Example 3: JSON Extraction from AI Response</h4>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-header">
+        <span class="filename">extract-json.js</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code class="language-javascript">// AI sometimes wraps JSON in markdown code blocks or adds text
+function extractJSON(text) {
+    // Try direct parse first
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        // Not pure JSON
+    }
+
+    // Try extracting from code block
+    const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+        try {
+            return JSON.parse(codeBlockMatch[1].trim());
+        } catch (e) {
+            // Invalid JSON in code block
+        }
+    }
+
+    // Try finding JSON object in text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+        try {
+            return JSON.parse(jsonMatch[0]);
+        } catch (e) {
+            // Found braces but not valid JSON
+        }
+    }
+
+    throw new Error('Could not extract valid JSON from AI response');
+}</code></pre>
+      <div class="code-explanation">
+        <strong>What's happening:</strong> Even with good prompts, AI sometimes wraps JSON in markdown or adds explanatory text. This extractor tries multiple strategies to find valid JSON in the response.
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Hands-On Exercises -->
+  <div class="section exercises">
+    <h3>Hands-On Exercises</h3>
+
+    <div class="exercise-card" data-exercise="1">
+      <div class="exercise-header">
+        <h4>Exercise 1: Build the Scene Builder</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Implement the SceneBuilder class in your project</p>
+      <ol class="exercise-steps">
+        <li>Create <code>src/SceneBuilder.js</code> with the code from Example 1</li>
+        <li>Create a test file that imports and uses it</li>
+        <li>Test with the sample JSON from Example 2</li>
+        <li>Verify all objects appear correctly positioned</li>
+        <li>Test the clear() method &mdash; does it properly clean up?</li>
+      </ol>
+      <p><strong>Expected Output:</strong> A 3D scene rendered from JSON data, with a golden icosahedron on a white pedestal.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="2">
+      <div class="exercise-header">
+        <h4>Exercise 2: Edge Case Testing</h4>
+        <span class="time-estimate">~15 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Make the builder bulletproof</p>
+      <ol class="exercise-steps">
+        <li>Test with missing geometry: <code>{ "name": "test", "position": [0,0,0] }</code></li>
+        <li>Test with invalid values: <code>{ "geometry": "nonexistent", "material": { "roughness": 5 } }</code></li>
+        <li>Test with empty objects array: <code>{ "objects": [] }</code></li>
+        <li>Test with completely invalid JSON structure</li>
+        <li>Each test should produce something (even a default box) instead of crashing</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Builder handles all edge cases gracefully with console warnings.</p>
+    </div>
+
+    <div class="exercise-card" data-exercise="3">
+      <div class="exercise-header">
+        <h4>Exercise 3: Semantic Enhancement</h4>
+        <span class="time-estimate">~20 min</span>
+      </div>
+      <p class="exercise-goal"><strong>Goal:</strong> Add natural language concept support</p>
+      <ol class="exercise-steps">
+        <li>Add support for "emissive" / "glowing" materials</li>
+        <li>Add support for "transparent" / "glass" materials</li>
+        <li>Add a "group" feature &mdash; objects can contain children</li>
+        <li>Add support for a "floor" shorthand that auto-creates a ground plane</li>
+        <li>Test each enhancement with appropriate JSON input</li>
+      </ol>
+      <p><strong>Expected Output:</strong> Glowing objects, glass materials, and grouped objects rendering correctly.</p>
+    </div>
+  </div>
+
+  <!-- 6. Curated Resources -->
+  <div class="section resources">
+    <h3>Curated Resources</h3>
+    <div class="resource-cards">
+      <a class="resource-card" href="https://threejs.org/manual/#en/creating-a-scene" target="_blank" rel="noopener">
+        <span class="resource-type">Docs</span>
+        <span class="resource-title">Creating a Scene &mdash; Three.js Manual</span>
+        <span class="resource-meta">Three.js &mdash; Refresher on programmatic scene creation (what the builder automates)</span>
+      </a>
+      <a class="resource-card" href="https://json-schema.org/learn/getting-started-step-by-step" target="_blank" rel="noopener">
+        <span class="resource-type">Guide</span>
+        <span class="resource-title">JSON Schema &mdash; Getting Started</span>
+        <span class="resource-meta">json-schema.org &mdash; Formal approach to defining and validating JSON structures</span>
+      </a>
+      <a class="resource-card" href="https://www.youtube.com/watch?v=pUgWfqWZWmM" target="_blank" rel="noopener">
+        <span class="resource-type">Video</span>
+        <span class="resource-title">Getting Started with THREE.JS &mdash; DesignCourse</span>
+        <span class="resource-meta">DesignCourse &mdash; Review of programmatic scene building patterns (20 min)</span>
+      </a>
+      <a class="resource-card" href="https://refactoring.guru/design-patterns/factory-method" target="_blank" rel="noopener">
+        <span class="resource-type">Deep Dive</span>
+        <span class="resource-title">Factory Pattern &mdash; Refactoring Guru</span>
+        <span class="resource-meta">Refactoring Guru &mdash; The geometry/material mapping is a factory pattern; understanding it helps you extend it</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 7. Reflection Questions -->
+  <div class="section reflection">
+    <h3>Reflection Questions</h3>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Why do we separate the AI prompt layer from the scene building layer?</p>
+      <textarea placeholder="Think about testability, debugging, and separation of concerns..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How would you extend the builder to support loading GLTF models from a URL specified in the JSON?</p>
+      <textarea placeholder="Think about async loading, the GLTFLoader, and how the JSON schema would change..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">How does the defensive parsing relate to the validation you built in Day 12?</p>
+      <textarea placeholder="Think about where validation happens: in the prompt, in the parser, or both..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">Should the scene builder support animations? What would that JSON look like?</p>
+      <textarea placeholder="Think about keyframes, easing functions, and how to represent motion in JSON..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+
+    <div class="reflection-card">
+      <p class="reflection-prompt">What features does your portfolio's scene builder need that aren't covered yet?</p>
+      <textarea placeholder="Think about your specific portfolio goals and what 3D elements you want to showcase..."></textarea>
+      <button class="save-reflection">Save</button>
+    </div>
+  </div>
+
+  <!-- 8. Next Steps -->
+  <div class="section next-steps">
+    <h3>Next Steps</h3>
+    <p><strong>Tomorrow:</strong> <a href="14-mini-project.html">Day 14: Week 2 Mini-Project &mdash; Prompt-Driven Scene Generator</a> &mdash; Connect everything into a working prototype where you type a description and see a 3D scene.</p>
+
+    <p>You now have both halves of the AI-to-3D pipeline: prompts that generate JSON (Day 12) and a builder that renders JSON as 3D scenes (today). Tomorrow you'll connect them into a working demo.</p>
+
+    <div class="checklist">
+      <label><input type="checkbox"> I can build a 3D scene from JSON data using SceneBuilder</label>
+      <label><input type="checkbox"> I can handle missing and invalid data gracefully</label>
+      <label><input type="checkbox"> I can extract JSON from messy AI responses</label>
+      <label><input type="checkbox"> I can map geometry names to Three.js constructors</label>
+      <label><input type="checkbox"> I can clear and rebuild scenes without memory leaks</label>
+    </div>
+  </div>
+
+  <!-- Bottom navigation -->
+  </section>

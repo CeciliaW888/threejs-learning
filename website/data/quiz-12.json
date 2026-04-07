@@ -1,0 +1,35 @@
+[
+  {
+    "question": "What is the purpose of a system prompt when working with an LLM?",
+    "options": [
+      "To display error messages to the user",
+      "To set the AI's role, behavior, and constraints before the conversation begins",
+      "To encrypt the user's messages",
+      "To speed up the model's response time"
+    ],
+    "answer": 1,
+    "explanation": "A system prompt provides instructions that shape how the AI responds throughout the conversation, including its role, tone, and output format."
+  },
+  {
+    "question": "What is 'few-shot prompting'?",
+    "options": [
+      "Sending very short prompts to save tokens",
+      "Limiting the model to a few responses",
+      "Providing example input-output pairs so the model learns the expected pattern",
+      "Running the model multiple times and picking the best result"
+    ],
+    "answer": 2,
+    "explanation": "Few-shot prompting includes examples of desired input-output pairs in the prompt, helping the model understand the expected format and behavior."
+  },
+  {
+    "question": "What does the 'temperature' parameter control in LLM responses?",
+    "options": [
+      "The speed of response generation",
+      "The maximum length of the response",
+      "The language of the response",
+      "The randomness and creativity of the output"
+    ],
+    "answer": 3,
+    "explanation": "Temperature controls randomness: lower values (e.g., 0) produce more deterministic, focused output, while higher values produce more varied, creative responses."
+  }
+]

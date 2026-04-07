@@ -1,0 +1,35 @@
+[
+  {
+    "question": "In a text-to-3D pipeline, what is the correct order of the main components?",
+    "options": [
+      "Scene Builder \u00e2\u2020\u2019 API Client \u00e2\u2020\u2019 JSON Parser \u00e2\u2020\u2019 UI Controller",
+      "UI Controller \u00e2\u2020\u2019 API Client \u00e2\u2020\u2019 JSON Parser \u00e2\u2020\u2019 Scene Builder",
+      "API Client \u00e2\u2020\u2019 Scene Builder \u00e2\u2020\u2019 UI Controller \u00e2\u2020\u2019 JSON Parser",
+      "JSON Parser \u00e2\u2020\u2019 UI Controller \u00e2\u2020\u2019 API Client \u00e2\u2020\u2019 Scene Builder"
+    ],
+    "answer": 1,
+    "explanation": "The UI captures user input, the API client sends it to the LLM, the JSON parser extracts structured scene data from the response, and the Scene Builder creates the 3D objects."
+  },
+  {
+    "question": "Why is separating the pipeline into distinct modules (API client, parser, builder, UI) beneficial?",
+    "options": [
+      "It makes the code run faster",
+      "It reduces the total lines of code",
+      "Each module can be tested, debugged, and replaced independently",
+      "It eliminates the need for error handling"
+    ],
+    "answer": 2,
+    "explanation": "Separation of concerns makes each piece easier to understand, test, and maintain. You can swap out the API client or parser without affecting other modules."
+  },
+  {
+    "question": "What should the JSON parser do if the LLM returns invalid or incomplete JSON?",
+    "options": [
+      "Crash the application immediately",
+      "Silently ignore it and show nothing",
+      "Send the request again without telling the user",
+      "Attempt to fix or extract valid data, and use sensible defaults for missing fields"
+    ],
+    "answer": 3,
+    "explanation": "Robust parsers try to extract usable data, apply defaults for missing fields, and gracefully handle errors rather than crashing or silently failing."
+  }
+]
