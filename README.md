@@ -34,37 +34,37 @@ By the end of this course, you will be able to:
 
 | Day | Topic | Type |
 |-----|-------|------|
-| [1](./week-01/day-01-intro-threejs.md) | Introduction to 3D on the Web & Three.js | Foundations |
-| [2](./week-01/day-02-first-scene.md) | Setting Up Your First Scene | Foundations |
-| [3](./week-01/day-03-geometries-materials.md) | Geometries & Materials | Concepts |
-| [4](./week-01/day-04-materials-textures.md) | Materials Deep Dive | Concepts |
-| [5](./week-01/day-05-lighting.md) | Lighting Fundamentals | Concepts |
-| [6](./week-01/day-06-textures.md) | Textures & Asset Loading | Concepts |
-| [7](./week-01/day-07-mini-project.md) | Mini Project — 3D Product Showcase | Project |
+| 1 | [Introduction to 3D on the Web & Three.js](./week-01/day-01-intro-threejs.md) | Foundations |
+| 2 | [Setting Up Your First Scene](./week-01/day-02-first-scene.md) | Foundations |
+| 3 | [Geometries & Materials](./week-01/day-03-geometries-materials.md) | Concepts |
+| 4 | [Materials Deep Dive](./week-01/day-04-materials-textures.md) | Concepts |
+| 5 | [Lighting Fundamentals](./week-01/day-05-lighting.md) | Concepts |
+| 6 | [Textures & Asset Loading](./week-01/day-06-textures.md) | Concepts |
+| 7 | [Mini Project — 3D Product Showcase](./week-01/day-07-mini-project.md) | Project |
 
 ### Week 2: Advanced Techniques + Prompt Engineering
 
 | Day | Topic | Type |
 |-----|-------|------|
-| [8](./week-02/day-08-animation.md) | Animation Fundamentals | Concepts |
-| [9](./week-02/day-09-loading-models.md) | Loading 3D Models (GLTF/GLB) | Concepts |
-| [10](./week-02/day-10-shadows-lighting.md) | Shadows & Realistic Lighting | Concepts |
-| [11](./week-02/day-11-performance.md) | Performance Optimization | Advanced |
-| [12](./week-02/day-12-prompt-engineering.md) | Intro to Prompt Engineering for 3D | Concepts |
-| [13](./week-02/day-13-language-to-3d.md) | Mapping Natural Language to 3D Parameters | Advanced |
-| [14](./week-02/day-14-mini-project.md) | Mini Project — Prompt-Driven Scene Generator | Project |
+| 8 | [Animation Fundamentals](./week-02/day-08-animation.md) | Concepts |
+| 9 | [Loading 3D Models (GLTF/GLB)](./week-02/day-09-loading-models.md) | Concepts |
+| 10 | [Shadows & Realistic Lighting](./week-02/day-10-shadows-lighting.md) | Concepts |
+| 11 | [Performance Optimization](./week-02/day-11-performance.md) | Advanced |
+| 12 | [Intro to Prompt Engineering for 3D](./week-02/day-12-prompt-engineering.md) | Concepts |
+| 13 | [Mapping Natural Language to 3D Parameters](./week-02/day-13-language-to-3d.md) | Advanced |
+| 14 | [Mini Project — Prompt-Driven Scene Generator](./week-02/day-14-mini-project.md) | Project |
 
 ### Week 3: AI Integration & Portfolio
 
 | Day | Topic | Type |
 |-----|-------|------|
-| [15](./week-03/day-15-llm-apis.md) | Introduction to LLM APIs (Claude & OpenAI) | Concepts |
-| [16](./week-03/day-16-text-to-3d-pipeline.md) | Building a Text-to-3D Pipeline | Advanced |
-| [17](./week-03/day-17-realtime-modifications.md) | Real-Time Scene Modifications | Advanced |
-| [18](./week-03/day-18-memory-context.md) | Adding Memory & Context to AI Agent | Concepts |
-| [19](./week-03/day-19-advanced-prompting.md) | Advanced Prompting Techniques | Advanced |
-| [20](./week-03/day-20-deployment.md) | Deployment & Production Best Practices | Advanced |
-| [21](./week-03/day-21-final-project.md) | Final Project — AI Portfolio Generator | Project |
+| 15 | [Introduction to LLM APIs (Claude & OpenAI)](./week-03/day-15-llm-apis.md) | Concepts |
+| 16 | [Building a Text-to-3D Pipeline](./week-03/day-16-text-to-3d-pipeline.md) | Advanced |
+| 17 | [Real-Time Scene Modifications](./week-03/day-17-realtime-modifications.md) | Advanced |
+| 18 | [Adding Memory & Context to AI Agent](./week-03/day-18-memory-context.md) | Concepts |
+| 19 | [Advanced Prompting Techniques](./week-03/day-19-advanced-prompting.md) | Advanced |
+| 20 | [Deployment & Production Best Practices](./week-03/day-20-deployment.md) | Advanced |
+| 21 | [Final Project — AI Portfolio Generator](./week-03/day-21-final-project.md) | Project |
 
 ## Get Started
 

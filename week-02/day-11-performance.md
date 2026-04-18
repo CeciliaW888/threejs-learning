@@ -375,11 +375,11 @@ Measurable performance improvement with documented before/after numbers.
 ### Video Resources
 
 3. **Three.js Optimization - Best Practices and Techniques** — Valentin's Coding Book
-   - 🎥 https://www.youtube.com/watch?v=dc5iJVInpPY (⚠️ VERIFIED)
+   - 🎥 https://www.youtube.com/watch?v=dc5iJVInpPY
    - Why: Comprehensive walkthrough of optimization techniques with live examples
 
 4. **Better Performance With LOD in Three.js** — Wael Yasmina
-   - 🎥 https://www.youtube.com/watch?v=IsRBxh4Jb18 (⚠️ VERIFIED)
+   - 🎥 https://www.youtube.com/watch?v=IsRBxh4Jb18
    - Why: Practical LOD implementation tutorial
 
 ### Deep Dives (optional)

@@ -260,9 +260,9 @@ You can give each cube a name (e.g., `cube1`, `cube2`) and reference them indivi
 
 ### Video Resources
 
-3. **Learn Three.js from Scratch** — Chris Courses
-   - 🎥 https://www.youtube.com/watch?v=YK1Sw_hnm58 (⚠️ VERIFIED, first 15 min)
-   - Why: Step-by-step walkthrough of creating your first scene
+3. **Vibe Coding Three.js** — Robot Bobby (2025)
+   - 🎥 https://www.youtube.com/watch?v=GL0HAJ8xjww
+   - Why: Build your first Three.js scene with AI assistance — the modern workflow
 
 ### Deep Dives (optional)
 

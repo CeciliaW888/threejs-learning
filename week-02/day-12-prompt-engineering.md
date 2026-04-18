@@ -350,9 +350,9 @@ A documented progression from bad to good prompt with specific improvement notes
 
 ### Video Resources
 
-3. **Prompt Engineering for Beginners: Full Workshop** — 9x
-   - 🎥 https://www.youtube.com/watch?v=QnZYrD5ia7c (⚠️ VERIFIED)
-   - Why: Comprehensive workshop covering all prompt engineering fundamentals
+3. **How to Code Art with AI #threejs** — Robot Bobby (2025)
+   - 🎥 https://www.youtube.com/watch?v=6UACcBwnbqw
+   - Why: How to collaborate with an LLM to design and prompt-generate Three.js generative art
 
 ### Deep Dives (optional)
 

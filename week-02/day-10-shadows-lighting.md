@@ -329,13 +329,13 @@ Your portfolio scene looking dramatically better with professional lighting.
 
 ### Video Resources
 
-3. **Three.js Realistic Lighting Setup Tutorial** — Red Stapler
-   - 🎥 https://www.youtube.com/watch?v=7GGNzryHfTw (⚠️ VERIFIED)
-   - Why: Practical walkthrough of achieving realistic lighting in Three.js
+3. **Realistic Reflections in Three.js with Environment Mapping** — Dan Greenheck (2024)
+   - 🎥 https://www.youtube.com/watch?v=7gtrBJzm2xE
+   - Why: PBR materials, HDR environment maps, and realistic lighting setup
 
-4. **Build a Mindblowing 3D Portfolio Website** — Fireship
-   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU (⚠️ VERIFIED, 12 min)
-   - Why: See lighting techniques applied in a real portfolio project
+4. **Three.js Lighting Tutorial: HemisphereLight + DirectionalLight (Crisp Shadows)** — Pixel Grid UI (2025)
+   - 🎥 https://www.youtube.com/watch?v=bRCfC9ZASR8
+   - Why: Focused shadow setup with directional and hemisphere lights
 
 ### Deep Dives (optional)
 

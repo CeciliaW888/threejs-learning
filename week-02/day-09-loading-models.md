@@ -319,13 +319,9 @@ A workspace scene with smooth loading experience and error handling.
 
 ### Video Resources
 
-3. **How to Load a 3D model in Three.js | GLTF/GLB Model | GLTFLoader** — Knightcube 3D
-   - 🎥 https://www.youtube.com/watch?v=yPA2z7fl4J8 (⚠️ VERIFIED)
-   - Why: Clear walkthrough of GLTF vs GLB and loading process
-
-4. **Three.js Importing Models Tutorial** — Suboptimal Engineer
-   - 🎥 https://www.youtube.com/watch?v=WBe3xrV4CPM (⚠️ VERIFIED)
-   - Why: Comprehensive guide covering model import, positioning, and common issues
+3. **Three.js Tutorial: How to Load a Model** — Robot Bobby (2024)
+   - 🎥 https://www.youtube.com/watch?v=ylyLefnMc1c
+   - Why: Loading 3D models and HDR environments with GLTFLoader — exact topic, recent video
 
 ### Deep Dives (optional)
 

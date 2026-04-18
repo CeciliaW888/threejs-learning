@@ -252,12 +252,12 @@ Think about how 3D can showcase your work in unique ways. Could projects be disp
 ### Video Resources
 
 3. **Build a Mindblowing 3D Portfolio Website** — Fireship
-   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU (⚠️ VERIFIED, 12 min)
-   - Why: Quick overview of what's possible with Three.js, great motivation
+   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU
+   - Why: Quick, high-energy overview of what's possible with Three.js — great for motivation
 
-4. **Getting Started with THREE.JS in 2021!** — DesignCourse
-   - 🎥 https://www.youtube.com/watch?v=pUgWfqWZWmM (⚠️ VERIFIED, 20 min)
-   - Why: Beginner-friendly walkthrough of setup and basic concepts
+4. **Vibe Coding Three.js** — Robot Bobby (2025)
+   - 🎥 https://www.youtube.com/watch?v=GL0HAJ8xjww
+   - Why: See the modern AI-assisted workflow — building a scene without hand-typing every line
 
 ### Deep Dives (optional)
 

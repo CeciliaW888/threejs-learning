@@ -315,8 +315,8 @@ For the moon: add it directly to the earth mesh (not the group). Then rotate ear
 ### Video Resources
 
 3. **Build a Mindblowing 3D Portfolio Website** — Fireship
-   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU (⚠️ VERIFIED, 12 min)
-   - Why: See how geometries and compositions come together in a real portfolio
+   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU
+   - Why: See geometries and materials in action in a real portfolio project
 
 ### Deep Dives (optional)
 

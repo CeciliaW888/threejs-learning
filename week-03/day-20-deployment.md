@@ -369,11 +369,11 @@ Measurable performance improvement (target: >90 Lighthouse score).
 ### Video Resources
 
 3. **How to Deploy Three.js Projects** — Freddy Minn
-   - 🎥 https://www.youtube.com/watch?v=qyZ48DAajE0 (⚠️ VERIFIED)
+   - 🎥 https://www.youtube.com/watch?v=qyZ48DAajE0
    - Why: Step-by-step Three.js deployment to Vercel
 
 4. **Using Vite to Create a Three.js Project (+ Deploy on Netlify)** — Frederik De Bleser
-   - 🎥 https://www.youtube.com/watch?v=2x9AuM6xpxg (⚠️ VERIFIED)
+   - 🎥 https://www.youtube.com/watch?v=2x9AuM6xpxg
    - Why: Alternative deployment to Netlify
 
 ---

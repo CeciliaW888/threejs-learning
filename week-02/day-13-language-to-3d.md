@@ -506,9 +506,9 @@ Glowing objects, glass materials, and grouped objects rendering correctly.
 
 ### Video Resources
 
-3. **Getting Started with THREE.JS** — DesignCourse
-   - 🎥 https://www.youtube.com/watch?v=pUgWfqWZWmM (⚠️ VERIFIED, 20 min)
-   - Why: Review of programmatic scene building patterns
+3. **Three.js and AI Agents: A New Workflow** — Robot Bobby (2025)
+   - 🎥 https://www.youtube.com/watch?v=ckaizd-tZtI
+   - Why: Use natural language to instruct an AI agent to build Three.js scenes — directly on topic
 
 ### Deep Dives (optional)
 

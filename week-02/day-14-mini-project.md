@@ -443,9 +443,9 @@ Set all materials to `transparent: true`, then animate opacity from 1→0 and 0�
 
 ### Video Resources
 
-3. **Build a Mindblowing 3D Portfolio Website** — Fireship
-   - 🎥 https://www.youtube.com/watch?v=Q7AOvWpIVHU (⚠️ VERIFIED, 12 min)
-   - Why: Inspiration for the final portfolio look and feel
+3. **Claude Code + Three.js Tutorial: Build an Interactive 3D Room with AI** — ABV (2026)
+   - 🎥 https://www.youtube.com/watch?v=zpUWXJNgvnM
+   - Why: Uses Claude Code to build a complete 3D scene from prompts — ideal mini-project inspiration
 
 ---
 
